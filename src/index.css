@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  background: #E8F4FD;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 430px;
+  height: 100dvh;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 手機全螢幕 */
+@media (min-width: 431px) {
+  body {
+    background: linear-gradient(135deg, #C8A8E9 0%, #A8D8EA 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+  }
+  #root {
+    border-radius: 40px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+    overflow: hidden;
+  }
+}
+
+/* 自訂捲動條 */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #C8A8E9; border-radius: 4px; }
+
+/* 通用按鈕觸感 */
+.tap-bounce {
+  transition: transform 0.1s;
+  cursor: pointer;
+}
+.tap-bounce:active {
+  transform: scale(0.93);
+}
+
+/* 柔和陰影 */
+.soft-shadow {
+  box-shadow: 0 4px 20px rgba(200, 168, 233, 0.4);
+}
+
+/* 星星閃爍 */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.star { animation: twinkle 2s ease-in-out infinite; }
+.star:nth-child(2n) { animation-delay: 0.5s; }
+.star:nth-child(3n) { animation-delay: 1s; }
+
+/* 怪物血條動畫 */
+@keyframes hpDrain {
+  from { width: var(--from); }
+  to { width: var(--to); }
+}
+
+/* 傷害數字 */
+@keyframes damageFloat {
+  0% { transform: translateY(0) scale(1.4); opacity: 1; }
+  100% { transform: translateY(-70px) scale(0.8); opacity: 0; }
+}
+.damage-num {
+  animation: damageFloat 0.9s ease-out forwards;
+  pointer-events: none;
+  font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* 怪物受擊 */
+@keyframes monsterHit {
+  0% { filter: brightness(1); transform: translateX(0); }
+  20% { filter: brightness(3) saturate(0); transform: translateX(-8px); }
+  40% { filter: brightness(3) saturate(0); transform: translateX(8px); }
+  60% { filter: brightness(2); transform: translateX(-4px); }
+  100% { filter: brightness(1); transform: translateX(0); }
+}
+.monster-hit { animation: monsterHit 0.5s ease-out; }
+
+/* 漂浮動畫 */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.floating { animation: floatY 3s ease-in-out infinite; }
+
+/* 入場動畫 */
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.slide-up { animation: slideUp 0.4s ease-out; }
+
+/* 建築點擊效果 */
+@keyframes buildingPop {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.08) translateY(-4px); }
+  100% { transform: scale(1) translateY(0); }
+}
+.building-pop { animation: buildingPop 0.3s ease-out; }
