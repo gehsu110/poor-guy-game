@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap');
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -10,8 +12,8 @@
 
 body {
   margin: 0;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  background: #E8F4FD;
+  font-family: 'Noto Serif TC', serif;
+  background: #0D0B1A;
   overflow: hidden;
 }
 
@@ -22,12 +24,13 @@ body {
   margin: 0 auto;
   position: relative;
   overflow: hidden;
+  background: #0D0B1A;
 }
 
-/* 手機全螢幕 */
+/* 桌機框 */
 @media (min-width: 431px) {
   body {
-    background: linear-gradient(135deg, #C8A8E9 0%, #A8D8EA 100%);
+    background: radial-gradient(ellipse at center, #1A1040 0%, #050310 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,85 +38,121 @@ body {
   }
   #root {
     border-radius: 40px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+    box-shadow: 0 0 60px rgba(155,109,255,0.3), 0 30px 80px rgba(0,0,0,0.6);
     overflow: hidden;
   }
 }
 
-/* 自訂捲動條 */
+/* 捲動條 */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #C8A8E9; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #4A3F7A; border-radius: 4px; }
 
-/* 通用按鈕觸感 */
+/* 點擊回饋 */
 .tap-bounce {
   transition: transform 0.1s;
   cursor: pointer;
 }
-.tap-bounce:active {
-  transform: scale(0.93);
-}
+.tap-bounce:active { transform: scale(0.93); }
 
-/* 柔和陰影 */
-.soft-shadow {
-  box-shadow: 0 4px 20px rgba(200, 168, 233, 0.4);
+/* 金色邊框裝飾 */
+.gold-border {
+  border: 1px solid #4A3F7A;
+  border-top-color: #F0C040;
+  border-bottom-color: #A07820;
 }
 
 /* 星星閃爍 */
 @keyframes twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  0%, 100% { opacity: 0.2; transform: scale(0.6); }
   50% { opacity: 1; transform: scale(1.2); }
 }
-.star { animation: twinkle 2s ease-in-out infinite; }
-.star:nth-child(2n) { animation-delay: 0.5s; }
-.star:nth-child(3n) { animation-delay: 1s; }
+.star { animation: twinkle 2.5s ease-in-out infinite; }
+.star:nth-child(2n) { animation-delay: 0.8s; }
+.star:nth-child(3n) { animation-delay: 1.5s; }
+.star:nth-child(4n) { animation-delay: 2.1s; }
 
-/* 怪物血條動畫 */
-@keyframes hpDrain {
-  from { width: var(--from); }
-  to { width: var(--to); }
+/* 魔法粒子 */
+@keyframes particleRise {
+  0%   { opacity: 0.8; transform: translateY(0) scale(1); }
+  100% { opacity: 0;   transform: translateY(-60px) scale(0) rotate(180deg); }
 }
+.particle { animation: particleRise 2s ease-out infinite; }
 
 /* 傷害數字 */
 @keyframes damageFloat {
-  0% { transform: translateY(0) scale(1.4); opacity: 1; }
+  0%   { transform: translateY(0) scale(1.4); opacity: 1; }
   100% { transform: translateY(-70px) scale(0.8); opacity: 0; }
 }
 .damage-num {
   animation: damageFloat 0.9s ease-out forwards;
   pointer-events: none;
   font-weight: 900;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  text-shadow: 0 0 10px currentColor, 0 2px 8px rgba(0,0,0,0.6);
 }
 
 /* 怪物受擊 */
 @keyframes monsterHit {
-  0% { filter: brightness(1); transform: translateX(0); }
-  20% { filter: brightness(3) saturate(0); transform: translateX(-8px); }
-  40% { filter: brightness(3) saturate(0); transform: translateX(8px); }
-  60% { filter: brightness(2); transform: translateX(-4px); }
+  0%   { filter: brightness(1); transform: translateX(0); }
+  20%  { filter: brightness(4) saturate(0) hue-rotate(30deg); transform: translateX(-8px); }
+  40%  { filter: brightness(4) saturate(0); transform: translateX(8px); }
+  60%  { filter: brightness(2); transform: translateX(-4px); }
   100% { filter: brightness(1); transform: translateX(0); }
 }
 .monster-hit { animation: monsterHit 0.5s ease-out; }
 
-/* 漂浮動畫 */
+/* 漂浮 */
 @keyframes floatY {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
 }
 .floating { animation: floatY 3s ease-in-out infinite; }
 
-/* 入場動畫 */
+/* 入場 */
 @keyframes slideUp {
   from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 .slide-up { animation: slideUp 0.4s ease-out; }
 
-/* 建築點擊效果 */
-@keyframes buildingPop {
-  0% { transform: scale(1) translateY(0); }
-  50% { transform: scale(1.08) translateY(-4px); }
-  100% { transform: scale(1) translateY(0); }
+/* 建築光暈 */
+@keyframes buildingGlow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(155,109,255,0.4)); }
+  50%       { filter: drop-shadow(0 0 16px rgba(240,192,64,0.7)); }
 }
-.building-pop { animation: buildingPop 0.3s ease-out; }
+.building-hover { animation: buildingGlow 2.5s ease-in-out infinite; }
+
+/* 金色閃爍文字 */
+@keyframes goldShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.gold-text {
+  background: linear-gradient(90deg, #A07820, #F0C040, #FFE680, #F0C040, #A07820);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 3s linear infinite;
+}
+
+/* HP 消耗動畫 */
+@keyframes hpDrain {
+  from { width: var(--from); }
+  to   { width: var(--to); }
+}
+
+/* 魔法圓陣旋轉 */
+@keyframes runeRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.rune-spin { animation: runeRotate 8s linear infinite; }
+.rune-spin-rev { animation: runeRotate 12s linear infinite reverse; }
+
+/* 脈衝光圈 */
+@keyframes ripple {
+  0%   { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2); opacity: 0; }
+}
+.ripple { animation: ripple 1.5s ease-out infinite; }
