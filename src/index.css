@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap');
 
 * {
   box-sizing: border-box;
@@ -12,8 +12,8 @@
 
 body {
   margin: 0;
-  font-family: 'Noto Serif TC', serif;
-  background: #0D0B1A;
+  font-family: 'Noto Sans TC', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #243B6B;
   overflow: hidden;
 }
 
@@ -24,13 +24,13 @@ body {
   margin: 0 auto;
   position: relative;
   overflow: hidden;
-  background: #0D0B1A;
+  background: #FFF7E8;
 }
 
 /* 桌機框 */
 @media (min-width: 431px) {
   body {
-    background: radial-gradient(ellipse at center, #1A1040 0%, #050310 100%);
+    background: radial-gradient(ellipse at center, #7FCDE2 0%, #243B6B 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,7 +38,7 @@ body {
   }
   #root {
     border-radius: 40px;
-    box-shadow: 0 0 60px rgba(155,109,255,0.3), 0 30px 80px rgba(0,0,0,0.6);
+    box-shadow: 0 24px 80px rgba(36,59,107,0.42);
     overflow: hidden;
   }
 }
@@ -54,6 +54,270 @@ body {
   cursor: pointer;
 }
 .tap-bounce:active { transform: scale(0.93); }
+
+.mobile-hud,
+.mobile-panel,
+.today-quest-card {
+  border: 1px solid rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.88);
+  box-shadow: 0 16px 36px rgba(36,59,107,0.16);
+  backdrop-filter: blur(18px);
+}
+
+.mobile-hud {
+  border-radius: 24px;
+  padding: 12px;
+}
+
+.mobile-panel {
+  border-radius: 26px;
+}
+
+.mobile-level-badge {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  color: #243B6B;
+  font-size: 16px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #FFFFFF, #BFEFF5);
+  border: 2px solid rgba(245,185,66,0.7);
+  box-shadow: 0 8px 18px rgba(36,59,107,0.12);
+}
+
+.mobile-resource {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #8B6242;
+  font-weight: 900;
+  background: #FFF4C9;
+  border: 1px solid rgba(245,185,66,0.55);
+}
+
+.mobile-resource--purple {
+  color: #7357D9;
+  background: #F1ECFF;
+  border-color: rgba(158,124,242,0.45);
+}
+
+.mobile-resource--coral {
+  color: #C94A5C;
+  background: #FFE8EA;
+  border-color: rgba(242,107,107,0.42);
+}
+
+.town-gate {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.76);
+  background: rgba(255,255,255,0.84);
+  padding: 10px 10px;
+  box-shadow: 0 12px 26px rgba(36,59,107,0.14);
+  backdrop-filter: blur(14px);
+}
+
+.town-gate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.48), transparent 62%);
+}
+
+.town-gate__icon {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  font-size: 20px;
+  box-shadow: inset 0 -5px 10px rgba(36,59,107,0.08);
+}
+
+.town-gate--teal .town-gate__icon { background: #DDF8F2; }
+.town-gate--gold .town-gate__icon { background: #FFF1BF; }
+.town-gate--blue .town-gate__icon { background: #DDF1FF; }
+.town-gate--coral .town-gate__icon { background: #FFE1E3; }
+
+.town-gate__badge {
+  position: absolute;
+  right: -5px;
+  top: -6px;
+  z-index: 2;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #F26B6B;
+  color: white;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 22px;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(242,107,107,0.32);
+}
+
+.today-quest-card {
+  width: 100%;
+  border-radius: 28px;
+  padding: 14px;
+  text-align: initial;
+}
+
+.today-monster-token,
+.battle-monster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 32px;
+  background: radial-gradient(circle at 35% 25%, #FFFFFF 0%, #FFF4C9 42%, #BFEFF5 100%);
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 16px 34px rgba(36,59,107,0.22), inset 0 -8px 16px rgba(36,59,107,0.08);
+}
+
+.today-monster-token {
+  width: 70px;
+  height: 70px;
+  flex: 0 0 auto;
+  font-size: 40px;
+}
+
+.quest-status,
+.battle-tier {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #8B6242;
+  font-size: 10px;
+  font-weight: 900;
+  background: #FFF1BF;
+}
+
+.quest-status--done {
+  color: #13816F;
+  background: #DDF8F2;
+}
+
+.battle-tier {
+  color: #13816F;
+  background: #DDF8F2;
+}
+
+.battle-tier--gold {
+  color: #8B6242;
+  background: #FFF1BF;
+}
+
+.battle-tier--coral {
+  color: #C94A5C;
+  background: #FFE1E3;
+}
+
+.battle-boss-plate {
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.76);
+  background: rgba(255,255,255,0.82);
+  padding: 12px;
+  box-shadow: 0 14px 28px rgba(36,59,107,0.14);
+  backdrop-filter: blur(14px);
+}
+
+.battle-monster {
+  width: 130px;
+  height: 130px;
+  font-size: 76px;
+}
+
+.segmented-control {
+  display: flex;
+  gap: 6px;
+  border-radius: 18px;
+  background: #EEF3F6;
+  padding: 5px;
+}
+
+.segmented-control button {
+  flex: 1 1 0;
+  border-radius: 14px;
+  padding: 8px 10px;
+  color: #7A8A99;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.segmented-control button.is-active {
+  color: #243B6B;
+  background: white;
+  box-shadow: 0 6px 14px rgba(36,59,107,0.1);
+}
+
+.category-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 62px;
+  border-radius: 18px;
+  color: #66788A;
+  background: #F6F8FA;
+  border: 1px solid #E6EDF2;
+}
+
+.category-chip--active {
+  color: #13816F;
+  background: #DDF8F2;
+  border-color: #87D9D0;
+  box-shadow: 0 8px 18px rgba(74,184,200,0.18);
+}
+
+.amount-display {
+  border-radius: 22px;
+  padding: 14px 16px;
+  text-align: right;
+  background: linear-gradient(135deg, #FFFFFF, #EEF9FB);
+  border: 1px solid #D9EEF1;
+}
+
+.calc-key {
+  min-height: 44px;
+  border-radius: 16px;
+  color: #243B6B;
+  font-size: 15px;
+  font-weight: 900;
+  background: #F7FAFC;
+  border: 1px solid #E6EDF2;
+  box-shadow: inset 0 -3px 0 rgba(36,59,107,0.05);
+}
+
+.calc-key--op {
+  color: #13816F;
+  background: #E7FAF6;
+  border-color: #C9EFEA;
+}
+
+.calc-key--submit {
+  color: white;
+  background: linear-gradient(135deg, #4AB8C8, #7CCB83);
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(74,184,200,0.25);
+}
 
 /* 金色邊框裝飾 */
 .gold-border {

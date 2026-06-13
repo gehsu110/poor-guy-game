@@ -86,9 +86,15 @@ export async function addExpense(uid, { category, amount, note, date }) {
 /** 取得某日的消費列表 */
 export async function getExpensesByDate(uid, date) {
   const ref = collection(db, 'users', uid, 'expenses')
-  const q = query(ref, where('date', '==', date), orderBy('createdAt', 'asc'))
+  const q = query(ref, where('date', '==', date))
   const snap = await getDocs(q)
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .sort((a, b) => {
+      const at = a.createdAt?.toMillis?.() ?? 0
+      const bt = b.createdAt?.toMillis?.() ?? 0
+      return at - bt
+    })
 }
 
 /** 取得本月消費 */
