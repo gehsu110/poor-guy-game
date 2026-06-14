@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { formatMoney, getTitle } from '../gameLogic'
-import townBg from '../assets/game-art/town-bg-v1.webp'
+import townBg from '../assets/urban-art/urban-home-v1.webp'
+import spendingCurse from '../assets/urban-art/spending-curse-v1.png'
 
 function ResourcePill({ children, tone = 'gold' }) {
   return (
@@ -99,7 +100,7 @@ function TodayStatusCard({ monster, currentHp, totalSpent, budget, onClick }) {
           animate={defeated ? { rotate: [0, -10, 8, 0] } : { y: [0, -5, 0] }}
           transition={{ duration: defeated ? 0.8 : 2.4, repeat: Infinity }}
         >
-          {defeated ? '🏆' : monster.emoji}
+          {defeated ? '🏆' : <img src={spendingCurse} alt="" className="today-monster-img" draggable="false" />}
         </motion.div>
 
         <div className="min-w-0 flex-1 text-left">
@@ -107,7 +108,7 @@ function TodayStatusCard({ monster, currentHp, totalSpent, budget, onClick }) {
             <div className="min-w-0">
               <div className="truncate text-sm font-black text-slate-900">{monster.name}</div>
               <div className="text-[10px] font-bold text-slate-500">
-                {defeated ? '今日討伐完成' : '今日消費怪物'}
+                {defeated ? '今日討伐完成' : '今日消費咒靈'}
               </div>
             </div>
             <span className={`quest-status ${defeated ? 'quest-status--done' : ''}`}>
@@ -162,15 +163,15 @@ export default function TownScreen() {
   const budget = profile?.dailyBudget ?? 1000
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#FFF7E8]">
+    <div className="relative h-full w-full overflow-hidden bg-[#090F1C]">
       <img
         src={townBg}
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
         draggable="false"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/5 to-[#243B6B]/20" />
-      <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#243B6B]/45 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050814]/10 via-[#050814]/20 to-[#050814]/80" />
+      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#050814] via-[#050814]/70 to-transparent" />
 
       <TopHUD profile={profile} todayBudget={budget} spent={totalSpent} />
 
@@ -178,15 +179,15 @@ export default function TownScreen() {
         <div className="mb-3 grid grid-cols-2 gap-2">
           <FeatureGate
             icon="🔮"
-            title="魔法商店"
-            subtitle="扭蛋・收藏"
+            title="裝備補給"
+            subtitle="扭蛋・特效"
             badge={profile?.tickets?.normal > 0 ? profile.tickets.normal : null}
             tone="teal"
             onClick={() => navigate('shop')}
           />
           <FeatureGate
             icon="📜"
-            title="任務公告"
+            title="任務署"
             subtitle="成就・挑戰"
             tone="gold"
             onClick={() => navigate('quest')}
@@ -194,15 +195,15 @@ export default function TownScreen() {
           />
           <FeatureGate
             icon="🗺️"
-            title="遠征地圖"
-            subtitle="本月路線"
+            title="城市戰線"
+            subtitle="本月區域"
             tone="blue"
             onClick={() => navigate('map')}
             delay={0.08}
           />
           <FeatureGate
             icon="👤"
-            title="勇者小屋"
+            title="特工檔案"
             subtitle="資料・設定"
             tone="coral"
             onClick={() => navigate('profile')}
@@ -227,15 +228,15 @@ export default function TownScreen() {
 
 export function BottomNav({ current, navigate }) {
   const tabs = [
-    { key: 'town', label: '主城', emoji: '🏰' },
-    { key: 'battle', label: '戰鬥', emoji: '⚔️' },
-    { key: 'map', label: '地圖', emoji: '🗺️' },
-    { key: 'shop', label: '商店', emoji: '🔮' },
-    { key: 'profile', label: '我的', emoji: '👤' },
+    { key: 'town', label: '基地', emoji: '🏙️' },
+    { key: 'battle', label: '討伐', emoji: '⚔️' },
+    { key: 'map', label: '戰線', emoji: '🗺️' },
+    { key: 'shop', label: '補給', emoji: '🔮' },
+    { key: 'profile', label: '檔案', emoji: '👤' },
   ]
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-40 border-t border-white/35 bg-white/88 shadow-[0_-10px_30px_rgba(36,59,107,0.12)] backdrop-blur-xl">
+    <div className="absolute bottom-0 left-0 right-0 z-40 border-t border-cyan-300/15 bg-[#070B16]/88 shadow-[0_-12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
       <div className="flex px-2 pb-2 pt-1">
         {tabs.map(tab => (
           <button
@@ -246,12 +247,12 @@ export function BottomNav({ current, navigate }) {
             <span className={`text-xl transition-transform ${current === tab.key ? 'scale-110' : 'scale-100 opacity-70'}`}>
               {tab.emoji}
             </span>
-            <span className={`text-[10px] font-black ${current === tab.key ? 'text-[#243B6B]' : 'text-slate-400'}`}>
+            <span className={`text-[10px] font-black ${current === tab.key ? 'text-cyan-200' : 'text-slate-500'}`}>
               {tab.label}
             </span>
             {current === tab.key && (
               <motion.div
-                className="absolute bottom-0 h-1 w-1 rounded-full bg-amber-400"
+                className="absolute bottom-0 h-1 w-1 rounded-full bg-cyan-300"
                 layoutId="navDot"
               />
             )}

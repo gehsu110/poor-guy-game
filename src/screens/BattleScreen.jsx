@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import { BottomNav } from './TownScreen'
-import battleBg from '../assets/game-art/battle-bg-v1.webp'
+import battleBg from '../assets/urban-art/urban-battle-v1.webp'
+import spendingCurse from '../assets/urban-art/spending-curse-v1.png'
 
 function TierBadge({ tier }) {
   if (tier === 'monthboss') return <span className="battle-tier battle-tier--gold">月Boss</span>
@@ -63,7 +64,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
           }
           transition={{ duration: defeated ? 1 : isAngry ? 0.45 : 2.4, repeat: Infinity }}
         >
-          {defeated ? '🏆' : monster.emoji}
+          {defeated ? '🏆' : <img src={spendingCurse} alt="" className="battle-monster-img" draggable="false" />}
         </motion.div>
         {isAngry && <div className="absolute right-6 top-4 text-xl">💢</div>}
 
@@ -321,27 +322,27 @@ export default function BattleScreen() {
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-[#FFF7E8]">
+    <div className="relative flex h-full flex-col overflow-hidden bg-[#090F1C]">
       <img
         src={battleBg}
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
         draggable="false"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-[#FFF7E8]/95" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050814]/5 via-[#050814]/15 to-[#050814]/95" />
 
       <div className="relative z-20 flex items-center gap-2 px-4 pb-1 pt-4">
         <button
-          className="tap-bounce rounded-2xl bg-white/85 px-3 py-2 text-sm font-black text-slate-500 shadow-md"
+          className="tap-bounce rounded-2xl border border-cyan-300/20 bg-[#101827]/85 px-3 py-2 text-sm font-black text-cyan-100 shadow-md"
           onClick={() => navigate('town')}
         >
           ←
         </button>
         <div className="min-w-0 flex-1 text-center">
-          <div className="text-sm font-black text-[#243B6B]">今日討伐</div>
-          <div className="text-[10px] font-bold text-slate-400">{state.date}</div>
+          <div className="text-sm font-black text-cyan-100">今日討伐</div>
+          <div className="text-[10px] font-bold text-cyan-300/70">{state.date}</div>
         </div>
-        <div className="rounded-2xl bg-white/85 px-3 py-2 text-xs font-black text-amber-500 shadow-md">
+        <div className="rounded-2xl border border-amber-300/25 bg-[#101827]/85 px-3 py-2 text-xs font-black text-amber-300 shadow-md">
           NT${formatMoney(Math.max(0, budget - totalSpent))}
         </div>
       </div>
@@ -357,7 +358,7 @@ export default function BattleScreen() {
 
       <div className="relative z-20 flex-1 overflow-y-auto px-4 pb-24">
         <div className="mb-3">
-          <div className="mb-1 text-xs font-black text-[#243B6B]">今日記錄</div>
+          <div className="mb-1 text-xs font-black text-cyan-100">今日記錄</div>
           <ExpenseList expenses={expenses} />
         </div>
 
