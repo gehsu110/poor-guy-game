@@ -41,7 +41,7 @@ function TitleList({ currentLevel }) {
         const unlocked = currentLevel >= t.minLv
         return (
           <div key={i} className={`academy-list-row ${unlocked ? '' : 'opacity-55'}`}>
-            <span className="text-lg">{unlocked ? '✦' : '◇'}</span>
+            <span className={`academy-icon ${unlocked ? 'academy-icon--star' : 'academy-icon--unknown'}`} />
             <div className="min-w-0 flex-1">
               <div className="truncate text-xs font-black text-[#26324A]">{t.name}</div>
               <div className="truncate text-[10px] font-bold text-[#8E87A8]">{t.desc}</div>

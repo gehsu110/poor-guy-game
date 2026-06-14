@@ -7,13 +7,13 @@ import mapBg from '../assets/academy-art/map-bg.webp'
 
 // 節點狀態設定
 const NODE_CONFIG = {
-  defeated:  { bg: '#A8E6CF', border: '#69D2A8', icon: '✓',  label: '擊殺' },
-  undefeated:{ bg: '#FFE4A0', border: '#FFD060', icon: '△',  label: '未滅' },
-  no_record: { bg: '#F0F0F0', border: '#DDD',    icon: '✕',  label: '未記' },
-  today:     { bg: '#C8A8E9', border: '#A87DE0', icon: '⚔️', label: '今日' },
-  future:    { bg: '#E8E8E8', border: '#CCC',    icon: '?',  label: '未來' },
-  boss:      { bg: '#FFB3C6', border: '#FF6B9D', icon: '👑', label: 'Boss' },
-  monthboss: { bg: '#C8A8E9', border: '#7B5EA7', icon: '🐉', label: '月Boss' },
+  defeated:  { bg: '#A8E6CF', border: '#69D2A8', icon: 'star', label: '擊殺' },
+  undefeated:{ bg: '#FFE4A0', border: '#FFD060', icon: 'battle', label: '未滅' },
+  no_record: { bg: '#F0F0F0', border: '#DDD', icon: 'unknown', label: '未記' },
+  today:     { bg: '#C8A8E9', border: '#A87DE0', icon: 'battle', label: '今日' },
+  future:    { bg: '#E8E8E8', border: '#CCC', icon: 'unknown', label: '未來' },
+  boss:      { bg: '#FFB3C6', border: '#FF6B9D', icon: 'boss', label: 'Boss' },
+  monthboss: { bg: '#C8A8E9', border: '#7B5EA7', icon: 'boss', label: '月Boss' },
 }
 
 function MapNode({ day, date, status, tier, budget, onClick, isToday }) {
@@ -32,7 +32,7 @@ function MapNode({ day, date, status, tier, budget, onClick, isToday }) {
       animate={isToday ? { scale: [1, 1.1, 1], boxShadow: ['0 0 0 0 rgba(200,168,233,0)', '0 0 0 8px rgba(200,168,233,0.4)', '0 0 0 0 rgba(200,168,233,0)'] } : {}}
       transition={{ duration: 2, repeat: Infinity }}
     >
-      <span className={tier !== 'normal' ? 'text-base' : 'text-xs'}>{cfg.icon}</span>
+      <span className={`academy-icon academy-icon--${cfg.icon}`} />
       {/* 日期 */}
       <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-slate-400 whitespace-nowrap font-bold">
         {day}日
@@ -149,7 +149,7 @@ export default function MapScreen() {
         >
           <div className="flex justify-between items-start mb-2">
             <div>
-              <div className="font-black text-[#26324A]">{selected.monster.emoji} {selected.monster.name}</div>
+              <div className="font-black text-[#26324A]">{selected.monster.name}</div>
               <div className="text-xs font-bold text-[#8E87A8]">{selected.date}</div>
             </div>
             <button className="text-[#8E87A8] text-lg tap-bounce" onClick={() => setSelected(null)}>×</button>

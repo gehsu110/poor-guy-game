@@ -2,16 +2,16 @@
 
 const MONSTER_POOL = [
   // 平日怪 (平日, 簡單)
-  { id: 'slime',    name: '消費史萊姆',   emoji: '🫧', color: '#A8D8EA', maxHpColor: '#7EC8E3', tier: 'normal' },
-  { id: 'rabbit',   name: '帳單兔兔',     emoji: '🐰', color: '#FFB3C6', maxHpColor: '#FF8FA3', tier: 'normal' },
-  { id: 'mushroom', name: '零食蘑菇',     emoji: '🍄', color: '#A8E6CF', maxHpColor: '#69D2A8', tier: 'normal' },
-  { id: 'coin',     name: '金幣精靈',     emoji: '🪙', color: '#FFE4A0', maxHpColor: '#FFD060', tier: 'normal' },
-  { id: 'cat',      name: '慵懶貓貓獸',   emoji: '🐱', color: '#FFCBA4', maxHpColor: '#FFA97A', tier: 'normal' },
+  { id: 'slime',    name: '消費史萊姆', color: '#A8D8EA', maxHpColor: '#7EC8E3', tier: 'normal' },
+  { id: 'rabbit',   name: '帳單兔兔',   color: '#FFB3C6', maxHpColor: '#FF8FA3', tier: 'normal' },
+  { id: 'mushroom', name: '零食蘑菇',   color: '#A8E6CF', maxHpColor: '#69D2A8', tier: 'normal' },
+  { id: 'coin',     name: '金幣精靈',   color: '#FFE4A0', maxHpColor: '#FFD060', tier: 'normal' },
+  { id: 'cat',      name: '慵懶貓貓獸', color: '#FFCBA4', maxHpColor: '#FFA97A', tier: 'normal' },
   // 週末 Boss
-  { id: 'weekend',  name: '週末誘惑魔',   emoji: '🛍️', color: '#C8A8E9', maxHpColor: '#A87DE0', tier: 'weekend' },
-  { id: 'sunday',   name: '享樂大魔王',   emoji: '🍔', color: '#FFB3C6', maxHpColor: '#FF6B9D', tier: 'boss' },
+  { id: 'weekend',  name: '週末誘惑魔', color: '#C8A8E9', maxHpColor: '#A87DE0', tier: 'weekend' },
+  { id: 'sunday',   name: '享樂大魔王', color: '#FFB3C6', maxHpColor: '#FF6B9D', tier: 'boss' },
   // 月底
-  { id: 'month',    name: '月底壓力龍',   emoji: '🐉', color: '#C8A8E9', maxHpColor: '#7B5EA7', tier: 'monthboss' },
+  { id: 'month',    name: '月底壓力龍', color: '#C8A8E9', maxHpColor: '#7B5EA7', tier: 'monthboss' },
 ]
 
 /**
@@ -121,7 +121,7 @@ export const TITLES = [
   { minLv: 20, name: '月底倖存者',   desc: '撐過無數月末壓力' },
   { minLv: 30, name: '財務鐵壁',     desc: '超支？不存在的' },
   { minLv: 40, name: '傳說記帳師',   desc: '達到巔峰境界' },
-  { minLv: 50, name: '✨ 理財聖賢',  desc: '滿等，真神' },
+  { minLv: 50, name: '理財聖賢',  desc: '滿等，真神' },
 ]
 
 export function getTitle(level) {
@@ -134,14 +134,14 @@ export function getTitle(level) {
 // ─── 分類 ─────────────────────────────────────────────────────────────────────
 
 export const DEFAULT_CATEGORIES = [
-  { id: 'food',      label: '餐飲',   emoji: '🍱', color: '#FFB3C6' },
-  { id: 'transport', label: '交通',   emoji: '🚌', color: '#A8D8EA' },
-  { id: 'shopping',  label: '購物',   emoji: '🛍️', color: '#C8A8E9' },
-  { id: 'entertain', label: '娛樂',   emoji: '🎮', color: '#A8E6CF' },
-  { id: 'health',    label: '醫療',   emoji: '💊', color: '#FFE4A0' },
-  { id: 'daily',     label: '日用',   emoji: '🧴', color: '#FFCBA4' },
-  { id: 'edu',       label: '學習',   emoji: '📚', color: '#B8E0FF' },
-  { id: 'other',     label: '其他',   emoji: '✨', color: '#E8E8E8' },
+  { id: 'food',      label: '餐飲', iconKey: 'food',      color: '#FFB3C6' },
+  { id: 'transport', label: '交通', iconKey: 'transport', color: '#A8D8EA' },
+  { id: 'shopping',  label: '購物', iconKey: 'shopping',  color: '#C8A8E9' },
+  { id: 'entertain', label: '娛樂', iconKey: 'play',      color: '#A8E6CF' },
+  { id: 'health',    label: '醫療', iconKey: 'health',    color: '#FFE4A0' },
+  { id: 'daily',     label: '日用', iconKey: 'daily',     color: '#FFCBA4' },
+  { id: 'edu',       label: '學習', iconKey: 'learn',     color: '#B8E0FF' },
+  { id: 'other',     label: '其他', iconKey: 'other',     color: '#E8E8E8' },
 ]
 
 // ─── 工具 ─────────────────────────────────────────────────────────────────────

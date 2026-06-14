@@ -64,9 +64,9 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
           }
           transition={{ duration: defeated ? 1 : isAngry ? 0.45 : 2.4, repeat: Infinity }}
         >
-          {defeated ? '🏆' : <img src={spirit} alt="" draggable="false" />}
+          {defeated ? <span className="academy-icon academy-icon--star h-16 w-16" /> : <img src={spirit} alt="" draggable="false" />}
         </motion.div>
-        {isAngry && <div className="absolute right-6 top-4 text-xl">💢</div>}
+        {isAngry && <div className="absolute right-6 top-4 h-5 w-5 rounded-full bg-[#FF7FA3] shadow-[0_0_18px_rgba(255,127,163,0.58)]" />}
 
         {damageNumbers.map(dn => (
           <motion.div
@@ -95,7 +95,9 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 10, opacity: 0 }}
           >
-            <div className="text-3xl">🏆</div>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF4BE]">
+              <span className="academy-icon academy-icon--star" />
+            </div>
             <div className="mt-1 text-sm font-black text-[#26324A]">淨化成功</div>
             <div className="text-[10px] font-bold text-[#8E87A8]">獎勵已加入你的術師背包</div>
           </motion.div>
@@ -103,6 +105,10 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
       </AnimatePresence>
     </div>
   )
+}
+
+function CategoryIcon({ cat, className = '' }) {
+  return <span className={`academy-category-symbol ${className}`} style={{ '--cat-color': cat?.color ?? '#C8A8E9' }} />
 }
 
 function CategoryPicker({ selected, onSelect }) {
@@ -115,7 +121,7 @@ function CategoryPicker({ selected, onSelect }) {
           onClick={() => onSelect(cat.id)}
           whileTap={{ scale: 0.92 }}
         >
-          <span className="text-xl">{cat.emoji}</span>
+          <CategoryIcon cat={cat} />
           <span className="mt-0.5 text-[10px] font-black">{cat.label}</span>
         </motion.button>
       ))}
@@ -234,7 +240,7 @@ function ExpensePanel({ onSubmit, budget, spent }) {
           <CategoryPicker selected={category} onSelect={cat => { setCategory(cat); setStep('amount') }} />
           {category && (
             <div className="text-center text-xs font-bold text-[#8E87A8]">
-              已選：{currentCat?.emoji} {currentCat?.label}
+              已選：{currentCat?.label}
               <button className="ml-2 text-[#24B7B0]" onClick={() => setStep('amount')}>繼續</button>
             </div>
           )}
@@ -243,7 +249,7 @@ function ExpensePanel({ onSubmit, budget, spent }) {
         <>
           <div className="academy-amount">
             <div className="text-xs font-black text-[#8E87A8]">
-              {currentCat ? `${currentCat.emoji} ${currentCat.label}` : '尚未選擇分類'}
+              {currentCat ? currentCat.label : '尚未選擇分類'}
             </div>
             <div className="mt-1 text-3xl font-black text-[#26324A]">
               NT$ {amount.includes('+') ? amount : formatMoney(Number(amount) || 0)}
@@ -296,7 +302,7 @@ function ExpenseList({ expenses }) {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: i * 0.02 }}
           >
-            <span className="text-base">{cat?.emoji ?? '✨'}</span>
+            <CategoryIcon cat={cat} className="h-6 w-6 rounded-lg" />
             <div className="min-w-0 flex-1">
               <div className="truncate text-xs font-black text-[#26324A]">{cat?.label ?? '其他'}</div>
               {e.note && <div className="truncate text-[10px] font-bold text-[#8E87A8]">{e.note}</div>}

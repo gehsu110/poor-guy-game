@@ -154,7 +154,7 @@ export function AppProvider({ children }) {
     dispatch({ type: 'UPDATE_PROFILE', data: { tickets: newTickets } })
     dispatch({
       type: 'SET_NOTIFICATION',
-      notification: { type: 'kill', message: `💀 擊殺！獲得扭蛋券 x${tickets.normal ?? tickets.gold}` }
+      notification: { type: 'kill', message: `淨化完成，獲得補給券 x${tickets.normal ?? tickets.gold}` }
     })
     setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 3000)
   }

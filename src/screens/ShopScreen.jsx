@@ -3,44 +3,73 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { BottomNav } from './TownScreen'
 import shopBg from '../assets/academy-art/shop-bg.webp'
-
-// ─── 扭蛋池 ───────────────────────────────────────────────────────────────────
+import shopAssets from '../assets/academy-art/shop-assets.png'
 
 const GACHA_POOL = [
-  // 攻擊特效
-  { id: 'fx_slash',    type: 'effect',  name: '劍氣斬擊',   emoji: '⚡', rarity: 'R',  color: '#A8D8EA' },
-  { id: 'fx_fire',     type: 'effect',  name: '烈焰衝擊',   emoji: '🔥', rarity: 'SR', color: '#FFB3C6' },
-  { id: 'fx_star',     type: 'effect',  name: '星光爆發',   emoji: '✨', rarity: 'SSR',color: '#FFE4A0' },
-  { id: 'fx_ice',      type: 'effect',  name: '冰晶穿刺',   emoji: '❄️', rarity: 'R',  color: '#A8E6CF' },
-  // 稱號
-  { id: 'title_saving',  type: 'title', name: '省錢達人',   emoji: '💰', rarity: 'R',  color: '#A8E6CF' },
-  { id: 'title_hero',    type: 'title', name: '記帳英雄',   emoji: '🦸', rarity: 'SR', color: '#C8A8E9' },
-  { id: 'title_legend',  type: 'title', name: '財務傳說',   emoji: '👑', rarity: 'SSR',color: '#FFE4A0' },
-  // 頭像框
-  { id: 'frame_stars',   type: 'frame', name: '星光邊框',   emoji: '🌟', rarity: 'R',  color: '#FFE4A0' },
-  { id: 'frame_rainbow', type: 'frame', name: '彩虹邊框',   emoji: '🌈', rarity: 'SR', color: '#FFB3C6' },
-  { id: 'frame_dragon',  type: 'frame', name: '龍紋邊框',   emoji: '🐉', rarity: 'SSR',color: '#C8A8E9' },
+  { id: 'fx_slash', type: 'effect', name: '星軌斬擊', rarity: 'R', color: '#A8D8EA', iconKey: 'crystal' },
+  { id: 'fx_fire', type: 'effect', name: '粉晶爆發', rarity: 'SR', color: '#FFB3C6', iconKey: 'star' },
+  { id: 'fx_star', type: 'effect', name: '星芒結界', rarity: 'SSR', color: '#FFE4A0', iconKey: 'star' },
+  { id: 'fx_ice', type: 'effect', name: '薄荷護盾', rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
+  { id: 'title_saving', type: 'title', name: '省錢優等生', rarity: 'R', color: '#A8E6CF', iconKey: 'coin' },
+  { id: 'title_hero', type: 'title', name: '記帳魔法使', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
+  { id: 'title_legend', type: 'title', name: '理財賢者', rarity: 'SSR', color: '#FFE4A0', iconKey: 'star' },
+  { id: 'frame_stars', type: 'frame', name: '星砂邊框', rarity: 'R', color: '#FFE4A0', iconKey: 'ticket' },
+  { id: 'frame_ribbon', type: 'frame', name: '緞帶邊框', rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
+  { id: 'frame_moon', type: 'frame', name: '月光邊框', rarity: 'SSR', color: '#C8A8E9', iconKey: 'goldTicket' },
 ]
 
 const RARITY_CONFIG = {
-  SSR: { color: '#FFD700', bg: 'linear-gradient(135deg, #FFD700, #FFA500)', label: 'SSR', prob: 3  },
-  SR:  { color: '#C8A8E9', bg: 'linear-gradient(135deg, #C8A8E9, #A87DE0)', label: 'SR',  prob: 15 },
-  R:   { color: '#A8D8EA', bg: 'linear-gradient(135deg, #A8D8EA, #7EC8E3)', label: 'R',   prob: 82 },
+  SSR: { color: '#FFD35F', bg: 'linear-gradient(135deg, #FFE981, #FFB84D)', prob: 3 },
+  SR: { color: '#B79BFF', bg: 'linear-gradient(135deg, #D4B9FF, #9A7CFF)', prob: 15 },
+  R: { color: '#8FD8EA', bg: 'linear-gradient(135deg, #BFEFFF, #74D3E8)', prob: 82 },
 }
 
-function drawGacha(count = 1) {
+const SPRITE_BY_ICON = {
+  star: 'star',
+  heart: 'heart',
+  ticket: 'ticket',
+  goldTicket: 'goldTicket',
+  box: 'box',
+  keeper: 'keeper',
+  coin: 'star',
+  crystal: 'heart',
+}
+
+function ShopSprite({ name, className = '' }) {
+  return <span className={`academy-shop-sprite academy-shop-sprite--${name} ${className}`} aria-hidden="true" />
+}
+
+function PrizeIcon({ item }) {
+  const sprite = SPRITE_BY_ICON[item.iconKey] ?? 'box'
+  return (
+    <span className="academy-prize-icon grid place-items-center" style={{ '--prize-color': item.color }}>
+      <ShopSprite name={sprite} className="h-9 w-9" />
+    </span>
+  )
+}
+
+function drawGacha(count = 1, gold = false) {
   const results = []
   for (let i = 0; i < count; i++) {
     const rand = Math.random() * 100
-    let rarity = rand < 3 ? 'SSR' : rand < 18 ? 'SR' : 'R'
+    const rarity = gold ? (rand < 12 ? 'SSR' : rand < 45 ? 'SR' : 'R') : rand < 3 ? 'SSR' : rand < 18 ? 'SR' : 'R'
     const pool = GACHA_POOL.filter(g => g.rarity === rarity)
-    const item = pool[Math.floor(Math.random() * pool.length)]
-    results.push(item)
+    results.push(pool[Math.floor(Math.random() * pool.length)])
   }
   return results
 }
 
-// ─── 扭蛋結果展示 ─────────────────────────────────────────────────────────────
+function CurrencyCard({ sprite, label, value }) {
+  return (
+    <div className="academy-currency-card">
+      <ShopSprite name={sprite} />
+      <div className="min-w-0">
+        <div className="truncate text-[9px] font-black text-[#8E87A8]">{label}</div>
+        <div className="truncate">{value ?? 0}</div>
+      </div>
+    </div>
+  )
+}
 
 function GachaResult({ results, onClose }) {
   const [revealed, setRevealed] = useState(0)
@@ -51,99 +80,72 @@ function GachaResult({ results, onClose }) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
-      onClick={revealNext}
-    >
-      <div className="text-white text-sm mb-6 opacity-60">點擊繼續</div>
-      <div className="flex flex-wrap justify-center gap-3 px-6 max-w-xs">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#4F3A7D]/48 px-6 backdrop-blur-md" onClick={revealNext}>
+      <div className="mb-5 rounded-full bg-white/72 px-4 py-2 text-xs font-black text-[#7B63D8]">點擊揭曉補給</div>
+      {revealed === 0 && (
+        <motion.div
+          className="grid h-32 w-32 place-items-center rounded-[32px] bg-white/84 shadow-2xl"
+          animate={{ rotate: [0, -4, 4, 0], scale: [1, 1.05, 1] }}
+          transition={{ duration: 1.2, repeat: Infinity }}
+        >
+          <ShopSprite name="box" className="h-24 w-24" />
+        </motion.div>
+      )}
+      <div className="grid max-w-xs grid-cols-2 gap-3">
         {results.slice(0, revealed).map((item, i) => {
           const rar = RARITY_CONFIG[item.rarity]
           return (
             <motion.div
-              key={i}
-              className="flex flex-col items-center"
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 300 }}
+              key={`${item.id}-${i}`}
+              className="rounded-3xl bg-white/90 p-3 text-center shadow-xl"
+              initial={{ scale: 0, y: 18 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 280 }}
+              style={{ border: `2px solid ${rar.color}` }}
             >
-              <div
-                className="w-20 h-24 rounded-2xl flex flex-col items-center justify-center shadow-xl gap-1"
-                style={{ background: item.color, border: `3px solid ${rar.color}` }}
-              >
-                <span className="text-3xl">{item.emoji}</span>
-                <span className="text-[10px] font-bold text-white/80 px-2 py-0.5 rounded-full"
-                  style={{ background: rar.bg }}>
-                  {item.rarity}
-                </span>
+              <div className="mx-auto mb-2 flex justify-center">
+                <PrizeIcon item={item} />
               </div>
-              <div className="text-white text-xs mt-1 font-bold">{item.name}</div>
+              <div className="text-[10px] font-black text-white" style={{ background: rar.bg, borderRadius: 999 }}>
+                {item.rarity}
+              </div>
+              <div className="mt-1 text-xs font-black text-[#26324A]">{item.name}</div>
             </motion.div>
           )
         })}
       </div>
-      {revealed === 0 && (
-        <motion.div
-          className="text-6xl mt-8"
-          animate={{ rotate: [0, 360], scale: [1, 1.2, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          onClick={revealNext}
-        >
-          🎰
-        </motion.div>
-      )}
-      {revealed < results.length && revealed > 0 && (
-        <motion.div
-          className="mt-6 text-white text-sm bg-white/20 px-6 py-2 rounded-full"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1, repeat: Infinity }}
-        >
-          點擊揭曉下一個
-        </motion.div>
+      {revealed > 0 && revealed < results.length && (
+        <div className="mt-5 rounded-full bg-white/70 px-5 py-2 text-xs font-black text-[#7B63D8]">下一個</div>
       )}
       {revealed >= results.length && (
-        <motion.button
-          className="mt-6 text-white text-sm bg-white/20 px-6 py-2 rounded-full font-bold"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          onClick={onClose}
-        >
-          收下！🎁
-        </motion.button>
+        <button className="academy-small-button mt-5" onClick={onClose}>收下補給</button>
       )}
     </div>
   )
 }
 
-// ─── 收藏展示 ─────────────────────────────────────────────────────────────────
-
 function CollectionGrid({ items }) {
   if (!items || !items.length) {
     return (
-      <div className="text-center text-slate-300 py-8">
-        <div className="text-4xl mb-2">📦</div>
-        <div className="text-sm">還沒有收藏品<br />去扭蛋吧！</div>
+      <div className="py-8 text-center">
+        <ShopSprite name="box" className="mx-auto mb-2 h-20 w-20" />
+        <div className="text-sm font-black text-[#26324A]">還沒有收藏品</div>
+        <div className="text-xs font-bold text-[#8E87A8]">完成每日討伐來取得補給券</div>
       </div>
     )
   }
+
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-3 gap-2">
       {items.map((item, i) => {
-        const g = GACHA_POOL.find(g => g.id === item.id) ?? {}
-        const rar = RARITY_CONFIG[g.rarity] ?? RARITY_CONFIG.R
+        const prize = GACHA_POOL.find(g => g.id === item.id) ?? GACHA_POOL[0]
+        const rar = RARITY_CONFIG[prize.rarity] ?? RARITY_CONFIG.R
         return (
-          <div key={i} className="flex flex-col items-center">
-            <div
-              className="w-14 h-16 rounded-xl flex flex-col items-center justify-center shadow-sm"
-              style={{ background: g.color ?? '#F0F0F0', border: `2px solid ${rar.color}` }}
-            >
-              <span className="text-2xl">{g.emoji ?? '?'}</span>
-              <span className="text-[9px] font-bold px-1 py-0.5 rounded-full text-white" style={{ background: rar.bg }}>
-                {g.rarity}
-              </span>
+          <div key={i} className="rounded-2xl bg-white/72 p-2 text-center" style={{ border: `1px solid ${rar.color}` }}>
+            <div className="mx-auto mb-1 flex justify-center">
+              <PrizeIcon item={prize} />
             </div>
-            <div className="text-[9px] text-slate-500 mt-0.5 text-center leading-tight">{g.name ?? '???'}</div>
+            <div className="truncate text-[10px] font-black text-[#26324A]">{prize.name}</div>
           </div>
         )
       })}
@@ -151,149 +153,117 @@ function CollectionGrid({ items }) {
   )
 }
 
-// ─── 主商店畫面 ────────────────────────────────────────────────────────────────
-
 export default function ShopScreen() {
   const { state, navigate } = useApp()
   const { profile } = state
   const [gachaResult, setGachaResult] = useState(null)
-  const [tab, setTab] = useState('gacha') // gacha | collection
+  const [tab, setTab] = useState('gacha')
 
   const tickets = profile?.tickets ?? { normal: 0, gold: 0 }
+  const stars = profile?.stars ?? { yellow: 0, purple: 0 }
 
   function handleGacha(count, isGold) {
-    const cost = isGold ? count : count
     const available = isGold ? tickets.gold : tickets.normal
-    if (available < cost) return
-
-    const results = drawGacha(count)
-    setGachaResult(results)
-    // TODO: 扣除券 + 儲存到 Firebase
+    if (available < count) return
+    setGachaResult(drawGacha(count, isGold))
   }
 
   return (
-    <div className="academy-screen">
+    <div className="academy-screen" style={{ '--shop-assets': `url(${shopAssets})` }}>
       <img src={shopBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
-      {/* 頂部 */}
-      <div className="relative z-10 flex items-center px-4 pt-4 pb-2 gap-2">
+
+      <div className="relative z-10 flex items-center gap-2 px-4 pb-2 pt-4">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>
-        <div className="flex-1 text-center">
-          <span className="text-sm font-black text-[#26324A]">補給商店</span>
-        </div>
-        {/* 貨幣 */}
-        <div className="flex gap-1.5 text-xs">
-          <span className="academy-pill academy-pill--pink">🎟 {tickets.normal}</span>
-          <span className="academy-pill academy-pill--gold">🎫 {tickets.gold}</span>
-        </div>
+        <div className="flex-1 text-center text-sm font-black text-[#26324A]">補給商店</div>
+        <div className="w-10" />
       </div>
 
-      {/* Tab */}
-      <div className="relative z-10 academy-tabs mx-4 mb-3">
-        {[{k:'gacha',label:'🎰 扭蛋'},{k:'collection',label:'📦 收藏'}].map(t => (
-          <button
-            key={t.k}
-            className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition-all ${tab === t.k ? 'bg-white text-slate-700 shadow-sm' : 'text-slate-400'}`}
-            onClick={() => setTab(t.k)}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="relative z-10 px-4">
+        <div className="academy-currency-row mb-3">
+          <CurrencyCard sprite="star" label="黃星" value={stars.yellow} />
+          <CurrencyCard sprite="heart" label="紫心" value={stars.purple} />
+          <CurrencyCard sprite="ticket" label="補給券" value={tickets.normal} />
+          <CurrencyCard sprite="goldTicket" label="金券" value={tickets.gold} />
+        </div>
+        <div className="academy-tabs mb-3">
+          <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>扭蛋補給</button>
+          <button className={tab === 'collection' ? 'is-active' : ''} onClick={() => setTab('collection')}>收藏庫</button>
+        </div>
       </div>
 
       <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
         {tab === 'gacha' ? (
-          <div className="flex flex-col gap-4">
-            {/* 一般扭蛋 */}
+          <div className="flex flex-col gap-3">
             <div className="academy-card">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">🎟</span>
+              <div className="academy-shop-hero">
+                <ShopSprite name="keeper" />
                 <div>
-                  <div className="font-black text-slate-700">一般扭蛋</div>
-                  <div className="text-xs text-slate-400">特效・稱號・邊框</div>
+                  <div className="text-base font-black text-[#26324A]">小魔女補給員</div>
+                  <div className="mt-1 text-xs font-bold leading-5 text-[#8E87A8]">
+                    用每日討伐拿到的補給券，抽出攻擊特效、稱號和頭像框。
+                  </div>
                 </div>
               </div>
-              {/* 機率說明 */}
-              <div className="flex gap-2 mb-3">
+            </div>
+
+            <div className="academy-card">
+              <div className="mb-3 flex items-center gap-3">
+                <ShopSprite name="box" className="h-16 w-16" />
+                <div>
+                  <div className="text-sm font-black text-[#26324A]">一般補給箱</div>
+                  <div className="text-xs font-bold text-[#8E87A8]">特效・稱號・邊框</div>
+                </div>
+              </div>
+              <div className="mb-3 flex gap-2">
                 {Object.entries(RARITY_CONFIG).map(([k, v]) => (
-                  <div key={k} className="flex-1 text-center py-1.5 rounded-xl text-xs font-bold text-white"
-                    style={{ background: v.bg }}>
+                  <div key={k} className="flex-1 rounded-2xl py-2 text-center text-xs font-black text-white" style={{ background: v.bg }}>
                     {k} {v.prob}%
                   </div>
                 ))}
               </div>
               <div className="flex gap-2">
-                <button
-                  className="flex-1 py-3 rounded-xl font-bold text-sm tap-bounce text-white disabled:opacity-40"
-                  style={{ background: 'linear-gradient(135deg, #A8D8EA, #7EC8E3)' }}
-                  disabled={tickets.normal < 1}
-                  onClick={() => handleGacha(1, false)}
-                >
-                  🎟 抽1次
+                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 1} onClick={() => handleGacha(1, false)}>
+                  抽 1 次
                 </button>
-                <button
-                  className="flex-1 py-3 rounded-xl font-bold text-sm tap-bounce text-white disabled:opacity-40"
-                  style={{ background: 'linear-gradient(135deg, #C8A8E9, #A87DE0)' }}
-                  disabled={tickets.normal < 10}
-                  onClick={() => handleGacha(10, false)}
-                >
-                  🎟×10 抽10次
+                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 10} onClick={() => handleGacha(10, false)}>
+                  抽 10 次
                 </button>
               </div>
-              <div className="text-center text-xs text-slate-400 mt-1">
-                持有：{tickets.normal} 張扭蛋券
-              </div>
+              <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有補給券：{tickets.normal}</div>
             </div>
 
-            {/* 金色扭蛋 */}
-            <div className="academy-card"
-              style={{ border: '2px solid #FFD700' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">🎫</span>
+            <div className="academy-card" style={{ border: '2px solid rgba(255,211,95,0.86)' }}>
+              <div className="mb-3 flex items-center gap-3">
+                <ShopSprite name="goldTicket" className="h-14 w-14" />
                 <div>
-                  <div className="font-black text-slate-700">限定金色扭蛋</div>
-                  <div className="text-xs text-orange-400">限定特效・節慶背景</div>
+                  <div className="text-sm font-black text-[#26324A]">限定金券池</div>
+                  <div className="text-xs font-bold text-[#D79B26]">SSR 機率提升，月 Boss 掉落</div>
                 </div>
               </div>
-              <button
-                className="w-full py-3 rounded-xl font-bold text-sm tap-bounce text-white disabled:opacity-40"
-                style={{ background: 'linear-gradient(135deg, #FFD700, #FFA500)' }}
-                disabled={tickets.gold < 1}
-                onClick={() => handleGacha(1, true)}
-              >
-                🎫 金色抽1次
+              <button className="academy-small-button w-full disabled:opacity-40" disabled={tickets.gold < 1} onClick={() => handleGacha(1, true)}>
+                金券抽 1 次
               </button>
-              <div className="text-center text-xs text-slate-400 mt-1">
-                持有：{tickets.gold} 張金色券（月Boss 擊殺獲得）
-              </div>
+              <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有金券：{tickets.gold}</div>
             </div>
 
-            {/* 獲得管道說明 */}
-            <div className="academy-card text-xs text-[#8E87A8]">
-              <div className="font-bold mb-1.5">🎟 扭蛋券獲得方式</div>
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between"><span>擊殺平日怪物</span><span className="font-bold">×1</span></div>
-                <div className="flex justify-between"><span>擊殺週末Boss</span><span className="font-bold">×2</span></div>
-                <div className="flex justify-between text-yellow-600"><span>擊殺月Boss 🐉</span><span className="font-bold">金券 ×1</span></div>
-              </div>
+            <div className="academy-card text-xs font-bold leading-6 text-[#8E87A8]">
+              <div className="mb-1 text-xs font-black text-[#26324A]">補給券獲得方式</div>
+              <div className="flex justify-between"><span>平日咒靈淨化</span><span>補給券 x1</span></div>
+              <div className="flex justify-between"><span>週末 Boss 淨化</span><span>補給券 x2</span></div>
+              <div className="flex justify-between text-[#B47B16]"><span>月底 Boss 淨化</span><span>金券 x1</span></div>
             </div>
           </div>
         ) : (
           <div className="academy-card">
-            <div className="font-black text-[#26324A] mb-3">我的收藏品</div>
+            <div className="mb-3 text-sm font-black text-[#26324A]">我的收藏品</div>
             <CollectionGrid items={profile?.collection ?? []} />
           </div>
         )}
       </div>
 
-      {/* 扭蛋結果 */}
       <AnimatePresence>
-        {gachaResult && (
-          <GachaResult
-            results={gachaResult}
-            onClose={() => setGachaResult(null)}
-          />
-        )}
+        {gachaResult && <GachaResult results={gachaResult} onClose={() => setGachaResult(null)} />}
       </AnimatePresence>
 
       <BottomNav current="shop" navigate={navigate} />
