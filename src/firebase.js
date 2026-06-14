@@ -54,6 +54,7 @@ const DEFAULT_PROFILE = {
   stars:      { yellow: 0, purple: 0 },
   tickets:    { normal: 0, gold: 0 },
   dailyBudget: 1000,
+  avatarGender: 'girl',
   consecutiveDays: 0,
   lastActiveDate: null,
   collection: [],

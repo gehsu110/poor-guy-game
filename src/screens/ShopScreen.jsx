@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { BottomNav } from './TownScreen'
+import shopBg from '../assets/academy-art/shop-bg.webp'
 
 // ─── 扭蛋池 ───────────────────────────────────────────────────────────────────
 
@@ -171,22 +172,24 @@ export default function ShopScreen() {
   }
 
   return (
-    <div className="flex flex-col h-full" style={{ background: 'linear-gradient(180deg, #FFF0F8 0%, #F0E8FF 100%)' }}>
+    <div className="academy-screen">
+      <img src={shopBg} alt="" className="academy-bg" draggable="false" />
+      <div className="academy-bg-soft" />
       {/* 頂部 */}
-      <div className="flex items-center px-4 pt-3 pb-2 gap-2">
-        <button className="text-slate-400 tap-bounce" onClick={() => navigate('town')}>←</button>
+      <div className="relative z-10 flex items-center px-4 pt-4 pb-2 gap-2">
+        <button className="academy-back" onClick={() => navigate('town')}>←</button>
         <div className="flex-1 text-center">
-          <span className="text-sm font-black text-slate-700">🛒 魔法商店</span>
+          <span className="text-sm font-black text-[#26324A]">補給商店</span>
         </div>
         {/* 貨幣 */}
         <div className="flex gap-1.5 text-xs">
-          <span className="bg-white/80 px-2 py-0.5 rounded-full font-bold text-slate-600">🎟 {tickets.normal}</span>
-          <span className="bg-yellow-100 px-2 py-0.5 rounded-full font-bold text-yellow-700">🎫 {tickets.gold}</span>
+          <span className="academy-pill academy-pill--pink">🎟 {tickets.normal}</span>
+          <span className="academy-pill academy-pill--gold">🎫 {tickets.gold}</span>
         </div>
       </div>
 
       {/* Tab */}
-      <div className="flex mx-4 bg-white/60 rounded-2xl p-1 gap-1 mb-3">
+      <div className="relative z-10 academy-tabs mx-4 mb-3">
         {[{k:'gacha',label:'🎰 扭蛋'},{k:'collection',label:'📦 收藏'}].map(t => (
           <button
             key={t.k}
@@ -198,11 +201,11 @@ export default function ShopScreen() {
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24">
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
         {tab === 'gacha' ? (
           <div className="flex flex-col gap-4">
             {/* 一般扭蛋 */}
-            <div className="bg-white/80 rounded-3xl p-4 shadow-md">
+            <div className="academy-card">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-2xl">🎟</span>
                 <div>
@@ -243,7 +246,7 @@ export default function ShopScreen() {
             </div>
 
             {/* 金色扭蛋 */}
-            <div className="bg-white/80 rounded-3xl p-4 shadow-md"
+            <div className="academy-card"
               style={{ border: '2px solid #FFD700' }}>
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-2xl">🎫</span>
@@ -266,7 +269,7 @@ export default function ShopScreen() {
             </div>
 
             {/* 獲得管道說明 */}
-            <div className="bg-white/60 rounded-2xl p-3 text-xs text-slate-500">
+            <div className="academy-card text-xs text-[#8E87A8]">
               <div className="font-bold mb-1.5">🎟 扭蛋券獲得方式</div>
               <div className="flex flex-col gap-1">
                 <div className="flex justify-between"><span>擊殺平日怪物</span><span className="font-bold">×1</span></div>
@@ -276,8 +279,8 @@ export default function ShopScreen() {
             </div>
           </div>
         ) : (
-          <div className="bg-white/80 rounded-3xl p-4 shadow-md">
-            <div className="font-black text-slate-700 mb-3">我的收藏品</div>
+          <div className="academy-card">
+            <div className="font-black text-[#26324A] mb-3">我的收藏品</div>
             <CollectionGrid items={profile?.collection ?? []} />
           </div>
         )}

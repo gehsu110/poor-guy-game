@@ -1,85 +1,88 @@
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { BottomNav } from './TownScreen'
+import guildBg from '../assets/academy-art/guild-bg.webp'
+import { formatMoney } from '../gameLogic'
 
-const QUESTS = [
-  // 成就型
-  { id: 'first_record',    name: '第一筆記帳',     desc: '記下你的第一筆消費',     emoji: '✏️', reward: { exp: 50, yellow: 2 },  required: 1,   type: 'count', key: 'totalEntries' },
-  { id: 'first_kill',      name: '初次擊殺',        desc: '擊殺你的第一隻怪物',     emoji: '⚔️', reward: { exp: 80, ticket: 1 }, required: 1,   type: 'count', key: 'totalKills' },
-  { id: 'streak_7',        name: '七日連勤',        desc: '連續記帳 7 天',          emoji: '🔥', reward: { exp: 200, ticket: 2 },required: 7,   type: 'streak', key: 'consecutiveDays' },
-  { id: 'streak_30',       name: '月度傳說',        desc: '連續記帳 30 天',         emoji: '🌟', reward: { exp: 800, purple: 2 }, required: 30,  type: 'streak', key: 'consecutiveDays' },
-  { id: 'entries_100',     name: '百筆勇者',        desc: '累積記帳 100 筆',        emoji: '📚', reward: { exp: 300, yellow: 5 }, required: 100, type: 'count', key: 'totalEntries' },
-  { id: 'kills_50',        name: '連勝50場',        desc: '累積擊殺 50 隻怪物',     emoji: '💀', reward: { exp: 500, ticket: 3 }, required: 50,  type: 'count', key: 'totalKills' },
-  { id: 'first_s',         name: '完美守護',        desc: '獲得第一個 S 評級',      emoji: '✨', reward: { exp: 150, purple: 1 }, required: 1,   type: 'count', key: 'sRatings' },
-  { id: 'first_monthboss', name: '月底英雄',        desc: '擊殺月Boss',             emoji: '🐉', reward: { exp: 500, gold: 1 },   required: 1,   type: 'count', key: 'monthBossKills' },
-]
-
-function QuestCard({ quest, progress, done }) {
-  const pct = Math.min(progress / quest.required, 1)
-
+function FinanceModule({ title, value, sub, tone = 'purple', delay = 0 }) {
   return (
     <motion.div
-      className={`flex items-center gap-3 px-3 py-3 rounded-2xl ${done ? 'bg-green-50' : 'bg-white/70'}`}
-      initial={{ x: -10, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
+      className={`academy-guild-module academy-guild-module--${tone}`}
+      initial={{ y: 12, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay }}
     >
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${done ? 'bg-green-100' : 'bg-gray-100'}`}>
-        {done ? '✅' : quest.emoji}
-      </div>
-      <div className="flex-1">
-        <div className={`text-xs font-bold ${done ? 'text-green-700' : 'text-slate-700'}`}>{quest.name}</div>
-        <div className="text-[10px] text-slate-400">{quest.desc}</div>
-        {!done && (
-          <div className="mt-1">
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full rounded-full bg-purple-300" style={{ width: `${pct * 100}%` }} />
-            </div>
-            <div className="text-[9px] text-slate-400 mt-0.5">{progress} / {quest.required}</div>
-          </div>
-        )}
-      </div>
-      <div className="text-right text-[10px] text-slate-500">
-        {quest.reward.exp && <div>EXP+{quest.reward.exp}</div>}
-        {quest.reward.ticket && <div>🎟+{quest.reward.ticket}</div>}
-        {quest.reward.gold && <div>🎫+{quest.reward.gold}</div>}
-        {quest.reward.purple && <div>💜+{quest.reward.purple}</div>}
-        {quest.reward.yellow && <div>⭐+{quest.reward.yellow}</div>}
-      </div>
+      <div className="text-[10px] font-black text-[#8E87A8]">{title}</div>
+      <div className="mt-1 text-lg font-black text-[#26324A]">{value}</div>
+      <div className="mt-0.5 text-[10px] font-bold text-[#8E87A8]">{sub}</div>
     </motion.div>
   )
 }
 
 export default function QuestScreen() {
   const { state, navigate } = useApp()
-  const { profile } = state
-
-  // 取得進度（真實要從 Firebase 讀，這裡先用 profile 估算）
-  const getProgress = (key) => {
-    const map = {
-      totalEntries: state.expenses?.length ?? 0,
-      totalKills: 0,
-      consecutiveDays: profile?.consecutiveDays ?? 0,
-      sRatings: 0,
-      monthBossKills: 0,
-    }
-    return map[key] ?? 0
-  }
+  const { profile, totalSpent } = state
+  const budget = profile?.dailyBudget ?? 1000
+  const remaining = budget - totalSpent
+  const budgetPct = budget > 0 ? Math.min(totalSpent / budget, 1) : 0
 
   return (
-    <div className="flex flex-col h-full" style={{ background: 'linear-gradient(180deg, #FFFBF0 0%, #F0F8FF 100%)' }}>
-      {/* 頂部 */}
-      <div className="flex items-center px-4 pt-3 pb-2 gap-2">
-        <button className="text-slate-400 tap-bounce" onClick={() => navigate('town')}>←</button>
-        <div className="flex-1 text-center text-sm font-black text-slate-700">📜 任務 & 成就</div>
+    <div className="academy-screen">
+      <img src={guildBg} alt="" className="academy-bg" draggable="false" />
+      <div className="academy-bg-soft" />
+
+      <div className="relative z-10 flex items-center gap-2 px-4 pb-2 pt-4">
+        <button className="academy-back" onClick={() => navigate('town')}>←</button>
+        <div className="flex-1 text-center text-sm font-black text-[#26324A]">公會基地</div>
+        <div className="w-10" />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24">
-        <div className="flex flex-col gap-2 py-2">
-          {QUESTS.map(q => {
-            const progress = getProgress(q.key)
-            const done = progress >= q.required
-            return <QuestCard key={q.id} quest={q} progress={progress} done={done} />
-          })}
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
+        <div className="academy-card mb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-base font-black text-[#26324A]">家庭財務俱樂部</div>
+              <div className="text-xs font-bold text-[#8E87A8]">收入、儲蓄、固定支出集中管理</div>
+            </div>
+            <span className="academy-status">Lv.1</span>
+          </div>
+          <div className="mt-4">
+            <div className="mb-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
+              <span>今日預算壓力</span>
+              <span>{Math.round(budgetPct * 100)}%</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-[#ECE7F5]">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-[#52DED4] via-[#FFD166] to-[#FF7FA3]"
+                animate={{ width: `${budgetPct * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <FinanceModule title="今日預算" value={`NT$${formatMoney(budget)}`} sub="每日討伐基準" tone="blue" />
+          <FinanceModule title="剩餘預算" value={`NT$${formatMoney(Math.max(0, remaining))}`} sub="可轉最後一擊" tone="green" delay={0.04} />
+          <FinanceModule title="固定支出" value="設定中" sub="房租、訂閱、保險" tone="pink" delay={0.08} />
+          <FinanceModule title="儲蓄罐" value="準備中" sub="未來版本解鎖" tone="gold" delay={0.12} />
+        </div>
+
+        <div className="academy-card mt-3">
+          <div className="mb-3 text-xs font-black text-[#26324A]">基地待辦</div>
+          {[
+            ['設定月收入', '讓公會知道本月資源'],
+            ['設定固定支出', '把訂閱與房租先扣除'],
+            ['設定儲蓄目標', '月底結算時追蹤成果'],
+          ].map(([title, sub], i) => (
+            <div key={title} className="academy-list-row">
+              <span className="text-lg">{i + 1}</span>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-black text-[#26324A]">{title}</div>
+                <div className="text-[10px] font-bold text-[#8E87A8]">{sub}</div>
+              </div>
+              <span className="academy-status">規劃</span>
+            </div>
+          ))}
         </div>
       </div>
 

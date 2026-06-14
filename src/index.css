@@ -650,3 +650,493 @@ body {
   background: linear-gradient(135deg, #21D4C2, #FFD166);
   box-shadow: 0 10px 24px rgba(33,212,194,0.26);
 }
+
+/* Bright chibi curse-academy skin */
+body {
+  background: #efe4ff;
+}
+
+#root {
+  background: #fff7ec;
+}
+
+@media (min-width: 431px) {
+  body {
+    background: radial-gradient(ellipse at center, #d8efff 0%, #bca8ff 58%, #6c5aa8 100%);
+  }
+  #root {
+    box-shadow: 0 26px 90px rgba(90,76,150,0.36);
+  }
+}
+
+.academy-screen {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff7ec;
+}
+
+.academy-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+.academy-bg-soft {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255,248,242,0.18) 0%, rgba(255,248,242,0.05) 38%, rgba(255,248,242,0.92) 100%),
+    radial-gradient(circle at 50% 44%, rgba(255,255,255,0.08), rgba(255,247,236,0.5) 72%);
+  pointer-events: none;
+}
+
+.academy-card,
+.academy-hud,
+.academy-attack-panel {
+  border: 1px solid rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.82);
+  box-shadow: 0 16px 34px rgba(86,74,130,0.16);
+  backdrop-filter: blur(16px);
+}
+
+.academy-card {
+  border-radius: 26px;
+  padding: 14px;
+}
+
+.academy-hud {
+  border-radius: 26px;
+  padding: 12px;
+}
+
+.academy-back {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  color: #8e87a8;
+  font-weight: 900;
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(255,255,255,0.72);
+  box-shadow: 0 8px 18px rgba(86,74,130,0.12);
+}
+
+.academy-avatar {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 38%, #ffffff 0%, #f2ebff 50%, #dff8ff 100%);
+}
+
+.academy-avatar img {
+  position: absolute;
+  top: 50%;
+  width: 210%;
+  max-width: none;
+  transform: translateY(-50%);
+}
+
+.academy-avatar--boy img {
+  left: -7%;
+}
+
+.academy-avatar--girl img {
+  left: -103%;
+}
+
+.academy-hud-avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 17px;
+  border: 2px solid rgba(139,124,255,0.42);
+  box-shadow: inset 0 0 14px rgba(139,124,255,0.12);
+}
+
+.academy-profile-avatar {
+  width: 128px;
+  height: 128px;
+  border-radius: 34px;
+  border: 3px solid rgba(255,209,102,0.72);
+  box-shadow: 0 18px 34px rgba(86,74,130,0.18);
+}
+
+.academy-profile-avatar img {
+  width: 205%;
+}
+
+.academy-pill {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-weight: 900;
+  border: 1px solid transparent;
+}
+
+.academy-pill--gold {
+  color: #b47b16;
+  background: #fff1bf;
+  border-color: rgba(255,209,102,0.65);
+}
+
+.academy-pill--purple {
+  color: #745bd6;
+  background: #f1ecff;
+  border-color: rgba(139,124,255,0.38);
+}
+
+.academy-pill--pink {
+  color: #d9517b;
+  background: #ffe5ee;
+  border-color: rgba(255,127,163,0.48);
+}
+
+.academy-monster-stage {
+  position: relative;
+  display: flex;
+  min-height: 380px;
+  flex: 1;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 18px;
+}
+
+.academy-monster-stage::before {
+  content: '';
+  position: absolute;
+  bottom: 72px;
+  width: 230px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(139,124,255,0.26), rgba(82,222,212,0.08), transparent 70%);
+  filter: blur(2px);
+}
+
+.academy-monster-img {
+  position: absolute;
+  bottom: 108px;
+  width: 235px;
+  max-width: none;
+  filter: drop-shadow(0 14px 18px rgba(93,72,130,0.2));
+}
+
+.academy-hp-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.84);
+  padding: 12px;
+  box-shadow: 0 12px 26px rgba(86,74,130,0.16);
+  backdrop-filter: blur(16px);
+}
+
+.academy-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #7b63d8;
+  font-size: 10px;
+  font-weight: 900;
+  background: #f1ecff;
+  border: 1px solid rgba(139,124,255,0.32);
+}
+
+.academy-status--done {
+  color: #178b82;
+  background: #dff8f5;
+  border-color: rgba(82,222,212,0.48);
+}
+
+.academy-status--boss {
+  color: #d9517b;
+  background: #ffe5ee;
+  border-color: rgba(255,127,163,0.48);
+}
+
+.academy-attack-panel {
+  position: relative;
+  z-index: 4;
+  border-radius: 28px;
+  padding: 14px;
+}
+
+.academy-step {
+  display: flex;
+  min-height: 54px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 18px;
+  color: #8e87a8;
+  background: #f7f1ff;
+  border: 1px solid #eadff7;
+}
+
+.academy-step span {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: white;
+  font-size: 10px;
+  font-weight: 900;
+  background: #b9a8ff;
+}
+
+.academy-step b {
+  color: #26324a;
+  font-size: 11px;
+}
+
+.academy-step--attack {
+  background: #ffe5ee;
+  border-color: rgba(255,127,163,0.45);
+}
+
+.academy-step--attack span {
+  background: #ff7fa3;
+}
+
+.academy-dock {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  display: flex;
+  gap: 2px;
+  border-top: 1px solid rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.88);
+  padding: 7px 8px 9px;
+  box-shadow: 0 -12px 30px rgba(86,74,130,0.12);
+  backdrop-filter: blur(18px);
+}
+
+.academy-dock-item {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border-radius: 18px;
+  padding: 5px 0;
+  color: #9d94b5;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.academy-dock-item span {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: #7b63d8;
+  font-size: 16px;
+  background: #f1ecff;
+}
+
+.academy-dock-item.is-active {
+  color: #26324a;
+}
+
+.academy-dock-item.is-active span {
+  color: white;
+  background: linear-gradient(135deg, #8b7cff, #52ded4);
+  box-shadow: 0 8px 18px rgba(139,124,255,0.28);
+}
+
+.academy-battle-monster {
+  display: flex;
+  width: 215px;
+  height: 215px;
+  align-items: center;
+  justify-content: center;
+}
+
+.academy-battle-monster img {
+  width: 250px;
+  max-width: none;
+  filter: drop-shadow(0 14px 20px rgba(93,72,130,0.22));
+}
+
+.academy-category {
+  display: flex;
+  min-height: 62px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  color: #8e87a8;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid #eadff7;
+}
+
+.academy-category.is-active {
+  color: #7b63d8;
+  background: #f1ecff;
+  border-color: rgba(139,124,255,0.45);
+  box-shadow: 0 10px 18px rgba(139,124,255,0.16);
+}
+
+.academy-key {
+  min-height: 44px;
+  border-radius: 16px;
+  color: #26324a;
+  font-size: 15px;
+  font-weight: 900;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid #eadff7;
+}
+
+.academy-key--op {
+  color: #7b63d8;
+  background: #f1ecff;
+}
+
+.academy-key--submit {
+  color: white;
+  background: linear-gradient(135deg, #8b7cff, #ff7fa3);
+  border-color: transparent;
+  box-shadow: 0 12px 22px rgba(255,127,163,0.22);
+}
+
+.academy-segment,
+.academy-tabs {
+  display: flex;
+  gap: 6px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.64);
+  padding: 5px;
+  border: 1px solid rgba(255,255,255,0.72);
+}
+
+.academy-segment button,
+.academy-tabs button {
+  flex: 1 1 0;
+  border-radius: 14px;
+  padding: 8px 10px;
+  color: #8e87a8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.academy-segment button.is-active,
+.academy-tabs button.is-active {
+  color: #26324a;
+  background: white;
+  box-shadow: 0 6px 14px rgba(86,74,130,0.1);
+}
+
+.academy-amount,
+.academy-stat-box {
+  border-radius: 20px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid #eadff7;
+  padding: 12px;
+}
+
+.academy-amount {
+  text-align: right;
+}
+
+.academy-list-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.62);
+  border: 1px solid #eadff7;
+  padding: 10px;
+}
+
+.academy-list-row + .academy-list-row {
+  margin-top: 7px;
+}
+
+.academy-mini-stat {
+  border-radius: 18px;
+  padding: 9px 6px;
+  text-align: center;
+  font-weight: 900;
+  border: 1px solid rgba(255,255,255,0.68);
+  background: rgba(255,255,255,0.78);
+  box-shadow: 0 8px 16px rgba(86,74,130,0.1);
+}
+
+.academy-mini-stat--gold { color: #b47b16; background: #fff1bf; }
+.academy-mini-stat--purple { color: #745bd6; background: #f1ecff; }
+.academy-mini-stat--blue { color: #2782a0; background: #e4f7ff; }
+.academy-mini-stat--pink { color: #d9517b; background: #ffe5ee; }
+.academy-mini-stat--green { color: #178b82; background: #dff8f5; }
+
+.academy-avatar-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.68);
+  border: 2px solid transparent;
+  padding: 10px;
+  color: #8e87a8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.academy-avatar-option .academy-profile-avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 26px;
+}
+
+.academy-avatar-option.is-active {
+  color: #26324a;
+  border-color: rgba(139,124,255,0.5);
+  background: #f1ecff;
+}
+
+.academy-small-button {
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8b7cff, #52ded4);
+  padding: 9px 14px;
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 10px 20px rgba(139,124,255,0.18);
+}
+
+.academy-guild-module {
+  min-height: 104px;
+  border-radius: 24px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.82);
+  box-shadow: 0 12px 24px rgba(86,74,130,0.12);
+  backdrop-filter: blur(14px);
+}
+
+.academy-guild-module--blue { background: rgba(228,247,255,0.88); }
+.academy-guild-module--green { background: rgba(223,248,245,0.88); }
+.academy-guild-module--pink { background: rgba(255,229,238,0.88); }
+.academy-guild-module--gold { background: rgba(255,241,191,0.88); }

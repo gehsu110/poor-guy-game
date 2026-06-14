@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { generateDayMonster, formatMoney } from '../gameLogic'
 import { BottomNav } from './TownScreen'
+import mapBg from '../assets/academy-art/map-bg.webp'
 
 // 節點狀態設定
 const NODE_CONFIG = {
@@ -86,23 +87,24 @@ export default function MapScreen() {
   }
 
   return (
-    <div className="flex flex-col h-full" style={{ background: 'linear-gradient(180deg, #FFF5E6 0%, #E8F4FD 100%)' }}>
+    <div className="academy-screen">
+      <img src={mapBg} alt="" className="academy-bg" draggable="false" />
+      <div className="academy-bg-soft" />
       {/* 頂部 */}
-      <div className="flex items-center px-4 pt-3 pb-2 gap-2">
-        <button className="text-slate-400 tap-bounce" onClick={() => navigate('town')}>←</button>
+      <div className="relative z-10 flex items-center px-4 pt-4 pb-2 gap-2">
+        <button className="academy-back" onClick={() => navigate('town')}>←</button>
         <div className="flex-1">
-          <div className="text-sm font-black text-slate-700">🗺️ 本月遠征路線</div>
-          <div className="text-xs text-slate-400">{year}年{month}月</div>
+          <div className="text-sm font-black text-[#26324A]">本月遠征路線</div>
+          <div className="text-xs font-bold text-[#8E87A8]">{year}年{month}月</div>
         </div>
-        <div className="text-xs bg-white/70 rounded-xl px-3 py-1.5">
-          <span className="text-green-600 font-bold">✓{stats.killed}</span>
-          <span className="text-slate-300"> / </span>
-          <span className="text-slate-500">{stats.total}天</span>
+        <div className="academy-mini-stat academy-mini-stat--blue">
+          <span className="font-black">{stats.killed}</span>
+          <span className="text-[9px]">/{stats.total}天</span>
         </div>
       </div>
 
       {/* 圖例 */}
-      <div className="flex gap-2 px-4 pb-2 overflow-x-auto">
+      <div className="relative z-10 flex gap-2 px-4 pb-2 overflow-x-auto">
         {[
           { color: '#A8E6CF', label: '擊殺' },
           { color: '#FFE4A0', label: '未滅' },
@@ -119,12 +121,12 @@ export default function MapScreen() {
       </div>
 
       {/* 地圖主體 */}
-      <div className="flex-1 overflow-y-auto px-4 pb-24">
-        <div className="flex flex-col gap-8 py-4">
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
+        <div className="academy-card flex flex-col gap-8 py-6">
           {rows.map((row, ri) => (
             <div key={ri} className="flex justify-around items-center relative">
               {/* 連接線 */}
-              <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-gray-200 -z-10" />
+              <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-[#D8CEED] -z-10" />
               {row.map(node => (
                 <MapNode
                   key={node.day}
@@ -141,28 +143,28 @@ export default function MapScreen() {
       {/* 選中節點詳情 */}
       {selected && (
         <motion.div
-          className="absolute bottom-16 left-3 right-3 bg-white rounded-3xl p-4 shadow-xl z-30"
+          className="absolute bottom-20 left-3 right-3 academy-card z-30"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
           <div className="flex justify-between items-start mb-2">
             <div>
-              <div className="font-black text-slate-700">{selected.monster.emoji} {selected.monster.name}</div>
-              <div className="text-xs text-slate-400">{selected.date}</div>
+              <div className="font-black text-[#26324A]">{selected.monster.emoji} {selected.monster.name}</div>
+              <div className="text-xs font-bold text-[#8E87A8]">{selected.date}</div>
             </div>
-            <button className="text-slate-300 text-lg tap-bounce" onClick={() => setSelected(null)}>×</button>
+            <button className="text-[#8E87A8] text-lg tap-bounce" onClick={() => setSelected(null)}>×</button>
           </div>
           <div className="flex gap-3 text-xs">
-            <div className="bg-gray-50 rounded-xl px-3 py-2 flex-1 text-center">
-              <div className="text-slate-500">怪物HP</div>
-              <div className="font-bold text-slate-700">NT${formatMoney(selected.monster.maxHp)}</div>
+            <div className="academy-stat-box flex-1 text-center">
+              <div className="text-[#8E87A8]">怪物HP</div>
+              <div className="font-bold text-[#26324A]">NT${formatMoney(selected.monster.maxHp)}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl px-3 py-2 flex-1 text-center">
-              <div className="text-slate-500">難度係數</div>
-              <div className="font-bold text-slate-700">×{selected.monster.coeff}</div>
+            <div className="academy-stat-box flex-1 text-center">
+              <div className="text-[#8E87A8]">難度係數</div>
+              <div className="font-bold text-[#26324A]">×{selected.monster.coeff}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl px-3 py-2 flex-1 text-center">
-              <div className="text-slate-500">狀態</div>
+            <div className="academy-stat-box flex-1 text-center">
+              <div className="text-[#8E87A8]">狀態</div>
               <div className={`font-bold ${selected.status === 'defeated' ? 'text-green-500' : 'text-slate-700'}`}>
                 {NODE_CONFIG[selected.status]?.label ?? '未知'}
               </div>
@@ -170,11 +172,10 @@ export default function MapScreen() {
           </div>
           {selected.date === todayDate && (
             <button
-              className="mt-3 w-full py-2 rounded-xl text-white text-sm font-bold tap-bounce"
-              style={{ background: 'linear-gradient(135deg, #C8A8E9, #A8D8EA)' }}
+              className="academy-small-button mt-3 w-full"
               onClick={() => { setSelected(null); navigate('battle') }}
             >
-              ⚔️ 前往戰鬥
+              前往今日討伐
             </button>
           )}
         </motion.div>

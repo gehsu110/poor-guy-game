@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import { BottomNav } from './TownScreen'
-import battleBg from '../assets/urban-art/urban-battle-v1.webp'
-import spendingCurse from '../assets/urban-art/spending-curse-v1.png'
+import battleBg from '../assets/academy-art/home-bg.webp'
+import spirit from '../assets/academy-art/spending-spirit.png'
 
 function TierBadge({ tier }) {
-  if (tier === 'monthboss') return <span className="battle-tier battle-tier--gold">月Boss</span>
-  if (tier === 'boss' || tier === 'weekend') return <span className="battle-tier battle-tier--coral">週末Boss</span>
-  return <span className="battle-tier">今日怪物</span>
+  if (tier === 'monthboss') return <span className="academy-status academy-status--boss">月Boss</span>
+  if (tier === 'boss' || tier === 'weekend') return <span className="academy-status academy-status--boss">週末Boss</span>
+  return <span className="academy-status">今日咒靈</span>
 }
 
 function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
@@ -19,44 +19,44 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
   const isAngry = hpPct < 0.3 && !defeated
 
   return (
-    <div className="relative flex h-full flex-col justify-end px-4 pb-3 pt-16">
-      <div className="battle-boss-plate">
+    <div className="relative flex h-full flex-col justify-end px-4 pb-3 pt-12">
+      <div className="academy-card">
         <div className="mb-2 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="truncate text-base font-black text-slate-900">{monster.name}</div>
-            <div className="text-[10px] font-bold text-slate-500">
-              {defeated ? '討伐完成，今天很穩。' : '輸入一筆消費，給它一擊。'}
+            <div className="truncate text-base font-black text-[#26324A]">{monster.name}</div>
+            <div className="text-[10px] font-bold text-[#8E87A8]">
+              {defeated ? '淨化完成，今天很穩。' : '輸入一筆消費，施放術式。'}
             </div>
           </div>
           <TierBadge tier={monster.tier} />
         </div>
 
-        <div className="mb-1 flex justify-between text-[10px] font-black text-slate-500">
+        <div className="mb-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
           <span>HP</span>
           <span>{defeated ? '0' : formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
         </div>
-        <div className="h-3.5 overflow-hidden rounded-full bg-slate-200">
+        <div className="h-3.5 overflow-hidden rounded-full bg-[#ECE7F5]">
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-teal-400 via-amber-300 to-rose-400"
+            className="h-full rounded-full bg-gradient-to-r from-[#52DED4] via-[#FFD166] to-[#FF7FA3]"
             animate={{ width: `${hpPct * 100}%` }}
             transition={{ duration: 0.55, ease: 'easeOut' }}
           />
         </div>
       </div>
 
-      <div className="relative mx-auto mt-3 flex h-44 w-44 items-center justify-center">
+      <div className="relative mx-auto mt-2 flex h-48 w-48 items-center justify-center">
         <motion.div
-          className="absolute inset-5 rounded-full bg-amber-200/25 blur-2xl"
+          className="absolute inset-4 rounded-full bg-[#9B7CFF]/25 blur-2xl"
           animate={{ scale: [0.92, 1.08, 0.92], opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 3, repeat: Infinity }}
         />
         <motion.div
-          className="absolute bottom-2 h-8 w-36 rounded-full bg-[#243B6B]/20 blur-md"
+          className="absolute bottom-2 h-8 w-36 rounded-full bg-[#8B7CFF]/20 blur-md"
           animate={{ scaleX: defeated ? 0.8 : [0.9, 1.05, 0.9] }}
           transition={{ duration: 2.4, repeat: Infinity }}
         />
         <motion.div
-          className={`battle-monster ${isHit ? 'monster-hit' : ''}`}
+          className={`academy-battle-monster ${isHit ? 'monster-hit' : ''}`}
           animate={
             defeated ? { rotate: [-4, 4, -4], scale: 0.9 } :
             isAngry ? { scale: [1, 1.08, 1] } :
@@ -64,7 +64,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
           }
           transition={{ duration: defeated ? 1 : isAngry ? 0.45 : 2.4, repeat: Infinity }}
         >
-          {defeated ? '🏆' : <img src={spendingCurse} alt="" className="battle-monster-img" draggable="false" />}
+          {defeated ? '🏆' : <img src={spirit} alt="" draggable="false" />}
         </motion.div>
         {isAngry && <div className="absolute right-6 top-4 text-xl">💢</div>}
 
@@ -75,7 +75,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
             style={{
               left: `${dn.x}%`,
               top: `${dn.y}%`,
-              color: dn.crit ? '#F5B942' : '#F26B6B',
+              color: dn.crit ? '#FFD166' : '#FF7FA3',
               fontSize: dn.crit ? 30 : 24,
             }}
             initial={{ y: 0, opacity: 1, scale: dn.crit ? 1.35 : 1.15 }}
@@ -90,14 +90,14 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
       <AnimatePresence>
         {defeated && (
           <motion.div
-            className="absolute inset-x-8 top-40 z-20 rounded-3xl border border-amber-200 bg-white/90 px-5 py-4 text-center shadow-2xl backdrop-blur"
+            className="absolute inset-x-8 top-40 z-20 rounded-3xl border border-[#FFD166]/50 bg-white/90 px-5 py-4 text-center shadow-2xl backdrop-blur"
             initial={{ y: 10, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 10, opacity: 0 }}
           >
             <div className="text-3xl">🏆</div>
-            <div className="mt-1 text-sm font-black text-slate-900">討伐成功</div>
-            <div className="text-[10px] font-bold text-slate-500">獎勵已加入你的冒險背包</div>
+            <div className="mt-1 text-sm font-black text-[#26324A]">淨化成功</div>
+            <div className="text-[10px] font-bold text-[#8E87A8]">獎勵已加入你的術師背包</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -111,7 +111,7 @@ function CategoryPicker({ selected, onSelect }) {
       {DEFAULT_CATEGORIES.map(cat => (
         <motion.button
           key={cat.id}
-          className={`category-chip ${selected === cat.id ? 'category-chip--active' : ''}`}
+          className={`academy-category ${selected === cat.id ? 'is-active' : ''}`}
           onClick={() => onSelect(cat.id)}
           whileTap={{ scale: 0.92 }}
         >
@@ -151,7 +151,7 @@ function CalcKeyboard({ value, onChange, onSubmit }) {
         return (
           <motion.button
             key={k}
-            className={`calc-key ${isOp ? 'calc-key--op' : ''} ${isEqual ? 'calc-key--submit' : ''}`}
+            className={`academy-key ${isOp ? 'academy-key--op' : ''} ${isEqual ? 'academy-key--submit' : ''}`}
             onClick={() => isEqual ? onSubmit(evalValue()) : press(k)}
             whileTap={{ scale: 0.9 }}
           >
@@ -198,14 +198,14 @@ function ExpensePanel({ onSubmit, budget, spent }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex justify-between text-xs font-black text-slate-500">
-        <span>今日消費 <b className="text-slate-800">NT${formatMoney(spent)}</b></span>
-        <span className={remaining < 0 ? 'text-rose-500' : 'text-teal-600'}>
+      <div className="flex justify-between text-xs font-black text-[#8E87A8]">
+        <span>今日消費 <b className="text-[#26324A]">NT${formatMoney(spent)}</b></span>
+        <span className={remaining < 0 ? 'text-[#FF6D98]' : 'text-[#24B7B0]'}>
           {remaining < 0 ? `超支 NT$${formatMoney(-remaining)}` : `剩餘 NT$${formatMoney(remaining)}`}
         </span>
       </div>
 
-      <div className="segmented-control">
+      <div className="academy-segment">
         {[
           { k: 'category', label: '選分類' },
           { k: 'amount', label: '輸入金額' },
@@ -225,7 +225,7 @@ function ExpensePanel({ onSubmit, budget, spent }) {
         placeholder="備註，可跳過"
         value={note}
         onChange={e => setNote(e.target.value)}
-        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 outline-none placeholder:text-slate-300 focus:border-teal-300"
+        className="rounded-2xl border border-[#E7DEF6] bg-white/90 px-4 py-3 text-sm font-bold text-[#26324A] outline-none placeholder:text-[#B8AECF] focus:border-[#8B7CFF]"
         maxLength={20}
       />
 
@@ -233,24 +233,24 @@ function ExpensePanel({ onSubmit, budget, spent }) {
         <>
           <CategoryPicker selected={category} onSelect={cat => { setCategory(cat); setStep('amount') }} />
           {category && (
-            <div className="text-center text-xs font-bold text-slate-500">
+            <div className="text-center text-xs font-bold text-[#8E87A8]">
               已選：{currentCat?.emoji} {currentCat?.label}
-              <button className="ml-2 text-teal-600" onClick={() => setStep('amount')}>繼續</button>
+              <button className="ml-2 text-[#24B7B0]" onClick={() => setStep('amount')}>繼續</button>
             </div>
           )}
         </>
       ) : (
         <>
-          <div className="amount-display">
-            <div className="text-xs font-black text-slate-400">
+          <div className="academy-amount">
+            <div className="text-xs font-black text-[#8E87A8]">
               {currentCat ? `${currentCat.emoji} ${currentCat.label}` : '尚未選擇分類'}
             </div>
-            <div className="mt-1 text-3xl font-black text-[#243B6B]">
+            <div className="mt-1 text-3xl font-black text-[#26324A]">
               NT$ {amount.includes('+') ? amount : formatMoney(Number(amount) || 0)}
             </div>
             {previewDmg && (
               <motion.div
-                className="mt-1 text-xs font-black text-rose-500"
+                className="mt-1 text-xs font-black text-[#FF6D98]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
@@ -264,7 +264,7 @@ function ExpensePanel({ onSubmit, budget, spent }) {
 
       {error && (
         <motion.div
-          className="text-center text-xs font-black text-rose-500"
+          className="text-center text-xs font-black text-[#FF6D98]"
           initial={{ x: -5 }}
           animate={{ x: 0 }}
         >
@@ -278,8 +278,8 @@ function ExpensePanel({ onSubmit, budget, spent }) {
 function ExpenseList({ expenses }) {
   if (!expenses.length) {
     return (
-      <div className="rounded-2xl bg-white/70 px-3 py-3 text-center text-xs font-bold text-slate-400">
-        還沒有記帳紀錄，輸入消費即可攻擊。
+      <div className="rounded-2xl bg-white/80 px-3 py-3 text-center text-xs font-bold text-[#8E87A8]">
+        還沒有記帳紀錄，輸入消費即可施法。
       </div>
     )
   }
@@ -291,17 +291,17 @@ function ExpenseList({ expenses }) {
         return (
           <motion.div
             key={e.id ?? i}
-            className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 shadow-sm"
+            className="flex items-center gap-2 rounded-2xl bg-white/85 px-3 py-2 shadow-sm"
             initial={{ x: -14, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: i * 0.02 }}
           >
             <span className="text-base">{cat?.emoji ?? '✨'}</span>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-black text-slate-700">{cat?.label ?? '其他'}</div>
-              {e.note && <div className="truncate text-[10px] font-bold text-slate-400">{e.note}</div>}
+              <div className="truncate text-xs font-black text-[#26324A]">{cat?.label ?? '其他'}</div>
+              {e.note && <div className="truncate text-[10px] font-bold text-[#8E87A8]">{e.note}</div>}
             </div>
-            <div className="text-sm font-black text-amber-500">NT${formatMoney(e.amount)}</div>
+            <div className="text-sm font-black text-[#D9961E]">NT${formatMoney(e.amount)}</div>
           </motion.div>
         )
       })}
@@ -322,32 +322,27 @@ export default function BattleScreen() {
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-[#090F1C]">
-      <img
-        src={battleBg}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        draggable="false"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050814]/5 via-[#050814]/15 to-[#050814]/95" />
+    <div className="academy-screen">
+      <img src={battleBg} alt="" className="academy-bg" draggable="false" />
+      <div className="academy-bg-soft" />
 
       <div className="relative z-20 flex items-center gap-2 px-4 pb-1 pt-4">
         <button
-          className="tap-bounce rounded-2xl border border-cyan-300/20 bg-[#101827]/85 px-3 py-2 text-sm font-black text-cyan-100 shadow-md"
+          className="tap-bounce rounded-2xl border border-white/60 bg-white/85 px-3 py-2 text-sm font-black text-[#8E87A8] shadow-md"
           onClick={() => navigate('town')}
         >
           ←
         </button>
         <div className="min-w-0 flex-1 text-center">
-          <div className="text-sm font-black text-cyan-100">今日討伐</div>
-          <div className="text-[10px] font-bold text-cyan-300/70">{state.date}</div>
+          <div className="text-sm font-black text-[#26324A]">今日討伐</div>
+          <div className="text-[10px] font-bold text-[#8E87A8]">{state.date}</div>
         </div>
-        <div className="rounded-2xl border border-amber-300/25 bg-[#101827]/85 px-3 py-2 text-xs font-black text-amber-300 shadow-md">
+        <div className="rounded-2xl border border-white/60 bg-white/85 px-3 py-2 text-xs font-black text-[#D9961E] shadow-md">
           NT${formatMoney(Math.max(0, budget - totalSpent))}
         </div>
       </div>
 
-      <div className="relative z-10 min-h-[340px] flex-none">
+      <div className="relative z-10 min-h-[330px] flex-none">
         <MonsterArea
           monster={monster}
           currentHp={currentHp}
@@ -358,17 +353,17 @@ export default function BattleScreen() {
 
       <div className="relative z-20 flex-1 overflow-y-auto px-4 pb-24">
         <div className="mb-3">
-          <div className="mb-1 text-xs font-black text-cyan-100">今日記錄</div>
+          <div className="mb-1 text-xs font-black text-[#26324A]">今日記錄</div>
           <ExpenseList expenses={expenses} />
         </div>
 
-        <div className="mobile-panel p-3">
-          <div className="mb-2 text-center text-xs font-black text-slate-400">輸入消費即可攻擊</div>
+        <div className="academy-card p-3">
+          <div className="mb-2 text-center text-xs font-black text-[#8E87A8]">輸入消費即可施放術式</div>
           <ExpensePanel onSubmit={handleSubmit} budget={budget} spent={totalSpent} />
         </div>
       </div>
 
-      <BottomNav current="battle" navigate={navigate} />
+      <BottomNav current="town" navigate={navigate} />
     </div>
   )
 }
