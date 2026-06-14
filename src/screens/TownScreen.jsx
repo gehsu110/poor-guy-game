@@ -1,9 +1,9 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { formatMoney, getTitle } from '../gameLogic'
+import { formatMoney, generateDayMonster, getTitle } from '../gameLogic'
 import homeBg from '../assets/academy-art/home-bg.webp'
 import avatars from '../assets/academy-art/avatars.png'
-import spirit from '../assets/academy-art/spending-spirit.png'
+import monsterSprites from '../assets/academy-art/monster-sprites.png'
 
 function Avatar({ gender = 'girl', className = '' }) {
   return (
@@ -59,11 +59,8 @@ function DailyMonster({ monster, currentHp }) {
 
   return (
     <div className="academy-monster-stage">
-      <motion.img
-        src={spirit}
-        alt=""
-        className="academy-monster-img"
-        draggable="false"
+      <motion.div
+        className={`academy-monster-img academy-monster-sprite academy-monster-sprite--${monster.id}`}
         animate={defeated ? { rotate: [-5, 4, -4] } : { y: [0, -8, 0] }}
         transition={{ duration: defeated ? 0.8 : 2.4, repeat: Infinity }}
       />
@@ -124,30 +121,15 @@ function AttackEntry({ spent, budget, onClick }) {
   )
 }
 
-function Toast({ notification }) {
-  return (
-    <AnimatePresence>
-      {notification && (
-        <motion.div
-          className="absolute left-1/2 top-24 z-50 -translate-x-1/2 whitespace-nowrap rounded-2xl border border-[#FFD166]/50 bg-white/95 px-4 py-2 text-sm font-black text-[#D9961E] shadow-xl"
-          initial={{ y: -18, opacity: 0, scale: 0.9 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: -18, opacity: 0 }}
-        >
-          {notification.message}
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
-}
-
 export default function TownScreen() {
   const { state, navigate } = useApp()
   const { profile, monster, currentHp, totalSpent } = state
   const budget = profile?.dailyBudget ?? 1000
+  const monsterToShow = monster ?? generateDayMonster(state.date, budget)
+  const hpToShow = monster ? currentHp : monsterToShow.maxHp
 
   return (
-    <div className="academy-screen">
+    <div className="academy-screen" style={{ '--monster-sprites': `url(${monsterSprites})` }}>
       <img src={homeBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
@@ -156,11 +138,10 @@ export default function TownScreen() {
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <DailyMonster monster={monster} currentHp={currentHp} />
+        <DailyMonster monster={monsterToShow} currentHp={hpToShow} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 
-      <Toast notification={state.notification} />
       <BottomNav current="town" navigate={navigate} />
     </div>
   )

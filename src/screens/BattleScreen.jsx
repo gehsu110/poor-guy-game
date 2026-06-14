@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import { BottomNav } from './TownScreen'
 import battleBg from '../assets/academy-art/home-bg.webp'
-import spirit from '../assets/academy-art/spending-spirit.png'
+import monsterSprites from '../assets/academy-art/monster-sprites.png'
 
 function TierBadge({ tier }) {
   if (tier === 'monthboss') return <span className="academy-status academy-status--boss">月Boss</span>
@@ -64,7 +64,9 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
           }
           transition={{ duration: defeated ? 1 : isAngry ? 0.45 : 2.4, repeat: Infinity }}
         >
-          {defeated ? <span className="academy-icon academy-icon--star h-16 w-16" /> : <img src={spirit} alt="" draggable="false" />}
+          {defeated
+            ? <span className="academy-icon academy-icon--star h-16 w-16" />
+            : <span className={`academy-monster-sprite academy-monster-sprite--${monster.id}`} />}
         </motion.div>
         {isAngry && <div className="absolute right-6 top-4 h-5 w-5 rounded-full bg-[#FF7FA3] shadow-[0_0_18px_rgba(255,127,163,0.58)]" />}
 
@@ -99,7 +101,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
               <span className="academy-icon academy-icon--star" />
             </div>
             <div className="mt-1 text-sm font-black text-[#26324A]">淨化成功</div>
-            <div className="text-[10px] font-bold text-[#8E87A8]">獎勵已加入你的術師背包</div>
+            <div className="text-[10px] font-bold text-[#8E87A8]">獎勵會在每日結算發放</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -169,7 +171,7 @@ function CalcKeyboard({ value, onChange, onSubmit }) {
   )
 }
 
-function ExpensePanel({ onSubmit, budget, spent }) {
+function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit }) {
   const [category, setCategory] = useState(null)
   const [note, setNote] = useState('')
   const [amount, setAmount] = useState('0')
@@ -178,6 +180,15 @@ function ExpensePanel({ onSubmit, budget, spent }) {
 
   const remaining = budget - spent
   const currentCat = DEFAULT_CATEGORIES.find(c => c.id === category)
+
+  useEffect(() => {
+    if (!editingExpense) return
+    setCategory(editingExpense.category)
+    setNote(editingExpense.note ?? '')
+    setAmount(String(editingExpense.amount ?? 0))
+    setStep('category')
+    setError('')
+  }, [editingExpense])
 
   function handleAmountSubmit(val) {
     const n = Number(val)
@@ -196,6 +207,7 @@ function ExpensePanel({ onSubmit, budget, spent }) {
     setNote('')
     setCategory(null)
     setStep('category')
+    onCancelEdit?.()
   }
 
   const previewDmg = amount !== '0' && Number(amount) > 0
@@ -210,6 +222,13 @@ function ExpensePanel({ onSubmit, budget, spent }) {
           {remaining < 0 ? `超支 NT$${formatMoney(-remaining)}` : `剩餘 NT$${formatMoney(remaining)}`}
         </span>
       </div>
+
+      {editingExpense && (
+        <div className="rounded-2xl bg-[#FFF4BE] px-3 py-2 text-center text-xs font-black text-[#B47B16]">
+          正在修改一筆紀錄
+          <button className="ml-2 text-[#7B63D8]" onClick={onCancelEdit}>取消</button>
+        </div>
+      )}
 
       <div className="academy-segment">
         {[
@@ -281,7 +300,7 @@ function ExpensePanel({ onSubmit, budget, spent }) {
   )
 }
 
-function ExpenseList({ expenses }) {
+function ExpenseList({ expenses, onEdit, onDelete }) {
   if (!expenses.length) {
     return (
       <div className="rounded-2xl bg-white/80 px-3 py-3 text-center text-xs font-bold text-[#8E87A8]">
@@ -308,6 +327,8 @@ function ExpenseList({ expenses }) {
               {e.note && <div className="truncate text-[10px] font-bold text-[#8E87A8]">{e.note}</div>}
             </div>
             <div className="text-sm font-black text-[#D9961E]">NT${formatMoney(e.amount)}</div>
+            <button className="rounded-full bg-[#F1ECFF] px-2 py-1 text-[10px] font-black text-[#7B63D8]" onClick={() => onEdit(e)}>改</button>
+            <button className="rounded-full bg-[#FFE5EE] px-2 py-1 text-[10px] font-black text-[#FF6D98]" onClick={() => onDelete(e.id)}>刪</button>
           </motion.div>
         )
       })}
@@ -316,19 +337,25 @@ function ExpenseList({ expenses }) {
 }
 
 export default function BattleScreen() {
-  const { state, navigate, submitExpense } = useApp()
+  const { state, navigate, submitExpense, updateExpenseEntry, deleteExpenseEntry } = useApp()
   const { profile, monster, currentHp, totalSpent, damageNumbers, expenses } = state
   const [isHit, setIsHit] = useState(false)
+  const [editingExpense, setEditingExpense] = useState(null)
   const budget = profile?.dailyBudget ?? 1000
 
   async function handleSubmit(data) {
     setIsHit(true)
     setTimeout(() => setIsHit(false), 500)
-    await submitExpense(data)
+    if (editingExpense) {
+      await updateExpenseEntry(editingExpense.id, data)
+      setEditingExpense(null)
+    } else {
+      await submitExpense(data)
+    }
   }
 
   return (
-    <div className="academy-screen">
+    <div className="academy-screen" style={{ '--monster-sprites': `url(${monsterSprites})` }}>
       <img src={battleBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
@@ -360,12 +387,18 @@ export default function BattleScreen() {
       <div className="relative z-20 flex-1 overflow-y-auto px-4 pb-24">
         <div className="mb-3">
           <div className="mb-1 text-xs font-black text-[#26324A]">今日記錄</div>
-          <ExpenseList expenses={expenses} />
+          <ExpenseList expenses={expenses} onEdit={setEditingExpense} onDelete={deleteExpenseEntry} />
         </div>
 
         <div className="academy-card p-3">
           <div className="mb-2 text-center text-xs font-black text-[#8E87A8]">輸入消費即可施放術式</div>
-          <ExpensePanel onSubmit={handleSubmit} budget={budget} spent={totalSpent} />
+          <ExpensePanel
+            onSubmit={handleSubmit}
+            budget={budget}
+            spent={editingExpense ? totalSpent - Number(editingExpense.amount ?? 0) : totalSpent}
+            editingExpense={editingExpense}
+            onCancelEdit={() => setEditingExpense(null)}
+          />
         </div>
       </div>
 

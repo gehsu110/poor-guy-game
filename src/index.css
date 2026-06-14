@@ -1395,6 +1395,25 @@ body {
 .academy-shop-sprite--ticket { background-position: 50% 100%; }
 .academy-shop-sprite--goldTicket { background-position: 100% 100%; }
 
+.academy-monster-sprite {
+  display: inline-block;
+  width: 230px;
+  height: 190px;
+  background-image: var(--monster-sprites);
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+  filter: drop-shadow(0 14px 18px rgba(93,72,130,0.2));
+}
+
+.academy-monster-sprite--slime { background-position: 0% 0%; }
+.academy-monster-sprite--rabbit { background-position: 33.333% 0%; }
+.academy-monster-sprite--mushroom { background-position: 66.666% 0%; }
+.academy-monster-sprite--coin { background-position: 100% 0%; }
+.academy-monster-sprite--cat { background-position: 0% 100%; }
+.academy-monster-sprite--weekend { background-position: 33.333% 100%; }
+.academy-monster-sprite--sunday { background-position: 66.666% 100%; }
+.academy-monster-sprite--month { background-position: 100% 100%; }
+
 .academy-currency-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

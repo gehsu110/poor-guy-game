@@ -1,10 +1,26 @@
-/**
- * 簡易全局狀態（不用 Redux，直接用 React context）
- * 提供：user, profile, today 戰鬥狀態
- */
 import { createContext, useContext, useEffect, useReducer, useCallback } from 'react'
-import { onAuth, loginAnonymously, getProfile, updateProfile, addExpense, getExpensesByDate, getDayRecord, setDayRecord, calcLevel } from './firebase'
-import { generateDayMonster, calcDamage, calcFinalBlow, calcRating, RATING_REWARDS, todayStr, getTitle } from './gameLogic'
+import {
+  onAuth,
+  loginAnonymously,
+  getProfile,
+  updateProfile,
+  addExpense,
+  updateExpense,
+  deleteExpense,
+  getExpensesByDate,
+  getDayRecord,
+  setDayRecord,
+  calcLevel,
+} from './firebase'
+import {
+  generateDayMonster,
+  calcDamage,
+  calcFinalBlow,
+  calcRating,
+  RATING_REWARDS,
+  todayStr,
+  getTitle,
+} from './gameLogic'
 
 const Ctx = createContext(null)
 
@@ -12,7 +28,6 @@ const init = {
   user: null,
   profile: null,
   loading: true,
-  // 今日
   date: todayStr(),
   monster: null,
   expenses: [],
@@ -20,48 +35,65 @@ const init = {
   maxHp: 0,
   totalSpent: 0,
   settled: false,
-  // UI
-  screen: 'town',       // town | battle | map | shop | profile
-  damageNumbers: [],    // [{id, value, x, y, crit}]
-  notification: null,   // {type, message}
+  screen: 'town',
+  damageNumbers: [],
+  notification: null,
+}
+
+function calcCombat(monster, expenses, budget, dayRecord) {
+  const totalSpent = expenses.reduce((s, e) => s + Number(e.amount ?? 0), 0)
+  let hp = monster.maxHp
+  let spentBefore = 0
+  for (const e of expenses) {
+    const { damage } = calcDamage(Number(e.amount ?? 0), spentBefore, budget)
+    hp = Math.max(0, hp - damage)
+    spentBefore += Number(e.amount ?? 0)
+  }
+  return {
+    totalSpent,
+    currentHp: dayRecord?.defeated ? 0 : hp,
+    maxHp: monster.maxHp,
+    settled: !!dayRecord?.settled,
+  }
+}
+
+function getKillTicketReward(tier) {
+  if (tier === 'monthboss') return { normal: 0, gold: 1 }
+  if (tier === 'boss' || tier === 'weekend') return { normal: 2, gold: 0 }
+  return { normal: 1, gold: 0 }
+}
+
+function addDays(dateStr, diff) {
+  const d = new Date(`${dateStr}T00:00:00`)
+  d.setDate(d.getDate() + diff)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'SET_USER':    return { ...state, user: action.user, loading: false }
-    case 'SET_PROFILE': return { ...state, profile: action.profile }
-    case 'SET_SCREEN':  return { ...state, screen: action.screen }
+    case 'SET_USER':
+      return { ...state, user: action.user, loading: false }
+    case 'SET_PROFILE':
+      return { ...state, profile: action.profile }
+    case 'SET_SCREEN':
+      return { ...state, screen: action.screen }
     case 'INIT_DAY': {
       const { monster, expenses, dayRecord } = action
-      const totalSpent = expenses.reduce((s, e) => s + e.amount, 0)
-      const budget = state.profile?.dailyBudget ?? 1000
-      // 計算怪物當前 HP
-      let hp = monster.maxHp
-      let spentBefore = 0
-      for (const e of expenses) {
-        const { damage } = calcDamage(e.amount, spentBefore, budget)
-        hp = Math.max(0, hp - damage)
-        spentBefore += e.amount
-      }
+      const budget = state.profile?.dailyBudget ?? action.profile?.dailyBudget ?? 1000
       return {
         ...state,
         monster,
         expenses,
-        currentHp: dayRecord?.defeated ? 0 : hp,
-        maxHp: monster.maxHp,
-        totalSpent,
-        settled: !!dayRecord?.settled,
+        ...calcCombat(monster, expenses, budget, dayRecord),
       }
     }
-    case 'ADD_EXPENSE': {
-      const { expense, damage } = action
-      const newExpenses = [...state.expenses, expense]
-      const newHp = Math.max(0, state.currentHp - damage)
+    case 'RECALC_DAY': {
+      const { expenses, dayRecord } = action
+      const budget = state.profile?.dailyBudget ?? 1000
       return {
         ...state,
-        expenses: newExpenses,
-        currentHp: newHp,
-        totalSpent: state.totalSpent + expense.amount,
+        expenses,
+        ...calcCombat(state.monster, expenses, budget, dayRecord),
       }
     }
     case 'ADD_DAMAGE_NUMBER': {
@@ -82,7 +114,6 @@ function reducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, init)
 
-  // 1. Auth 監聽
   useEffect(() => {
     const unsub = onAuth(async user => {
       if (!user) {
@@ -90,7 +121,8 @@ export function AppProvider({ children }) {
       }
       if (user) {
         dispatch({ type: 'SET_USER', user })
-        const profile = await getProfile(user.uid)
+        let profile = await getProfile(user.uid)
+        profile = await settleIfNeeded(user.uid, profile)
         dispatch({ type: 'SET_PROFILE', profile })
         await initToday(user, profile)
       } else {
@@ -100,74 +132,164 @@ export function AppProvider({ children }) {
     return unsub
   }, [])
 
+  async function settleIfNeeded(uid, profile) {
+    const today = todayStr()
+    const lastActiveDate = profile?.lastActiveDate
+    let nextProfile = profile
+
+    if (lastActiveDate && lastActiveDate < today) {
+      nextProfile = await settleDay(uid, lastActiveDate, nextProfile)
+    }
+
+    if (nextProfile?.lastActiveDate !== today) {
+      nextProfile = { ...nextProfile, lastActiveDate: today }
+      await updateProfile(uid, { lastActiveDate: today })
+    }
+
+    return nextProfile
+  }
+
+  async function settleDay(uid, date, profile) {
+    const dayRecord = await getDayRecord(uid, date)
+    if (dayRecord?.settled) return profile
+
+    const budget = profile?.dailyBudget ?? 1000
+    const expenses = await getExpensesByDate(uid, date)
+    if (!expenses.length) {
+      await setDayRecord(uid, date, { settled: true, defeated: false, rating: null, spent: 0 })
+      return { ...profile, consecutiveDays: 0 }
+    }
+
+    const monster = generateDayMonster(date, budget)
+    let spentBefore = 0
+    let totalDamage = 0
+    for (const e of expenses) {
+      const { damage } = calcDamage(Number(e.amount ?? 0), spentBefore, budget)
+      totalDamage += damage
+      spentBefore += Number(e.amount ?? 0)
+    }
+
+    const finalDamage = calcFinalBlow(spentBefore, budget)
+    totalDamage += finalDamage
+    const defeated = !!dayRecord?.defeated || totalDamage >= monster.maxHp
+    const rating = calcRating(spentBefore, budget, expenses.length)
+    const baseReward = RATING_REWARDS[rating] ?? RATING_REWARDS.C
+    const killReward = defeated && !dayRecord?.killRewardGranted
+      ? getKillTicketReward(monster.tier)
+      : { normal: 0, gold: 0 }
+
+    const expGain = baseReward.exp + (defeated ? 20 : 0) + (spentBefore <= budget ? 10 : 0)
+    const exp = (profile?.exp ?? 0) + expGain
+    const levelInfo = calcLevel(exp)
+    const newStars = {
+      yellow: (profile?.stars?.yellow ?? 0) + (baseReward.yellow ?? 0),
+      purple: (profile?.stars?.purple ?? 0) + (baseReward.purple ?? 0),
+    }
+    const newTickets = {
+      normal: (profile?.tickets?.normal ?? 0) + (baseReward.ticket ?? 0) + (killReward.normal ?? 0),
+      gold: (profile?.tickets?.gold ?? 0) + (killReward.gold ?? 0),
+    }
+    const consecutiveDays = (profile?.consecutiveDays ?? 0) + 1
+    const profileUpdate = {
+      exp,
+      ...levelInfo,
+      title: getTitle(levelInfo.level).name,
+      stars: newStars,
+      tickets: newTickets,
+      consecutiveDays,
+    }
+
+    await updateProfile(uid, profileUpdate)
+    await setDayRecord(uid, date, {
+      settled: true,
+      defeated,
+      rating,
+      spent: spentBefore,
+      totalDamage,
+      finalDamage,
+      rewards: {
+        yellow: baseReward.yellow ?? 0,
+        purple: baseReward.purple ?? 0,
+        normalTicket: (baseReward.ticket ?? 0) + (killReward.normal ?? 0),
+        goldTicket: killReward.gold ?? 0,
+        exp: expGain,
+      },
+      killRewardGranted: defeated || !!dayRecord?.killRewardGranted,
+    })
+
+    return { ...profile, ...profileUpdate }
+  }
+
   async function initToday(user, profile) {
     const date = todayStr()
     const budget = profile?.dailyBudget ?? 1000
     const monster = generateDayMonster(date, budget)
     const expenses = await getExpensesByDate(user.uid, date)
     const dayRecord = await getDayRecord(user.uid, date)
-    dispatch({ type: 'INIT_DAY', monster, expenses, dayRecord })
+    dispatch({ type: 'INIT_DAY', monster, expenses, dayRecord, profile })
   }
 
-  // 2. 記帳（攻擊）
+  async function refreshToday() {
+    if (!state.user || !state.monster) return
+    const expenses = await getExpensesByDate(state.user.uid, todayStr())
+    const dayRecord = await getDayRecord(state.user.uid, todayStr())
+    dispatch({ type: 'RECALC_DAY', expenses, dayRecord })
+  }
+
   const submitExpense = useCallback(async ({ category, amount, note }) => {
     if (!state.user) return
     const date = todayStr()
     const budget = state.profile?.dailyBudget ?? 1000
+    const numericAmount = Number(amount)
+    const expense = { category, amount: numericAmount, note, date }
+    const ref = await addExpense(state.user.uid, expense)
+    const expenseWithId = { ...expense, id: ref.id }
+    const { damage, mult } = calcDamage(numericAmount, state.totalSpent, budget)
+    const nextExpenses = [...state.expenses, expenseWithId]
+    dispatch({ type: 'RECALC_DAY', expenses: nextExpenses, dayRecord: { defeated: Math.max(0, state.currentHp - damage) <= 0 } })
 
-    // Firebase 新增
-    const expense = { category, amount: Number(amount), note, date }
-    await addExpense(state.user.uid, expense)
-    const expenseWithId = { ...expense, id: Date.now() }
-
-    // 計算傷害
-    const { damage, mult } = calcDamage(Number(amount), state.totalSpent, budget)
-
-    dispatch({ type: 'ADD_EXPENSE', expense: expenseWithId, damage })
-
-    // 傷害數字特效
-    const isCrit = mult >= 1.2
     const damageId = Date.now() + Math.random()
     dispatch({
       type: 'ADD_DAMAGE_NUMBER',
-      dn: { id: damageId, value: damage, crit: isCrit, x: 45 + Math.random() * 10, y: 35 + Math.random() * 10 }
+      dn: { id: damageId, value: damage, crit: mult >= 1.2, x: 45 + Math.random() * 10, y: 35 + Math.random() * 10 },
     })
-    setTimeout(() => {
-      dispatch({ type: 'REMOVE_DAMAGE_NUMBER', id: damageId })
-    }, 1000)
+    setTimeout(() => dispatch({ type: 'REMOVE_DAMAGE_NUMBER', id: damageId }), 1000)
 
-    // 更新日記錄
     const newHp = Math.max(0, state.currentHp - damage)
     if (state.currentHp > 0 && newHp <= 0) {
-      // 擊殺！
-      await setDayRecord(state.user.uid, date, { defeated: true })
-      await giveKillReward()
+      await setDayRecord(state.user.uid, date, { defeated: true, settled: false })
+      dispatch({
+        type: 'SET_NOTIFICATION',
+        notification: { type: 'kill', message: '今日咒靈已淨化，獎勵會在每日結算發放。' },
+      })
+      setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 3000)
     }
   }, [state])
 
-  async function giveKillReward() {
-    if (!state.user || !state.profile) return
-    const tier = state.monster?.tier ?? 'normal'
-    const tickets = tier === 'monthboss' ? { gold: 1 } : { normal: tier === 'boss' ? 2 : tier === 'weekend' ? 2 : 1 }
-    const newTickets = {
-      normal: (state.profile.tickets?.normal ?? 0) + (tickets.normal ?? 0),
-      gold:   (state.profile.tickets?.gold   ?? 0) + (tickets.gold   ?? 0),
-    }
-    await updateProfile(state.user.uid, { tickets: newTickets })
-    dispatch({ type: 'UPDATE_PROFILE', data: { tickets: newTickets } })
-    dispatch({
-      type: 'SET_NOTIFICATION',
-      notification: { type: 'kill', message: `淨化完成，獲得補給券 x${tickets.normal ?? tickets.gold}` }
+  const updateExpenseEntry = useCallback(async (expenseId, data) => {
+    if (!state.user || !expenseId) return
+    await updateExpense(state.user.uid, expenseId, {
+      category: data.category,
+      note: data.note ?? '',
+      amount: Number(data.amount),
     })
-    setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 3000)
-  }
+    await setDayRecord(state.user.uid, todayStr(), { settled: false })
+    await refreshToday()
+  }, [state])
+
+  const deleteExpenseEntry = useCallback(async (expenseId) => {
+    if (!state.user || !expenseId) return
+    await deleteExpense(state.user.uid, expenseId)
+    await setDayRecord(state.user.uid, todayStr(), { settled: false, defeated: false })
+    await refreshToday()
+  }, [state])
 
   const navigate = useCallback((screen) => {
     dispatch({ type: 'SET_SCREEN', screen })
   }, [])
 
   return (
-    <Ctx.Provider value={{ state, dispatch, submitExpense, navigate }}>
+    <Ctx.Provider value={{ state, dispatch, submitExpense, updateExpenseEntry, deleteExpenseEntry, navigate }}>
       {children}
     </Ctx.Provider>
   )

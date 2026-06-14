@@ -269,10 +269,10 @@ export default function ShopScreen() {
                 ))}
               </div>
               <div className="flex gap-2">
-                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 1 || isDrawing} onClick={() => handleGacha(1, false)}>
+                <button className={`academy-small-button flex-1 ${tickets.normal < 1 || isDrawing ? 'opacity-55' : ''}`} onClick={() => handleGacha(1, false)}>
                   抽 1 次
                 </button>
-                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 10 || isDrawing} onClick={() => handleGacha(10, false)}>
+                <button className={`academy-small-button flex-1 ${tickets.normal < 10 || isDrawing ? 'opacity-55' : ''}`} onClick={() => handleGacha(10, false)}>
                   抽 10 次
                 </button>
               </div>
@@ -287,7 +287,7 @@ export default function ShopScreen() {
                   <div className="text-xs font-bold text-[#D79B26]">SSR 機率提升，月 Boss 掉落</div>
                 </div>
               </div>
-              <button className="academy-small-button w-full disabled:opacity-40" disabled={tickets.gold < 1 || isDrawing} onClick={() => handleGacha(1, true)}>
+              <button className={`academy-small-button w-full ${tickets.gold < 1 || isDrawing ? 'opacity-55' : ''}`} onClick={() => handleGacha(1, true)}>
                 金券抽 1 次
               </button>
               <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有金券：{tickets.gold}</div>

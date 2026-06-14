@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, linkWithPopup, onAuthStateChanged } from 'firebase/auth'
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, documentId } from 'firebase/firestore'
+import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, documentId } from 'firebase/firestore'
 
 // 請複製 .env.example 為 .env 並填入你的 Firebase 設定
 const firebaseConfig = {
@@ -76,7 +76,7 @@ export async function getProfile(uid) {
 }
 
 export async function updateProfile(uid, data) {
-  await updateDoc(doc(db, 'users', uid), data)
+  await setDoc(doc(db, 'users', uid), data, { merge: true })
 }
 
 // ─── Expenses ─────────────────────────────────────────────────────────────────
@@ -85,6 +85,14 @@ export async function updateProfile(uid, data) {
 export async function addExpense(uid, { category, amount, note, date }) {
   const ref = collection(db, 'users', uid, 'expenses')
   return await addDoc(ref, { category, amount, note, date, createdAt: serverTimestamp() })
+}
+
+export async function updateExpense(uid, expenseId, data) {
+  await updateDoc(doc(db, 'users', uid, 'expenses', expenseId), data)
+}
+
+export async function deleteExpense(uid, expenseId) {
+  await deleteDoc(doc(db, 'users', uid, 'expenses', expenseId))
 }
 
 /** 取得某日的消費列表 */
