@@ -37,9 +37,11 @@ function reducer(state, action) {
       const budget = state.profile?.dailyBudget ?? 1000
       // 計算怪物當前 HP
       let hp = monster.maxHp
+      let spentBefore = 0
       for (const e of expenses) {
-        const { damage } = calcDamage(e.amount, hp === monster.maxHp ? 0 : monster.maxHp - hp, budget)
+        const { damage } = calcDamage(e.amount, spentBefore, budget)
         hp = Math.max(0, hp - damage)
+        spentBefore += e.amount
       }
       return {
         ...state,
@@ -63,7 +65,7 @@ function reducer(state, action) {
       }
     }
     case 'ADD_DAMAGE_NUMBER': {
-      const dn = { id: Date.now() + Math.random(), ...action.dn }
+      const dn = { id: action.dn.id ?? Date.now() + Math.random(), ...action.dn }
       return { ...state, damageNumbers: [...state.damageNumbers, dn] }
     }
     case 'REMOVE_DAMAGE_NUMBER':
@@ -125,17 +127,18 @@ export function AppProvider({ children }) {
 
     // 傷害數字特效
     const isCrit = mult >= 1.2
+    const damageId = Date.now() + Math.random()
     dispatch({
       type: 'ADD_DAMAGE_NUMBER',
-      dn: { value: damage, crit: isCrit, x: 45 + Math.random() * 10, y: 35 + Math.random() * 10 }
+      dn: { id: damageId, value: damage, crit: isCrit, x: 45 + Math.random() * 10, y: 35 + Math.random() * 10 }
     })
     setTimeout(() => {
-      dispatch({ type: 'REMOVE_DAMAGE_NUMBER', id: Date.now() })
+      dispatch({ type: 'REMOVE_DAMAGE_NUMBER', id: damageId })
     }, 1000)
 
     // 更新日記錄
     const newHp = Math.max(0, state.currentHp - damage)
-    if (newHp <= 0) {
+    if (state.currentHp > 0 && newHp <= 0) {
       // 擊殺！
       await setDayRecord(state.user.uid, date, { defeated: true })
       await giveKillReward()

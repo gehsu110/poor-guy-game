@@ -127,7 +127,7 @@ export default function ProfileScreen() {
           {[
             { label: '黃星', val: profile?.stars?.yellow ?? 0, tone: 'gold' },
             { label: '紫星', val: profile?.stars?.purple ?? 0, tone: 'purple' },
-            { label: '扭蛋券', val: profile?.tickets?.normal ?? 0, tone: 'blue' },
+            { label: '補給券', val: profile?.tickets?.normal ?? 0, tone: 'blue' },
             { label: '金券', val: profile?.tickets?.gold ?? 0, tone: 'pink' },
           ].map(c => (
             <div key={c.label} className={`academy-mini-stat academy-mini-stat--${c.tone}`}>

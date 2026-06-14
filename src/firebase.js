@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, linkWithPopup, onAuthStateChanged } from 'firebase/auth'
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from 'firebase/firestore'
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, documentId } from 'firebase/firestore'
 
 // 請複製 .env.example 為 .env 並填入你的 Firebase 設定
 const firebaseConfig = {
@@ -54,6 +54,9 @@ const DEFAULT_PROFILE = {
   stars:      { yellow: 0, purple: 0 },
   tickets:    { normal: 0, gold: 0 },
   dailyBudget: 1000,
+  monthlyIncome: 0,
+  fixedExpense: 0,
+  savingGoal: 0,
   avatarGender: 'girl',
   consecutiveDays: 0,
   lastActiveDate: null,
@@ -117,6 +120,15 @@ export async function getDayRecord(uid, date) {
 
 export async function setDayRecord(uid, date, data) {
   await setDoc(doc(db, 'users', uid, 'days', date), data, { merge: true })
+}
+
+export async function getMonthDayRecords(uid, year, month) {
+  const ref = collection(db, 'users', uid, 'days')
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDate   = `${year}-${String(month).padStart(2, '0')}-31`
+  const q = query(ref, where(documentId(), '>=', startDate), where(documentId(), '<=', endDate))
+  const snap = await getDocs(q)
+  return snap.docs.map(d => ({ date: d.id, ...d.data() }))
 }
 
 // ─── EXP & Level ─────────────────────────────────────────────────────────────

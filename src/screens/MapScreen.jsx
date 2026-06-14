@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { generateDayMonster, formatMoney } from '../gameLogic'
+import { getMonthDayRecords, getMonthExpenses } from '../firebase'
 import { BottomNav } from './TownScreen'
 import mapBg from '../assets/academy-art/map-bg.webp'
 
@@ -16,25 +17,26 @@ const NODE_CONFIG = {
   monthboss: { bg: '#C8A8E9', border: '#7B5EA7', icon: 'boss', label: '月Boss' },
 }
 
-function MapNode({ day, date, status, tier, budget, onClick, isToday }) {
+function MapNode({ day, date, status, tier, spent = 0, onClick, isToday }) {
   const cfg = tier === 'monthboss' ? NODE_CONFIG.monthboss
     : tier !== 'normal' && tier !== 'normal_special' ? NODE_CONFIG.boss
     : NODE_CONFIG[status] ?? NODE_CONFIG.future
 
-  const size = tier === 'monthboss' ? 'w-12 h-12' : tier !== 'normal' ? 'w-10 h-10' : 'w-9 h-9'
+  const size = tier === 'monthboss' ? 'academy-map-node--large' : tier !== 'normal' ? 'academy-map-node--boss' : ''
+  const isDim = status === 'future' || status === 'no_record'
 
   return (
     <motion.button
-      className={`${size} rounded-full flex items-center justify-center font-bold text-xs shadow-md tap-bounce relative`}
-      style={{ background: cfg.bg, border: `2px solid ${cfg.border}` }}
+      className={`academy-map-node ${size} ${isToday ? 'is-today' : ''} ${isDim ? 'is-dim' : ''}`}
+      style={{ '--node-bg': cfg.bg, '--node-border': cfg.border }}
       onClick={onClick}
       whileTap={{ scale: 0.88 }}
       animate={isToday ? { scale: [1, 1.1, 1], boxShadow: ['0 0 0 0 rgba(200,168,233,0)', '0 0 0 8px rgba(200,168,233,0.4)', '0 0 0 0 rgba(200,168,233,0)'] } : {}}
       transition={{ duration: 2, repeat: Infinity }}
     >
       <span className={`academy-icon academy-icon--${cfg.icon}`} />
-      {/* 日期 */}
-      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-slate-400 whitespace-nowrap font-bold">
+      {spent > 0 && <i className="academy-map-node__spent" />}
+      <div className="academy-map-node__date">
         {day}日
       </div>
     </motion.button>
@@ -54,33 +56,62 @@ function buildPath(days) {
 
 export default function MapScreen() {
   const { state, navigate } = useApp()
-  const { profile, date: todayDate } = state
+  const { profile, date: todayDate, user } = state
   const budget = profile?.dailyBudget ?? 1000
+  const [monthRecords, setMonthRecords] = useState({})
+  const [monthExpenses, setMonthExpenses] = useState({})
+  const [loadingMonth, setLoadingMonth] = useState(false)
 
   const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth() + 1
   const daysInMonth = new Date(year, month, 0).getDate()
 
-  // 建立本月所有天的資料
-  const days = Array.from({ length: daysInMonth }, (_, i) => {
+  useEffect(() => {
+    let alive = true
+    async function loadMonth() {
+      if (!user) return
+      setLoadingMonth(true)
+      try {
+        const [records, expenses] = await Promise.all([
+          getMonthDayRecords(user.uid, year, month),
+          getMonthExpenses(user.uid, year, month),
+        ])
+        if (!alive) return
+        setMonthRecords(Object.fromEntries(records.map(r => [r.date, r])))
+        setMonthExpenses(expenses.reduce((acc, e) => {
+          acc[e.date] = (acc[e.date] ?? 0) + Number(e.amount ?? 0)
+          return acc
+        }, {}))
+      } catch (e) {
+        console.error(e)
+      } finally {
+        if (alive) setLoadingMonth(false)
+      }
+    }
+    loadMonth()
+    return () => { alive = false }
+  }, [user, year, month])
+
+  const days = useMemo(() => Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1
     const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`
-    const todayStr = todayDate
     const monster = generateDayMonster(dateStr, budget)
+    const record = monthRecords[dateStr]
+    const spent = monthExpenses[dateStr] ?? 0
 
     let status = 'future'
-    if (dateStr === todayStr) status = 'today'
-    else if (dateStr < todayStr) status = 'no_record' // 預設，之後可從 Firebase 讀
+    if (record?.defeated) status = 'defeated'
+    else if (dateStr === todayDate) status = 'today'
+    else if (dateStr < todayDate) status = spent > 0 ? 'undefeated' : 'no_record'
 
-    return { day: d, date: dateStr, status, tier: monster.tier, monster }
-  })
+    return { day: d, date: dateStr, status, tier: monster.tier, monster, spent, record }
+  }), [budget, daysInMonth, month, monthExpenses, monthRecords, todayDate, year])
 
   const rows = buildPath(days)
 
   const [selected, setSelected] = useState(null)
 
-  // 本月統計（假資料，實際要從 Firebase 讀）
   const stats = {
     killed: days.filter(d => d.status === 'defeated').length,
     total: days.filter(d => d.date <= todayDate).length,
@@ -122,11 +153,16 @@ export default function MapScreen() {
 
       {/* 地圖主體 */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
-        <div className="academy-card flex flex-col gap-8 py-6">
+        <div className="academy-card academy-map-card flex flex-col gap-8 py-6">
+          {loadingMonth && (
+            <div className="absolute inset-x-8 top-3 rounded-full bg-white/82 px-3 py-1 text-center text-[10px] font-black text-[#8E87A8]">
+              讀取遠征紀錄中
+            </div>
+          )}
           {rows.map((row, ri) => (
             <div key={ri} className="flex justify-around items-center relative">
               {/* 連接線 */}
-              <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-[#D8CEED] -z-10" />
+              <div className="academy-map-line" />
               {row.map(node => (
                 <MapNode
                   key={node.day}
@@ -160,8 +196,8 @@ export default function MapScreen() {
               <div className="font-bold text-[#26324A]">NT${formatMoney(selected.monster.maxHp)}</div>
             </div>
             <div className="academy-stat-box flex-1 text-center">
-              <div className="text-[#8E87A8]">難度係數</div>
-              <div className="font-bold text-[#26324A]">×{selected.monster.coeff}</div>
+              <div className="text-[#8E87A8]">已記帳</div>
+              <div className="font-bold text-[#26324A]">NT${formatMoney(selected.spent ?? 0)}</div>
             </div>
             <div className="academy-stat-box flex-1 text-center">
               <div className="text-[#8E87A8]">狀態</div>

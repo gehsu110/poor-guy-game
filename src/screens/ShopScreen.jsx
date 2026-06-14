@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
+import { updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
@@ -154,18 +155,63 @@ function CollectionGrid({ items }) {
 }
 
 export default function ShopScreen() {
-  const { state, navigate } = useApp()
-  const { profile } = state
+  const { state, dispatch, navigate } = useApp()
+  const { profile, user } = state
   const [gachaResult, setGachaResult] = useState(null)
   const [tab, setTab] = useState('gacha')
+  const [isDrawing, setIsDrawing] = useState(false)
 
   const tickets = profile?.tickets ?? { normal: 0, gold: 0 }
   const stars = profile?.stars ?? { yellow: 0, purple: 0 }
 
-  function handleGacha(count, isGold) {
+  async function handleGacha(count, isGold) {
     const available = isGold ? tickets.gold : tickets.normal
-    if (available < count) return
-    setGachaResult(drawGacha(count, isGold))
+    if (isDrawing) return
+    if (available < count) {
+      dispatch({
+        type: 'SET_NOTIFICATION',
+        notification: { type: 'shop', message: isGold ? '金券不足，先挑戰月底 Boss。' : '補給券不足，先完成每日討伐。' },
+      })
+      setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2400)
+      return
+    }
+
+    setIsDrawing(true)
+    const results = drawGacha(count, isGold)
+    const newTickets = {
+      normal: (tickets.normal ?? 0) - (isGold ? 0 : count),
+      gold: (tickets.gold ?? 0) - (isGold ? count : 0),
+    }
+    const now = Date.now()
+    const newCollection = [
+      ...(profile?.collection ?? []),
+      ...results.map((item, i) => ({
+        id: item.id,
+        rarity: item.rarity,
+        obtainedAt: now + i,
+      })),
+    ]
+    const data = { tickets: newTickets, collection: newCollection }
+    const rollback = {
+      tickets: profile?.tickets ?? { normal: 0, gold: 0 },
+      collection: profile?.collection ?? [],
+    }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+
+    try {
+      if (user) await updateProfile(user.uid, data)
+      setGachaResult(results)
+    } catch (e) {
+      console.error(e)
+      dispatch({ type: 'UPDATE_PROFILE', data: rollback })
+      dispatch({
+        type: 'SET_NOTIFICATION',
+        notification: { type: 'shop', message: '補給同步失敗，請稍後再試。' },
+      })
+      setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2400)
+    } finally {
+      setIsDrawing(false)
+    }
   }
 
   return (
@@ -223,10 +269,10 @@ export default function ShopScreen() {
                 ))}
               </div>
               <div className="flex gap-2">
-                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 1} onClick={() => handleGacha(1, false)}>
+                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 1 || isDrawing} onClick={() => handleGacha(1, false)}>
                   抽 1 次
                 </button>
-                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 10} onClick={() => handleGacha(10, false)}>
+                <button className="academy-small-button flex-1 disabled:opacity-40" disabled={tickets.normal < 10 || isDrawing} onClick={() => handleGacha(10, false)}>
                   抽 10 次
                 </button>
               </div>
@@ -241,7 +287,7 @@ export default function ShopScreen() {
                   <div className="text-xs font-bold text-[#D79B26]">SSR 機率提升，月 Boss 掉落</div>
                 </div>
               </div>
-              <button className="academy-small-button w-full disabled:opacity-40" disabled={tickets.gold < 1} onClick={() => handleGacha(1, true)}>
+              <button className="academy-small-button w-full disabled:opacity-40" disabled={tickets.gold < 1 || isDrawing} onClick={() => handleGacha(1, true)}>
                 金券抽 1 次
               </button>
               <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有金券：{tickets.gold}</div>
