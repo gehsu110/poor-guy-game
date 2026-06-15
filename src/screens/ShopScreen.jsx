@@ -19,6 +19,14 @@ const GACHA_POOL = [
   { id: 'frame_moon', type: 'frame', name: '月光邊框', rarity: 'SSR', color: '#C8A8E9', iconKey: 'goldTicket' },
 ]
 
+const DIRECT_ITEMS = [
+  { id: 'bg_mint', type: 'background', name: '薄荷晨光背景', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
+  { id: 'bg_ribbon', type: 'background', name: '緞帶學園背景', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
+  { id: 'frame_gold', type: 'frame', name: '黃星頭像框', costType: 'yellow', cost: 5, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
+  { id: 'fx_moon', type: 'effect', name: '月光術式', costType: 'purple', cost: 2, rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
+  { id: 'title_budget', type: 'title', name: '預算守門人', costType: 'purple', cost: 3, rarity: 'SR', color: '#A8D8EA', iconKey: 'coin' },
+]
+
 const RARITY_CONFIG = {
   SSR: { color: '#FFD35F', bg: 'linear-gradient(135deg, #FFE981, #FFB84D)', prob: 3 },
   SR: { color: '#B79BFF', bg: 'linear-gradient(135deg, #D4B9FF, #9A7CFF)', prob: 15 },
@@ -125,7 +133,7 @@ function GachaResult({ results, onClose }) {
   )
 }
 
-function CollectionGrid({ items }) {
+function CollectionGrid({ items, equipped, onEquip }) {
   if (!items || !items.length) {
     return (
       <div className="py-8 text-center">
@@ -139,14 +147,18 @@ function CollectionGrid({ items }) {
   return (
     <div className="grid grid-cols-3 gap-2">
       {items.map((item, i) => {
-        const prize = GACHA_POOL.find(g => g.id === item.id) ?? GACHA_POOL[0]
+        const prize = [...GACHA_POOL, ...DIRECT_ITEMS].find(g => g.id === item.id) ?? GACHA_POOL[0]
         const rar = RARITY_CONFIG[prize.rarity] ?? RARITY_CONFIG.R
+        const isEquipped = equipped?.[prize.type] === prize.id
         return (
           <div key={i} className="rounded-2xl bg-white/72 p-2 text-center" style={{ border: `1px solid ${rar.color}` }}>
             <div className="mx-auto mb-1 flex justify-center">
               <PrizeIcon item={prize} />
             </div>
             <div className="truncate text-[10px] font-black text-[#26324A]">{prize.name}</div>
+            <button className={`academy-status mt-1 ${isEquipped ? 'academy-status--done' : ''}`} onClick={() => onEquip(prize)}>
+              {isEquipped ? '使用中' : '裝備'}
+            </button>
           </div>
         )
       })}
@@ -163,6 +175,8 @@ export default function ShopScreen() {
 
   const tickets = profile?.tickets ?? { normal: 0, gold: 0 }
   const stars = profile?.stars ?? { yellow: 0, purple: 0 }
+  const collection = profile?.collection ?? []
+  const equipped = profile?.equipped ?? {}
 
   async function handleGacha(count, isGold) {
     const available = isGold ? tickets.gold : tickets.normal
@@ -183,17 +197,30 @@ export default function ShopScreen() {
       gold: (tickets.gold ?? 0) - (isGold ? count : 0),
     }
     const now = Date.now()
-    const newCollection = [
-      ...(profile?.collection ?? []),
-      ...results.map((item, i) => ({
-        id: item.id,
-        rarity: item.rarity,
-        obtainedAt: now + i,
-      })),
-    ]
-    const data = { tickets: newTickets, collection: newCollection }
+    const ownedIds = new Set(collection.map(item => item.id))
+    const newItems = []
+    const duplicateStars = { yellow: 0, purple: 0 }
+    results.forEach((item, i) => {
+      if (ownedIds.has(item.id)) {
+        if (item.rarity === 'SSR') duplicateStars.purple += 1
+        else duplicateStars.yellow += item.rarity === 'SR' ? 2 : 1
+      } else {
+        ownedIds.add(item.id)
+        newItems.push({ id: item.id, rarity: item.rarity, obtainedAt: now + i })
+      }
+    })
+    const newCollection = [...collection, ...newItems]
+    const data = {
+      tickets: newTickets,
+      stars: {
+        yellow: (stars.yellow ?? 0) + duplicateStars.yellow,
+        purple: (stars.purple ?? 0) + duplicateStars.purple,
+      },
+      collection: newCollection,
+    }
     const rollback = {
       tickets: profile?.tickets ?? { normal: 0, gold: 0 },
+      stars: profile?.stars ?? { yellow: 0, purple: 0 },
       collection: profile?.collection ?? [],
     }
     dispatch({ type: 'UPDATE_PROFILE', data })
@@ -212,6 +239,41 @@ export default function ShopScreen() {
     } finally {
       setIsDrawing(false)
     }
+  }
+
+  async function buyDirect(item) {
+    const alreadyOwned = collection.some(c => c.id === item.id)
+    if (alreadyOwned) {
+      await equipItem(item)
+      return
+    }
+    const current = item.costType === 'purple' ? stars.purple ?? 0 : stars.yellow ?? 0
+    if (current < item.cost) {
+      dispatch({
+        type: 'SET_NOTIFICATION',
+        notification: { type: 'shop', message: item.costType === 'purple' ? '紫心不足。' : '黃星不足。' },
+      })
+      setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2200)
+      return
+    }
+    const nextStars = {
+      yellow: (stars.yellow ?? 0) - (item.costType === 'yellow' ? item.cost : 0),
+      purple: (stars.purple ?? 0) - (item.costType === 'purple' ? item.cost : 0),
+    }
+    const data = {
+      stars: nextStars,
+      collection: [...collection, { id: item.id, rarity: item.rarity, obtainedAt: Date.now(), source: 'direct' }],
+    }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    if (user) await updateProfile(user.uid, data)
+  }
+
+  async function equipItem(item) {
+    const data = { equipped: { ...equipped, [item.type]: item.id } }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'shop', message: `${item.name} 已裝備` } })
+    setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 1800)
+    if (user) await updateProfile(user.uid, data)
   }
 
   return (
@@ -234,6 +296,7 @@ export default function ShopScreen() {
         </div>
         <div className="academy-tabs mb-3">
           <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>扭蛋補給</button>
+          <button className={tab === 'direct' ? 'is-active' : ''} onClick={() => setTab('direct')}>星星直購</button>
           <button className={tab === 'collection' ? 'is-active' : ''} onClick={() => setTab('collection')}>收藏庫</button>
         </div>
       </div>
@@ -300,10 +363,28 @@ export default function ShopScreen() {
               <div className="flex justify-between text-[#B47B16]"><span>月底 Boss 淨化</span><span>金券 x1</span></div>
             </div>
           </div>
+        ) : tab === 'direct' ? (
+          <div className="flex flex-col gap-2">
+            {DIRECT_ITEMS.map(item => {
+              const owned = collection.some(c => c.id === item.id)
+              return (
+                <div key={item.id} className="academy-card flex items-center gap-3">
+                  <PrizeIcon item={item} />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-black text-[#26324A]">{item.name}</div>
+                    <div className="text-xs font-bold text-[#8E87A8]">{item.type} / {item.rarity}</div>
+                  </div>
+                  <button className="academy-small-button" onClick={() => buyDirect(item)}>
+                    {owned ? '裝備' : `${item.costType === 'purple' ? '紫心' : '黃星'} ${item.cost}`}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
         ) : (
           <div className="academy-card">
             <div className="mb-3 text-sm font-black text-[#26324A]">我的收藏品</div>
-            <CollectionGrid items={profile?.collection ?? []} />
+            <CollectionGrid items={collection} equipped={equipped} onEquip={equipItem} />
           </div>
         )}
       </div>

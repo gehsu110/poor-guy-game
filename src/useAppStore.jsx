@@ -40,6 +40,27 @@ const init = {
   notification: null,
 }
 
+const DEMO_PROFILE = {
+  level: 1,
+  exp: 0,
+  expInLevel: 0,
+  expToNext: 100,
+  title: '菜鳥冒險者',
+  stars: { yellow: 0, purple: 0 },
+  tickets: { normal: 0, gold: 0 },
+  dailyBudget: 1000,
+  monthlyIncome: 0,
+  fixedExpense: 0,
+  savingGoal: 0,
+  guildLedger: [],
+  customCategories: [],
+  equipped: {},
+  claimedMissions: {},
+  avatarGender: 'girl',
+  consecutiveDays: 0,
+  collection: [],
+}
+
 function calcCombat(monster, expenses, budget, dayRecord) {
   const totalSpent = expenses.reduce((s, e) => s + Number(e.amount ?? 0), 0)
   let hp = monster.maxHp
@@ -61,12 +82,6 @@ function getKillTicketReward(tier) {
   if (tier === 'monthboss') return { normal: 0, gold: 1 }
   if (tier === 'boss' || tier === 'weekend') return { normal: 2, gold: 0 }
   return { normal: 1, gold: 0 }
-}
-
-function addDays(dateStr, diff) {
-  const d = new Date(`${dateStr}T00:00:00`)
-  d.setDate(d.getDate() + diff)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 function reducer(state, action) {
@@ -114,24 +129,6 @@ function reducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, init)
 
-  useEffect(() => {
-    const unsub = onAuth(async user => {
-      if (!user) {
-        try { user = await loginAnonymously() } catch (e) { console.error(e) }
-      }
-      if (user) {
-        dispatch({ type: 'SET_USER', user })
-        let profile = await getProfile(user.uid)
-        profile = await settleIfNeeded(user.uid, profile)
-        dispatch({ type: 'SET_PROFILE', profile })
-        await initToday(user, profile)
-      } else {
-        dispatch({ type: 'SET_USER', user: null })
-      }
-    })
-    return unsub
-  }, [])
-
   async function settleIfNeeded(uid, profile) {
     const today = todayStr()
     const lastActiveDate = profile?.lastActiveDate
@@ -157,6 +154,7 @@ export function AppProvider({ children }) {
     const expenses = await getExpensesByDate(uid, date)
     if (!expenses.length) {
       await setDayRecord(uid, date, { settled: true, defeated: false, rating: null, spent: 0 })
+      await updateProfile(uid, { consecutiveDays: 0 })
       return { ...profile, consecutiveDays: 0 }
     }
 
@@ -229,12 +227,45 @@ export function AppProvider({ children }) {
     dispatch({ type: 'INIT_DAY', monster, expenses, dayRecord, profile })
   }
 
-  async function refreshToday() {
+  function initLocalDay(profile) {
+    const date = todayStr()
+    const budget = profile?.dailyBudget ?? 1000
+    const monster = generateDayMonster(date, budget)
+    dispatch({ type: 'INIT_DAY', monster, expenses: [], dayRecord: null, profile })
+  }
+
+  useEffect(() => {
+    const unsub = onAuth(async user => {
+      if (!user) {
+        try {
+          user = await loginAnonymously()
+        } catch (e) {
+          console.warn('匿名登入失敗，使用本機展示模式', e?.code ?? e)
+        }
+      }
+      if (user) {
+        dispatch({ type: 'SET_USER', user })
+        let profile = await getProfile(user.uid)
+        profile = await settleIfNeeded(user.uid, profile)
+        dispatch({ type: 'SET_PROFILE', profile })
+        await initToday(user, profile)
+      } else {
+        dispatch({ type: 'SET_USER', user: null })
+        dispatch({ type: 'SET_PROFILE', profile: DEMO_PROFILE })
+        initLocalDay(DEMO_PROFILE)
+      }
+    })
+    return unsub
+    // The auth listener is intentionally registered once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const refreshToday = useCallback(async () => {
     if (!state.user || !state.monster) return
     const expenses = await getExpensesByDate(state.user.uid, todayStr())
     const dayRecord = await getDayRecord(state.user.uid, todayStr())
     dispatch({ type: 'RECALC_DAY', expenses, dayRecord })
-  }
+  }, [state.user, state.monster])
 
   const submitExpense = useCallback(async ({ category, amount, note }) => {
     if (!state.user) return
@@ -275,14 +306,14 @@ export function AppProvider({ children }) {
     })
     await setDayRecord(state.user.uid, todayStr(), { settled: false })
     await refreshToday()
-  }, [state])
+  }, [state, refreshToday])
 
   const deleteExpenseEntry = useCallback(async (expenseId) => {
     if (!state.user || !expenseId) return
     await deleteExpense(state.user.uid, expenseId)
     await setDayRecord(state.user.uid, todayStr(), { settled: false, defeated: false })
     await refreshToday()
-  }, [state])
+  }, [state, refreshToday])
 
   const navigate = useCallback((screen) => {
     dispatch({ type: 'SET_SCREEN', screen })
@@ -295,6 +326,7 @@ export function AppProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useApp() {
   return useContext(Ctx)
 }

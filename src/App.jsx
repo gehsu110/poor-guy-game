@@ -6,6 +6,7 @@ import MapScreen     from './screens/MapScreen'
 import ShopScreen    from './screens/ShopScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import QuestScreen   from './screens/QuestScreen'
+import MissionScreen from './screens/MissionScreen'
 import splashBg from './assets/academy-art/splash-bg.webp'
 
 const SCREEN_MAP = {
@@ -15,6 +16,7 @@ const SCREEN_MAP = {
   shop:    ShopScreen,
   profile: ProfileScreen,
   quest:   QuestScreen,
+  missions: MissionScreen,
 }
 
 function LoadingScreen() {

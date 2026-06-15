@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { getTitle, TITLES, formatMoney } from '../gameLogic'
+import { COLLECTIBLE_TITLES, DEFAULT_CATEGORIES, getTitle, TITLES, formatMoney } from '../gameLogic'
 import { loginWithGoogle, updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
 import profileBg from '../assets/academy-art/profile-bg.webp'
@@ -60,11 +60,14 @@ export default function ProfileScreen() {
   const [tab, setTab] = useState('stats')
   const [editBudget, setEditBudget] = useState(false)
   const [budgetInput, setBudgetInput] = useState(String(profile?.dailyBudget ?? 1000))
+  const [customName, setCustomName] = useState('')
+  const [customColor, setCustomColor] = useState('#C8A8E9')
 
   const level = profile?.level ?? 1
   const expInLevel = profile?.expInLevel ?? 0
   const expToNext = profile?.expToNext ?? 100
   const title = getTitle(level)
+  const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const avatarGender = profile?.avatarGender ?? 'girl'
 
   async function handleGoogleLink() {
@@ -100,6 +103,44 @@ export default function ProfileScreen() {
     }
   }
 
+  async function saveCategories(nextCategories) {
+    dispatch({ type: 'UPDATE_PROFILE', data: { customCategories: nextCategories } })
+    if (user) {
+      try {
+        await updateProfile(user.uid, { customCategories: nextCategories })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
+  async function addCustomCategory() {
+    const label = customName.trim().slice(0, 6)
+    if (!label) return
+    const usedLabels = new Set([...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])].map(c => c.label))
+    if (usedLabels.has(label)) {
+      dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'profile', message: '這個分類已經存在' } })
+      setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 1800)
+      return
+    }
+    const nextCategories = [
+      ...(profile?.customCategories ?? []),
+      {
+        id: `custom_${Date.now()}`,
+        label,
+        iconKey: 'custom',
+        color: customColor,
+      },
+    ]
+    setCustomName('')
+    await saveCategories(nextCategories)
+  }
+
+  async function deleteCustomCategory(categoryId) {
+    const nextCategories = (profile?.customCategories ?? []).filter(c => c.id !== categoryId)
+    await saveCategories(nextCategories)
+  }
+
   return (
     <div className="academy-screen">
       <img src={profileBg} alt="" className="academy-bg" draggable="false" />
@@ -116,7 +157,7 @@ export default function ProfileScreen() {
           <div className="mx-auto mb-2 flex justify-center">
             <AvatarPreview gender={avatarGender} />
           </div>
-          <div className="text-base font-black text-[#26324A]">{title.name}</div>
+          <div className="text-base font-black text-[#26324A]">{equippedTitle ?? title.name}</div>
           <div className="text-xs font-bold text-[#8E87A8]">{title.desc}</div>
           <div className="mx-auto mt-2 w-52">
             <ExpBar expInLevel={expInLevel} expToNext={expToNext} />
@@ -214,6 +255,45 @@ export default function ProfileScreen() {
                   <button className="text-xs font-black text-[#8B7CFF]" onClick={() => setEditBudget(true)}>修改</button>
                 </div>
               )}
+            </div>
+
+            <div className="academy-card">
+              <div className="mb-3 text-xs font-black text-[#26324A]">自訂記帳分類</div>
+              <div className="mb-3 grid grid-cols-6 gap-2">
+                {['#FFB3C6', '#A8D8EA', '#C8A8E9', '#A8E6CF', '#FFE4A0', '#FFCBA4'].map(color => (
+                  <button
+                    key={color}
+                    className={`academy-color-swatch ${customColor === color ? 'is-active' : ''}`}
+                    style={{ background: color }}
+                    aria-label={color}
+                    onClick={() => setCustomColor(color)}
+                  />
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customName}
+                  onChange={e => setCustomName(e.target.value)}
+                  className="min-w-0 flex-1 rounded-2xl border border-[#E7DEF6] bg-white px-3 py-2 text-sm font-bold outline-none"
+                  placeholder="例如：飲料、寵物"
+                  maxLength={6}
+                />
+                <button className="academy-small-button" onClick={addCustomCategory}>新增</button>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(profile?.customCategories ?? []).length === 0 ? (
+                  <div className="w-full rounded-2xl bg-white/70 px-3 py-3 text-center text-xs font-bold text-[#8E87A8]">
+                    目前使用系統預設分類
+                  </div>
+                ) : (profile?.customCategories ?? []).map(cat => (
+                  <div key={cat.id} className="academy-category-chip">
+                    <span style={{ background: cat.color }} />
+                    <b>{cat.label}</b>
+                    <button onClick={() => deleteCustomCategory(cat.id)}>刪除</button>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="academy-card">

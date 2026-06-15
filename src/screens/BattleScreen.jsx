@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
@@ -113,10 +113,10 @@ function CategoryIcon({ cat, className = '' }) {
   return <span className={`academy-category-symbol ${className}`} style={{ '--cat-color': cat?.color ?? '#C8A8E9' }} />
 }
 
-function CategoryPicker({ selected, onSelect }) {
+function CategoryPicker({ selected, onSelect, categories }) {
   return (
     <div className="grid grid-cols-4 gap-2">
-      {DEFAULT_CATEGORIES.map(cat => (
+      {categories.map(cat => (
         <motion.button
           key={cat.id}
           className={`academy-category ${selected === cat.id ? 'is-active' : ''}`}
@@ -171,24 +171,15 @@ function CalcKeyboard({ value, onChange, onSubmit }) {
   )
 }
 
-function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit }) {
-  const [category, setCategory] = useState(null)
-  const [note, setNote] = useState('')
-  const [amount, setAmount] = useState('0')
+function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, categories }) {
+  const [category, setCategory] = useState(editingExpense?.category ?? null)
+  const [note, setNote] = useState(editingExpense?.note ?? '')
+  const [amount, setAmount] = useState(String(editingExpense?.amount ?? 0))
   const [step, setStep] = useState('category')
   const [error, setError] = useState('')
 
   const remaining = budget - spent
-  const currentCat = DEFAULT_CATEGORIES.find(c => c.id === category)
-
-  useEffect(() => {
-    if (!editingExpense) return
-    setCategory(editingExpense.category)
-    setNote(editingExpense.note ?? '')
-    setAmount(String(editingExpense.amount ?? 0))
-    setStep('category')
-    setError('')
-  }, [editingExpense])
+  const currentCat = categories.find(c => c.id === category)
 
   function handleAmountSubmit(val) {
     const n = Number(val)
@@ -256,7 +247,7 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit })
 
       {step === 'category' ? (
         <>
-          <CategoryPicker selected={category} onSelect={cat => { setCategory(cat); setStep('amount') }} />
+          <CategoryPicker selected={category} categories={categories} onSelect={cat => { setCategory(cat); setStep('amount') }} />
           {category && (
             <div className="text-center text-xs font-bold text-[#8E87A8]">
               已選：{currentCat?.label}
@@ -300,7 +291,7 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit })
   )
 }
 
-function ExpenseList({ expenses, onEdit, onDelete }) {
+function ExpenseList({ expenses, onEdit, onDelete, categories }) {
   if (!expenses.length) {
     return (
       <div className="rounded-2xl bg-white/80 px-3 py-3 text-center text-xs font-bold text-[#8E87A8]">
@@ -312,7 +303,7 @@ function ExpenseList({ expenses, onEdit, onDelete }) {
   return (
     <div className="flex max-h-24 flex-col gap-1 overflow-y-auto">
       {[...expenses].reverse().map((e, i) => {
-        const cat = DEFAULT_CATEGORIES.find(c => c.id === e.category)
+        const cat = categories.find(c => c.id === e.category)
         return (
           <motion.div
             key={e.id ?? i}
@@ -342,6 +333,7 @@ export default function BattleScreen() {
   const [isHit, setIsHit] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
   const budget = profile?.dailyBudget ?? 1000
+  const categories = [...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])]
 
   async function handleSubmit(data) {
     setIsHit(true)
@@ -387,17 +379,19 @@ export default function BattleScreen() {
       <div className="relative z-20 flex-1 overflow-y-auto px-4 pb-24">
         <div className="mb-3">
           <div className="mb-1 text-xs font-black text-[#26324A]">今日記錄</div>
-          <ExpenseList expenses={expenses} onEdit={setEditingExpense} onDelete={deleteExpenseEntry} />
+          <ExpenseList expenses={expenses} categories={categories} onEdit={setEditingExpense} onDelete={deleteExpenseEntry} />
         </div>
 
         <div className="academy-card p-3">
           <div className="mb-2 text-center text-xs font-black text-[#8E87A8]">輸入消費即可施放術式</div>
           <ExpensePanel
+            key={editingExpense?.id ?? 'new-expense'}
             onSubmit={handleSubmit}
             budget={budget}
             spent={editingExpense ? totalSpent - Number(editingExpense.amount ?? 0) : totalSpent}
             editingExpense={editingExpense}
             onCancelEdit={() => setEditingExpense(null)}
+            categories={categories}
           />
         </div>
       </div>

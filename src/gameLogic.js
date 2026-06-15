@@ -73,7 +73,7 @@ export function generateDayMonster(dateStr, budget) {
  */
 export function calcDamage(amount, todayTotal, budget) {
   const usage = budget > 0 ? todayTotal / budget : 0
-  let mult = 1.0
+  let mult
   if (usage < 0.50) mult = 1.2
   else if (usage < 0.85) mult = 1.0
   else if (usage < 1.00) mult = 0.7
@@ -153,4 +153,11 @@ export function todayStr() {
 
 export function formatMoney(n) {
   return n.toLocaleString('zh-TW')
+}
+
+export const COLLECTIBLE_TITLES = {
+  title_saving: '省錢優等生',
+  title_hero: '記帳魔法使',
+  title_legend: '理財賢者',
+  title_budget: '預算守門人',
 }

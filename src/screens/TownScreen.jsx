@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { formatMoney, generateDayMonster, getTitle } from '../gameLogic'
+import { COLLECTIBLE_TITLES, formatMoney, generateDayMonster, getTitle } from '../gameLogic'
 import homeBg from '../assets/academy-art/home-bg.webp'
 import avatars from '../assets/academy-art/avatars.png'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
@@ -13,8 +13,9 @@ function Avatar({ gender = 'girl', className = '' }) {
   )
 }
 
-function TopHUD({ profile, todayBudget, spent }) {
+function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   const title = profile ? getTitle(profile.level) : null
+  const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const remaining = todayBudget - spent
   const pct = todayBudget > 0 ? Math.min(spent / todayBudget, 1) : 0
 
@@ -22,10 +23,12 @@ function TopHUD({ profile, todayBudget, spent }) {
     <div className="academy-hud">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
-          <Avatar gender={profile?.avatarGender ?? 'girl'} className="academy-hud-avatar" />
+          <button onClick={onAvatarClick} className="shrink-0">
+            <Avatar gender={profile?.avatarGender ?? 'girl'} className="academy-hud-avatar" />
+          </button>
           <div className="min-w-0">
             <div className="text-[10px] font-black text-[#8E87A8]">Lv.{profile?.level ?? 1}</div>
-            <div className="truncate text-sm font-black text-[#26324A]">{title?.name ?? '菜鳥冒險者'}</div>
+            <div className="truncate text-sm font-black text-[#26324A]">{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</div>
           </div>
         </div>
         <div className="flex shrink-0 gap-1.5 text-[11px]">
@@ -134,7 +137,7 @@ export default function TownScreen() {
       <div className="academy-bg-soft" />
 
       <div className="relative z-10 px-4 pt-4">
-        <TopHUD profile={profile} todayBudget={budget} spent={totalSpent} />
+        <TopHUD profile={profile} todayBudget={budget} spent={totalSpent} onAvatarClick={() => navigate('profile')} />
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
@@ -151,9 +154,9 @@ export function BottomNav({ current, navigate }) {
   const tabs = [
     { key: 'town', label: '今日', icon: 'star' },
     { key: 'map', label: '遠征', icon: 'map' },
-    { key: 'quest', label: '公會', icon: 'home' },
+    { key: 'missions', label: '任務', icon: 'ticket' },
     { key: 'shop', label: '補給', icon: 'bag' },
-    { key: 'profile', label: '我的', icon: 'profile' },
+    { key: 'quest', label: '公會', icon: 'home' },
   ]
 
   return (
