@@ -57,6 +57,7 @@ const DEFAULT_PROFILE = {
   monthlyIncome: 0,
   fixedExpense: 0,
   savingGoal: 0,
+  sharedFund: 0,
   guildLedger: [],
   customCategories: [],
   equipped: {},

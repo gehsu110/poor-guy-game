@@ -171,7 +171,7 @@ export default function ShopScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile, user } = state
   const [gachaResult, setGachaResult] = useState(null)
-  const [tab, setTab] = useState('gacha')
+  const [tab, setTab] = useState('direct')
   const [isDrawing, setIsDrawing] = useState(false)
 
   const tickets = profile?.tickets ?? { normal: 0, gold: 0 }
@@ -296,9 +296,9 @@ export default function ShopScreen() {
           <CurrencyCard icon="gold-ticket" label="金色扭蛋券" value={tickets.gold} />
         </div>
         <div className="academy-tabs mb-3">
-          <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>扭蛋補給</button>
-          <button className={tab === 'direct' ? 'is-active' : ''} onClick={() => setTab('direct')}>星星直購</button>
-          <button className={tab === 'collection' ? 'is-active' : ''} onClick={() => setTab('collection')}>收藏庫</button>
+          <button className={tab === 'direct' ? 'is-active' : ''} onClick={() => setTab('direct')}>直購</button>
+          <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>扭蛋</button>
+          <button className={tab === 'collection' ? 'is-active' : ''} onClick={() => setTab('collection')}>圖鑑</button>
         </div>
       </div>
 

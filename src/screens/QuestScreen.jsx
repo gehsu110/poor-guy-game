@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { updateProfile } from '../firebase'
+import { calcLevel, updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
 import guildBg from '../assets/academy-art/guild-bg.webp'
-import { formatMoney } from '../gameLogic'
+import { formatMoney, getTitle } from '../gameLogic'
 
 function FinanceModule({ title, value, sub, tone = 'purple', delay = 0 }) {
   return (
@@ -49,6 +49,21 @@ function PlanningRow({ label, sub, field, value, editing, inputValue, onEdit, on
   )
 }
 
+function ChallengeRow({ title, sub, done, claimed, reward, onClaim }) {
+  return (
+    <div className="academy-challenge-row">
+      <div className={`academy-challenge-mark ${done ? 'is-done' : ''}`} />
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs font-black text-[#26324A]">{title}</div>
+        <div className="truncate text-[10px] font-bold text-[#8E87A8]">{sub}</div>
+      </div>
+      <button className={`academy-status ${done && !claimed ? 'academy-status--done' : ''}`} onClick={onClaim}>
+        {claimed ? '已領' : done ? '領取' : reward}
+      </button>
+    </div>
+  )
+}
+
 export default function QuestScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile, totalSpent, user } = state
@@ -62,6 +77,7 @@ export default function QuestScreen() {
   const monthlyIncome = profile?.monthlyIncome ?? 0
   const fixedExpense = profile?.fixedExpense ?? 0
   const savingGoal = profile?.savingGoal ?? 0
+  const sharedFund = profile?.sharedFund ?? 0
   const remaining = budget - totalSpent
   const budgetPct = budget > 0 ? Math.min(totalSpent / budget, 1) : 0
   const guildLedger = useMemo(() => profile?.guildLedger ?? [], [profile?.guildLedger])
@@ -75,13 +91,20 @@ export default function QuestScreen() {
     return acc
   }, {})
   const totalIncome = monthlyIncome + (ledgerTotals.income ?? 0)
-  const totalFixed = fixedExpense + (ledgerTotals.fixed ?? 0)
+  const fixedPaid = ledgerTotals.fixed ?? 0
   const actualSaving = ledgerTotals.saving ?? 0
-  const totalSaving = savingGoal + actualSaving
-  const monthlyFree = Math.max(0, totalIncome - totalFixed - totalSaving)
+  const commonFund = Math.max(0, sharedFund + totalIncome + actualSaving - fixedPaid)
+  const monthlyFree = Math.max(0, totalIncome - fixedExpense - actualSaving)
   const guildChallengeTarget = savingGoal > 0 ? savingGoal : 3000
-  const guildChallengeDone = actualSaving >= guildChallengeTarget
-  const guildChallengeClaimed = !!profile?.guildChallengeClaims?.[monthlyKey]
+  const fixedBossHp = fixedExpense
+  const fixedBossProgress = fixedBossHp > 0 ? Math.min(fixedPaid / fixedBossHp, 1) : 0
+  const fixedBossDefeated = fixedExpense > 0 && fixedPaid >= fixedExpense
+  const challengeClaims = profile?.guildChallengeClaims ?? {}
+  const stableChallengeDone = (profile?.consecutiveDays ?? 0) >= 25
+  const savingChallengeDone = actualSaving >= guildChallengeTarget
+  const responsibilityChallengeDone = fixedBossDefeated
+  const allChallengeDone = stableChallengeDone && savingChallengeDone && responsibilityChallengeDone
+  const allChallengeClaimed = !!challengeClaims[`${monthlyKey}_all`]
 
   function editField(field, value) {
     setEditing(field)
@@ -141,19 +164,38 @@ export default function QuestScreen() {
   }
 
   async function claimGuildChallenge() {
-    if (!guildChallengeDone || guildChallengeClaimed) return
+    await claimChallenge({
+      key: 'responsibility',
+      done: responsibilityChallengeDone,
+      reward: { goldTicket: 1, exp: 100 },
+      message: '財務責任達成，金色扭蛋券 x1',
+    })
+  }
+
+  async function claimChallenge({ key, done, reward, message }) {
+    const claimKey = `${monthlyKey}_${key}`
+    if (!done || challengeClaims[claimKey]) return
+    const exp = (profile?.exp ?? 0) + (reward.exp ?? 0)
+    const levelInfo = calcLevel(exp)
     const data = {
+      exp,
+      ...levelInfo,
+      title: getTitle(levelInfo.level).name,
+      stars: {
+        yellow: (profile?.stars?.yellow ?? 0) + (reward.yellow ?? 0),
+        purple: (profile?.stars?.purple ?? 0) + (reward.purple ?? 0),
+      },
       tickets: {
-        normal: profile?.tickets?.normal ?? 0,
-        gold: (profile?.tickets?.gold ?? 0) + 1,
+        normal: (profile?.tickets?.normal ?? 0) + (reward.normalTicket ?? 0),
+        gold: (profile?.tickets?.gold ?? 0) + (reward.goldTicket ?? 0),
       },
       guildChallengeClaims: {
-        ...(profile?.guildChallengeClaims ?? {}),
-        [monthlyKey]: true,
+        ...challengeClaims,
+        [claimKey]: true,
       },
     }
     dispatch({ type: 'UPDATE_PROFILE', data })
-    dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'guild', message: '已領取金色扭蛋券 x1' } })
+    dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'guild', message } })
     setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2200)
     if (user) {
       try {
@@ -162,6 +204,15 @@ export default function QuestScreen() {
         console.error(e)
       }
     }
+  }
+
+  async function claimAllChallengeBonus() {
+    await claimChallenge({
+      key: 'all',
+      done: allChallengeDone,
+      reward: { goldTicket: 1, exp: 80 },
+      message: '三項挑戰完成，金色扭蛋券 x1',
+    })
   }
 
   function ledgerLabel(type) {
@@ -205,14 +256,25 @@ export default function QuestScreen() {
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          <FinanceModule title="今日預算" value={`NT$${formatMoney(budget)}`} sub="每日討伐基準" tone="blue" />
+          <FinanceModule title="共同基金" value={`NT$${formatMoney(commonFund)}`} sub="收入與儲蓄扣固定支出" tone="blue" />
           <FinanceModule title="剩餘預算" value={`NT$${formatMoney(Math.max(0, remaining))}`} sub="可轉最後一擊" tone="green" delay={0.04} />
-          <FinanceModule title="固定支出" value={`NT$${formatMoney(totalFixed)}`} sub="房租、訂閱、保險" tone="pink" delay={0.08} />
+          <FinanceModule title="固定支出" value={`NT$${formatMoney(fixedExpense)}`} sub={`已繳 NT$${formatMoney(fixedPaid)}`} tone="pink" delay={0.08} />
           <FinanceModule title="本月可用" value={`NT$${formatMoney(monthlyFree)}`} sub="收入扣固定與儲蓄" tone="gold" delay={0.12} />
         </div>
 
         <div className="academy-card mt-3">
           <div className="mb-3 text-xs font-black text-[#26324A]">基地設定</div>
+          <PlanningRow
+            label="設定共同基金"
+            sub="目前可用家庭資產池"
+            field="sharedFund"
+            value={sharedFund}
+            editing={editing === 'sharedFund'}
+            inputValue={inputValue}
+            onEdit={editField}
+            onChange={setInputValue}
+            onSave={saveField}
+          />
           <PlanningRow
             label="設定月收入"
             sub="讓公會知道本月資源"
@@ -251,26 +313,72 @@ export default function QuestScreen() {
         <div className="academy-card mt-3">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <div className="text-xs font-black text-[#26324A]">公會月度挑戰</div>
-              <div className="text-[10px] font-bold text-[#8E87A8]">本月儲蓄達標可領金色扭蛋券</div>
+              <div className="text-xs font-black text-[#26324A]">固定支出 Boss</div>
+              <div className="text-[10px] font-bold text-[#8E87A8]">固定支出繳清後擊殺 Boss</div>
             </div>
-            <button
-              className={`academy-status ${guildChallengeDone && !guildChallengeClaimed ? 'academy-status--done' : ''}`}
-              onClick={claimGuildChallenge}
-            >
-              {guildChallengeClaimed ? '已領取' : guildChallengeDone ? '領取' : `${Math.min(actualSaving, guildChallengeTarget)}/${guildChallengeTarget}`}
-            </button>
+            <span className={`academy-status ${fixedBossDefeated ? 'academy-status--done' : ''}`}>
+              {fixedBossHp <= 0 ? '未設定' : fixedBossDefeated ? '擊殺' : `${formatMoney(Math.min(fixedPaid, fixedBossHp))}/${formatMoney(fixedBossHp)}`}
+            </span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-[#ECE7F5]">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#FFE981] via-[#FFB84D] to-[#D8941A]"
-              animate={{ width: `${Math.min(actualSaving / guildChallengeTarget, 1) * 100}%` }}
+              className="h-full rounded-full bg-gradient-to-r from-[#FFB3C6] via-[#FFD166] to-[#8B7CFF]"
+              animate={{ width: `${fixedBossProgress * 100}%` }}
             />
           </div>
           <div className="mt-2 flex justify-between text-[10px] font-black text-[#8E87A8]">
-            <span>已登錄儲蓄 NT${formatMoney(actualSaving)}</span>
-            <span>目標 NT${formatMoney(guildChallengeTarget)}</span>
+            <span>已繳固定支出 NT${formatMoney(fixedPaid)}</span>
+            <span>{fixedBossHp > 0 ? `Boss HP NT${formatMoney(fixedBossHp)}` : '請先設定固定支出'}</span>
           </div>
+        </div>
+
+        <div className="academy-card mt-3">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-black text-[#26324A]">公會月度挑戰</div>
+              <div className="text-[10px] font-bold text-[#8E87A8]">第一版固定三項挑戰</div>
+            </div>
+            <button
+              className={`academy-status ${allChallengeDone && !allChallengeClaimed ? 'academy-status--done' : ''}`}
+              onClick={claimAllChallengeBonus}
+            >
+              {allChallengeClaimed ? '全領' : allChallengeDone ? '額外領取' : '進行中'}
+            </button>
+          </div>
+          <ChallengeRow
+            title="穩定記帳"
+            sub={`連續記帳 ${profile?.consecutiveDays ?? 0}/25 天`}
+            done={stableChallengeDone}
+            claimed={!!challengeClaims[`${monthlyKey}_stable`]}
+            reward="黃星 x10"
+            onClaim={() => claimChallenge({
+              key: 'stable',
+              done: stableChallengeDone,
+              reward: { yellow: 10, exp: 80 },
+              message: '穩定記帳達成，黃色星星 x10',
+            })}
+          />
+          <ChallengeRow
+            title="預算節制"
+            sub={`本月儲蓄 NT${formatMoney(actualSaving)} / NT${formatMoney(guildChallengeTarget)}`}
+            done={savingChallengeDone}
+            claimed={!!challengeClaims[`${monthlyKey}_saving`]}
+            reward="紫星 x1"
+            onClaim={() => claimChallenge({
+              key: 'saving',
+              done: savingChallengeDone,
+              reward: { purple: 1, exp: 80 },
+              message: '預算節制達成，紫色星星 x1',
+            })}
+          />
+          <ChallengeRow
+            title="財務責任"
+            sub="固定支出 Boss 擊殺"
+            done={responsibilityChallengeDone}
+            claimed={!!challengeClaims[`${monthlyKey}_responsibility`]}
+            reward="金色券"
+            onClaim={claimGuildChallenge}
+          />
         </div>
 
         <div className="academy-card mt-3">
@@ -316,12 +424,12 @@ export default function QuestScreen() {
               <div className="text-xs font-black text-[#178B82]">NT${formatMoney(totalIncome)}</div>
             </div>
             <div className="academy-stat-box text-center">
-              <div className="text-[10px] font-bold text-[#8E87A8]">儲蓄</div>
-              <div className="text-xs font-black text-[#7B63D8]">NT${formatMoney(totalSaving)}</div>
+              <div className="text-[10px] font-bold text-[#8E87A8]">儲蓄目標</div>
+              <div className="text-xs font-black text-[#7B63D8]">NT${formatMoney(savingGoal)}</div>
             </div>
             <div className="academy-stat-box text-center">
-              <div className="text-[10px] font-bold text-[#8E87A8]">固定</div>
-              <div className="text-xs font-black text-[#D9517B]">NT${formatMoney(totalFixed)}</div>
+              <div className="text-[10px] font-bold text-[#8E87A8]">固定已繳</div>
+              <div className="text-xs font-black text-[#D9517B]">NT${formatMoney(fixedPaid)}</div>
             </div>
           </div>
           <div className="mt-3 flex flex-col gap-2">

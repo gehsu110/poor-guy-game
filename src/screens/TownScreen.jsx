@@ -153,8 +153,8 @@ export default function TownScreen() {
 
 export function BottomNav({ current, navigate }) {
   const tabs = [
-    { key: 'town', label: '今日', icon: 'yellow-star' },
-    { key: 'map', label: '遠征', icon: 'map' },
+    { key: 'town', label: '今日', icon: 'battle' },
+    { key: 'map', label: '地圖', icon: 'map' },
     { key: 'missions', label: '任務', icon: 'mission' },
     { key: 'shop', label: '補給', icon: 'shop' },
     { key: 'quest', label: '公會', icon: 'guild' },

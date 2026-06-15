@@ -10,7 +10,7 @@ import monsterSprites from '../assets/academy-art/monster-sprites.png'
 
 // 節點狀態設定
 const NODE_CONFIG = {
-  defeated:  { bg: '#A8E6CF', border: '#69D2A8', icon: 'yellow-star', label: '擊殺' },
+  defeated:  { bg: '#FFF0B8', border: '#D8A22A', icon: 'skull', label: '擊殺' },
   undefeated:{ bg: '#FFE4A0', border: '#FFD060', icon: 'battle', label: '未滅' },
   no_record: { bg: '#F0F0F0', border: '#DDD', icon: 'unknown', label: '未記' },
   today:     { bg: '#C8A8E9', border: '#A87DE0', icon: 'battle', label: '今日' },

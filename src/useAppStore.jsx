@@ -52,6 +52,7 @@ const DEMO_PROFILE = {
   monthlyIncome: 0,
   fixedExpense: 0,
   savingGoal: 0,
+  sharedFund: 0,
   guildLedger: [],
   customCategories: [],
   equipped: {},
@@ -79,7 +80,9 @@ function calcCombat(monster, expenses, budget, dayRecord) {
   }
 }
 
-function getKillTicketReward() {
+function getKillTicketReward(tier) {
+  if (tier === 'monthboss') return { normal: 3, gold: 0 }
+  if (tier === 'boss' || tier === 'weekend') return { normal: 2, gold: 0 }
   return { normal: 1, gold: 0 }
 }
 

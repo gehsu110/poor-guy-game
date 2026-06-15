@@ -1236,6 +1236,37 @@ body {
   background: #ffe5ee;
 }
 
+.academy-challenge-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: 18px;
+  border: 1px solid #eadff7;
+  background: rgba(255,255,255,0.68);
+  padding: 9px;
+}
+
+.academy-challenge-row + .academy-challenge-row {
+  margin-top: 8px;
+}
+
+.academy-challenge-mark {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  border: 2px solid #ded9e8;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.9), rgba(241,236,255,0.78));
+}
+
+.academy-challenge-mark.is-done {
+  border-color: #52ded4;
+  background:
+    linear-gradient(135deg, #52ded4 0 45%, #fff 45% 55%, #8b7cff 55% 100%);
+  box-shadow: 0 7px 14px rgba(82,222,212,0.18);
+}
+
 .academy-guild-module {
   min-height: 104px;
   border-radius: 24px;
@@ -1335,6 +1366,48 @@ body {
 .game-icon {
   display: inline-block;
   overflow: visible;
+  color: #7b63d8;
+}
+
+.game-icon--yellow-star { color: #d99a18; }
+.game-icon--purple-star { color: #765bd9; }
+.game-icon--normal-ticket { color: #d9517b; }
+.game-icon--gold-ticket { color: #b47b16; }
+.game-icon--battle { color: #7b63d8; }
+.game-icon--map { color: #3f8db5; }
+.game-icon--mission { color: #8b6ad8; }
+.game-icon--shop { color: #d9517b; }
+.game-icon--guild { color: #168f87; }
+.game-icon--skull { color: #b47b16; }
+
+.game-icon__plate {
+  fill: rgba(255,255,255,0.82);
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 4px 5px rgba(86,74,130,0.12));
+}
+
+.game-icon__accent {
+  fill: currentColor;
+  stroke: rgba(60,51,91,0.18);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.game-icon__line,
+.game-icon__route {
+  fill: none;
+  stroke: rgba(38,50,74,0.58);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.game-icon__dot {
+  fill: currentColor;
+  stroke: white;
+  stroke-width: 2;
 }
 
 .game-icon__stop-a { stop-color: #ffe981; }
@@ -1439,6 +1512,36 @@ body {
   fill: rgba(255,255,255,0.74);
   stroke: #ded9e8;
   stroke-width: 5;
+}
+
+.game-icon__plate {
+  fill: rgba(255,255,255,0.82);
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 4px 5px rgba(86,74,130,0.12));
+}
+
+.game-icon__accent {
+  fill: currentColor;
+  stroke: rgba(60,51,91,0.18);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.game-icon__line,
+.game-icon__route {
+  fill: none;
+  stroke: rgba(38,50,74,0.58);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.game-icon__dot {
+  fill: currentColor;
+  stroke: white;
+  stroke-width: 2;
 }
 
 .academy-icon {
