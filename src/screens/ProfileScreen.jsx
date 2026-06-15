@@ -166,10 +166,10 @@ export default function ProfileScreen() {
 
         <div className="mb-3 grid grid-cols-4 gap-2">
           {[
-            { label: '黃星', val: profile?.stars?.yellow ?? 0, tone: 'gold' },
-            { label: '紫星', val: profile?.stars?.purple ?? 0, tone: 'purple' },
-            { label: '補給券', val: profile?.tickets?.normal ?? 0, tone: 'blue' },
-            { label: '金券', val: profile?.tickets?.gold ?? 0, tone: 'pink' },
+            { label: '黃色星星', val: profile?.stars?.yellow ?? 0, tone: 'gold' },
+            { label: '紫色星星', val: profile?.stars?.purple ?? 0, tone: 'purple' },
+            { label: '一般扭蛋券', val: profile?.tickets?.normal ?? 0, tone: 'blue' },
+            { label: '金色扭蛋券', val: profile?.tickets?.gold ?? 0, tone: 'pink' },
           ].map(c => (
             <div key={c.label} className={`academy-mini-stat academy-mini-stat--${c.tone}`}>
               <div className="text-sm font-black">{c.val}</div>

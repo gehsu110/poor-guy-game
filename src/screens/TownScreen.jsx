@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, generateDayMonster, getTitle } from '../gameLogic'
+import GameIcon from '../components/GameIcon'
 import homeBg from '../assets/academy-art/home-bg.webp'
 import avatars from '../assets/academy-art/avatars.png'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
@@ -32,10 +33,10 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
           </div>
         </div>
         <div className="flex shrink-0 gap-1.5 text-[11px]">
-          <span className="academy-pill academy-pill--gold"><span className="academy-icon academy-icon--star" />{profile?.stars?.yellow ?? 0}</span>
-          <span className="academy-pill academy-pill--purple"><span className="academy-icon academy-icon--heart" />{profile?.stars?.purple ?? 0}</span>
-          <span className="academy-pill academy-pill--pink"><span className="academy-icon academy-icon--ticket" />{profile?.tickets?.normal ?? 0}</span>
-          <span className="academy-pill academy-pill--gold"><span className="academy-icon academy-icon--gold-ticket" />{profile?.tickets?.gold ?? 0}</span>
+          <span className="academy-pill academy-pill--gold"><GameIcon name="yellow-star" />{profile?.stars?.yellow ?? 0}</span>
+          <span className="academy-pill academy-pill--purple"><GameIcon name="purple-star" />{profile?.stars?.purple ?? 0}</span>
+          <span className="academy-pill academy-pill--pink"><GameIcon name="normal-ticket" />{profile?.tickets?.normal ?? 0}</span>
+          <span className="academy-pill academy-pill--gold"><GameIcon name="gold-ticket" />{profile?.tickets?.gold ?? 0}</span>
         </div>
       </div>
       <div className="mt-3">
@@ -152,11 +153,11 @@ export default function TownScreen() {
 
 export function BottomNav({ current, navigate }) {
   const tabs = [
-    { key: 'town', label: '今日', icon: 'star' },
+    { key: 'town', label: '今日', icon: 'yellow-star' },
     { key: 'map', label: '遠征', icon: 'map' },
-    { key: 'missions', label: '任務', icon: 'ticket' },
-    { key: 'shop', label: '補給', icon: 'bag' },
-    { key: 'quest', label: '公會', icon: 'home' },
+    { key: 'missions', label: '任務', icon: 'mission' },
+    { key: 'shop', label: '補給', icon: 'shop' },
+    { key: 'quest', label: '公會', icon: 'guild' },
   ]
 
   return (
@@ -167,7 +168,7 @@ export function BottomNav({ current, navigate }) {
           className={`academy-dock-item ${current === tab.key ? 'is-active' : ''}`}
           onClick={() => navigate(tab.key)}
         >
-          <span><i className={`academy-icon academy-icon--${tab.icon}`} /></span>
+          <span><GameIcon name={tab.icon} /></span>
           <b>{tab.label}</b>
         </button>
       ))}

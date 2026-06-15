@@ -105,10 +105,10 @@ export function calcRating(spent, budget, entryCount) {
 }
 
 export const RATING_REWARDS = {
-  S: { yellow: 0, purple: 1, ticket: 1, exp: 60 },
-  A: { yellow: 3, purple: 0, ticket: 1, exp: 40 },
-  B: { yellow: 2, purple: 0, ticket: 0, exp: 25 },
-  C: { yellow: 1, purple: 0, ticket: 0, exp: 10 },
+  S: { yellow: 0, purple: 1, exp: 60 },
+  A: { yellow: 3, purple: 0, exp: 40 },
+  B: { yellow: 2, purple: 0, exp: 25 },
+  C: { yellow: 1, purple: 0, exp: 10 },
 }
 
 // ─── 稱號表 ─────────────────────────────────────────────────────────────────────

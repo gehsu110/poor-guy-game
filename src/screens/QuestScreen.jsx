@@ -76,8 +76,12 @@ export default function QuestScreen() {
   }, {})
   const totalIncome = monthlyIncome + (ledgerTotals.income ?? 0)
   const totalFixed = fixedExpense + (ledgerTotals.fixed ?? 0)
-  const totalSaving = savingGoal + (ledgerTotals.saving ?? 0)
+  const actualSaving = ledgerTotals.saving ?? 0
+  const totalSaving = savingGoal + actualSaving
   const monthlyFree = Math.max(0, totalIncome - totalFixed - totalSaving)
+  const guildChallengeTarget = savingGoal > 0 ? savingGoal : 3000
+  const guildChallengeDone = actualSaving >= guildChallengeTarget
+  const guildChallengeClaimed = !!profile?.guildChallengeClaims?.[monthlyKey]
 
   function editField(field, value) {
     setEditing(field)
@@ -127,6 +131,30 @@ export default function QuestScreen() {
   async function deleteLedgerEntry(id) {
     const data = { guildLedger: guildLedger.filter(row => row.id !== id) }
     dispatch({ type: 'UPDATE_PROFILE', data })
+    if (user) {
+      try {
+        await updateProfile(user.uid, data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
+  async function claimGuildChallenge() {
+    if (!guildChallengeDone || guildChallengeClaimed) return
+    const data = {
+      tickets: {
+        normal: profile?.tickets?.normal ?? 0,
+        gold: (profile?.tickets?.gold ?? 0) + 1,
+      },
+      guildChallengeClaims: {
+        ...(profile?.guildChallengeClaims ?? {}),
+        [monthlyKey]: true,
+      },
+    }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'guild', message: '已領取金色扭蛋券 x1' } })
+    setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2200)
     if (user) {
       try {
         await updateProfile(user.uid, data)
@@ -218,6 +246,31 @@ export default function QuestScreen() {
             onChange={setInputValue}
             onSave={saveField}
           />
+        </div>
+
+        <div className="academy-card mt-3">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-black text-[#26324A]">公會月度挑戰</div>
+              <div className="text-[10px] font-bold text-[#8E87A8]">本月儲蓄達標可領金色扭蛋券</div>
+            </div>
+            <button
+              className={`academy-status ${guildChallengeDone && !guildChallengeClaimed ? 'academy-status--done' : ''}`}
+              onClick={claimGuildChallenge}
+            >
+              {guildChallengeClaimed ? '已領取' : guildChallengeDone ? '領取' : `${Math.min(actualSaving, guildChallengeTarget)}/${guildChallengeTarget}`}
+            </button>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-[#ECE7F5]">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-[#FFE981] via-[#FFB84D] to-[#D8941A]"
+              animate={{ width: `${Math.min(actualSaving / guildChallengeTarget, 1) * 100}%` }}
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-[10px] font-black text-[#8E87A8]">
+            <span>已登錄儲蓄 NT${formatMoney(actualSaving)}</span>
+            <span>目標 NT${formatMoney(guildChallengeTarget)}</span>
+          </div>
         </div>
 
         <div className="academy-card mt-3">

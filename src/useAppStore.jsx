@@ -56,6 +56,7 @@ const DEMO_PROFILE = {
   customCategories: [],
   equipped: {},
   claimedMissions: {},
+  guildChallengeClaims: {},
   avatarGender: 'girl',
   consecutiveDays: 0,
   collection: [],
@@ -78,9 +79,7 @@ function calcCombat(monster, expenses, budget, dayRecord) {
   }
 }
 
-function getKillTicketReward(tier) {
-  if (tier === 'monthboss') return { normal: 0, gold: 1 }
-  if (tier === 'boss' || tier === 'weekend') return { normal: 2, gold: 0 }
+function getKillTicketReward() {
   return { normal: 1, gold: 0 }
 }
 
@@ -184,7 +183,7 @@ export function AppProvider({ children }) {
       purple: (profile?.stars?.purple ?? 0) + (baseReward.purple ?? 0),
     }
     const newTickets = {
-      normal: (profile?.tickets?.normal ?? 0) + (baseReward.ticket ?? 0) + (killReward.normal ?? 0),
+      normal: (profile?.tickets?.normal ?? 0) + (killReward.normal ?? 0),
       gold: (profile?.tickets?.gold ?? 0) + (killReward.gold ?? 0),
     }
     const consecutiveDays = (profile?.consecutiveDays ?? 0) + 1
@@ -208,7 +207,7 @@ export function AppProvider({ children }) {
       rewards: {
         yellow: baseReward.yellow ?? 0,
         purple: baseReward.purple ?? 0,
-        normalTicket: (baseReward.ticket ?? 0) + (killReward.normal ?? 0),
+        normalTicket: killReward.normal ?? 0,
         goldTicket: killReward.gold ?? 0,
         exp: expGain,
       },

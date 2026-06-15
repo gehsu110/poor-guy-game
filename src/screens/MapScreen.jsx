@@ -4,12 +4,13 @@ import { useApp } from '../useAppStore'
 import { generateDayMonster, formatMoney } from '../gameLogic'
 import { getMonthDayRecords, getMonthExpenses } from '../firebase'
 import { BottomNav } from './TownScreen'
+import GameIcon from '../components/GameIcon'
 import mapBg from '../assets/academy-art/map-bg.webp'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
 
 // 節點狀態設定
 const NODE_CONFIG = {
-  defeated:  { bg: '#A8E6CF', border: '#69D2A8', icon: 'star', label: '擊殺' },
+  defeated:  { bg: '#A8E6CF', border: '#69D2A8', icon: 'yellow-star', label: '擊殺' },
   undefeated:{ bg: '#FFE4A0', border: '#FFD060', icon: 'battle', label: '未滅' },
   no_record: { bg: '#F0F0F0', border: '#DDD', icon: 'unknown', label: '未記' },
   today:     { bg: '#C8A8E9', border: '#A87DE0', icon: 'battle', label: '今日' },
@@ -35,7 +36,7 @@ function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
       animate={isToday ? { scale: [1, 1.1, 1], boxShadow: ['0 0 0 0 rgba(200,168,233,0)', '0 0 0 8px rgba(200,168,233,0.4)', '0 0 0 0 rgba(200,168,233,0)'] } : {}}
       transition={{ duration: 2, repeat: Infinity }}
     >
-      <span className={`academy-icon academy-icon--${cfg.icon}`} />
+      <GameIcon name={cfg.icon} />
       {spent > 0 && <i className="academy-map-node__spent" />}
       <div className="academy-map-node__date">
         {day}日
@@ -268,7 +269,7 @@ export default function MapScreen() {
               <div className="font-bold text-[#26324A]">NT${formatMoney(selected.record?.finalDamage ?? 0)}</div>
             </div>
             <div className="academy-stat-box text-center">
-              <div className="text-[#8E87A8]">補給券</div>
+              <div className="text-[#8E87A8]">扭蛋券</div>
               <div className="font-bold text-[#26324A]">{(selected.record?.rewards?.normalTicket ?? 0) + (selected.record?.rewards?.goldTicket ?? 0)}</div>
             </div>
           </div>

@@ -67,8 +67,8 @@ function buildMissions(state) {
 function RewardText({ reward }) {
   const parts = []
   if (reward.exp) parts.push(`EXP ${reward.exp}`)
-  if (reward.yellow) parts.push(`黃星 ${reward.yellow}`)
-  if (reward.purple) parts.push(`紫心 ${reward.purple}`)
+  if (reward.yellow) parts.push(`黃色星星 ${reward.yellow}`)
+  if (reward.purple) parts.push(`紫色星星 ${reward.purple}`)
   return parts.join(' / ')
 }
 

@@ -792,6 +792,11 @@ body {
   height: 14px;
 }
 
+.academy-pill .game-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .academy-pill--gold {
   color: #b47b16;
   background: #fff1bf;
@@ -955,14 +960,20 @@ body {
 
 .academy-dock-item span {
   display: flex;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 15px;
   color: #7b63d8;
   font-size: 16px;
-  background: #f1ecff;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.9), rgba(244,239,255,0.78)),
+    #f1ecff;
+  border: 1px solid rgba(255,255,255,0.82);
+  box-shadow:
+    inset 0 -2px 5px rgba(126,96,215,0.08),
+    0 8px 14px rgba(86,74,130,0.08);
 }
 
 .academy-dock-item.is-active {
@@ -971,8 +982,22 @@ body {
 
 .academy-dock-item.is-active span {
   color: white;
-  background: linear-gradient(135deg, #8b7cff, #52ded4);
-  box-shadow: 0 8px 18px rgba(139,124,255,0.28);
+  background:
+    linear-gradient(135deg, rgba(139,124,255,0.92), rgba(82,222,212,0.82)),
+    #8b7cff;
+  box-shadow:
+    0 8px 18px rgba(139,124,255,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.62);
+}
+
+.academy-dock-item .game-icon {
+  width: 30px;
+  height: 30px;
+  filter: saturate(1.18) contrast(1.04);
+}
+
+.academy-dock-item:not(.is-active) .game-icon {
+  opacity: 0.92;
 }
 
 .academy-battle-monster {
@@ -1307,6 +1332,115 @@ body {
   box-shadow: 0 0 12px rgba(139,124,255,0.45);
 }
 
+.game-icon {
+  display: inline-block;
+  overflow: visible;
+}
+
+.game-icon__stop-a { stop-color: #ffe981; }
+.game-icon__stop-b { stop-color: #ffb84d; }
+
+.game-icon--purple-star .game-icon__stop-a {
+  stop-color: #e7d4ff;
+}
+
+.game-icon--purple-star .game-icon__stop-b {
+  stop-color: #8b6dff;
+}
+
+.game-icon--normal-ticket .game-icon__stop-a {
+  stop-color: #ffc8dd;
+}
+
+.game-icon--normal-ticket .game-icon__stop-b {
+  stop-color: #ff7fa3;
+}
+
+.game-icon--gold-ticket .game-icon__stop-a {
+  stop-color: #fff4a8;
+}
+
+.game-icon--gold-ticket .game-icon__stop-b {
+  stop-color: #d8941a;
+}
+
+.game-icon--map .game-icon__stop-a,
+.game-icon--shop .game-icon__stop-a,
+.game-icon--guild .game-icon__stop-a,
+.game-icon--battle .game-icon__stop-a,
+.game-icon--mission .game-icon__stop-a {
+  stop-color: #ffffff;
+}
+
+.game-icon--map .game-icon__stop-b { stop-color: #8b7cff; }
+.game-icon--shop .game-icon__stop-b { stop-color: #ff7fa3; }
+.game-icon--guild .game-icon__stop-b { stop-color: #52ded4; }
+.game-icon--battle .game-icon__stop-b { stop-color: #c8a8e9; }
+.game-icon--mission .game-icon__stop-b { stop-color: #ffd166; }
+
+.game-icon__medal {
+  fill: rgba(255,255,255,0.82);
+  stroke: rgba(255,255,255,0.92);
+  stroke-width: 3;
+  filter: drop-shadow(0 5px 7px rgba(86,74,130,0.18));
+}
+
+.game-icon__main,
+.game-icon__paper,
+.game-icon__board,
+.game-icon__bag,
+.game-icon__roof {
+  stroke: rgba(82,65,116,0.16);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 4px 5px rgba(86,74,130,0.16));
+}
+
+.game-icon__spark,
+.game-icon__ticket-star {
+  fill: rgba(255,255,255,0.94);
+  stroke: rgba(82,65,116,0.08);
+  stroke-width: 1.5;
+}
+
+.game-icon__ticket-shadow {
+  fill: rgba(86,74,130,0.14);
+}
+
+.game-icon__ticket-cut,
+.game-icon__line,
+.game-icon__route,
+.game-icon__handle,
+.game-icon__clip,
+.game-icon__check,
+.game-icon__eye,
+.game-icon__mouth,
+.game-icon__door {
+  fill: none;
+  stroke: rgba(60,51,91,0.44);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.game-icon__paper,
+.game-icon__board,
+.game-icon__bag,
+.game-icon__roof {
+  fill: rgba(255,255,255,0.84);
+}
+
+.game-icon__pin,
+.game-icon__unknown-dot {
+  fill: #8b7cff;
+}
+
+.game-icon__unknown-ring {
+  fill: rgba(255,255,255,0.74);
+  stroke: #ded9e8;
+  stroke-width: 5;
+}
+
 .academy-icon {
   position: relative;
   display: inline-flex;
@@ -1499,12 +1633,15 @@ body {
 .academy-currency-card {
   display: flex;
   min-width: 0;
+  min-height: 66px;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  border-radius: 18px;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 20px;
   background: rgba(255,255,255,0.78);
   border: 1px solid rgba(255,255,255,0.82);
-  padding: 7px 6px;
+  padding: 6px 4px;
   color: #26324a;
   font-size: 11px;
   font-weight: 1000;
@@ -1514,6 +1651,28 @@ body {
 .academy-currency-card .academy-shop-sprite {
   width: 25px;
   height: 25px;
+}
+
+.academy-currency-card .game-icon {
+  width: 31px;
+  height: 31px;
+  flex: 0 0 auto;
+}
+
+.academy-currency-card__label {
+  max-width: 100%;
+  color: #8e87a8;
+  font-size: 8px;
+  font-weight: 1000;
+  line-height: 1.1;
+  white-space: normal;
+}
+
+.academy-currency-card__value {
+  color: #26324a;
+  font-size: 12px;
+  font-weight: 1000;
+  line-height: 1;
 }
 
 .academy-shop-hero {
@@ -1592,14 +1751,17 @@ body {
   filter: saturate(1.1);
 }
 
-.academy-map-node .academy-icon {
-  width: 18px;
-  height: 18px;
+.academy-map-node .academy-icon,
+.academy-map-node .game-icon {
+  width: 25px;
+  height: 25px;
+  filter: saturate(1.2) contrast(1.04);
 }
 
-.academy-map-node--large .academy-icon {
-  width: 23px;
-  height: 23px;
+.academy-map-node--large .academy-icon,
+.academy-map-node--large .game-icon {
+  width: 31px;
+  height: 31px;
 }
 
 .academy-map-node__spent {

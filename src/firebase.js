@@ -61,6 +61,7 @@ const DEFAULT_PROFILE = {
   customCategories: [],
   equipped: {},
   claimedMissions: {},
+  guildChallengeClaims: {},
   avatarGender: 'girl',
   consecutiveDays: 0,
   lastActiveDate: null,

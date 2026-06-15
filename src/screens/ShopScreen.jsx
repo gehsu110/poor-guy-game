@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
+import GameIcon from '../components/GameIcon'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
 
@@ -22,7 +23,7 @@ const GACHA_POOL = [
 const DIRECT_ITEMS = [
   { id: 'bg_mint', type: 'background', name: '薄荷晨光背景', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'bg_ribbon', type: 'background', name: '緞帶學園背景', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
-  { id: 'frame_gold', type: 'frame', name: '黃星頭像框', costType: 'yellow', cost: 5, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
+  { id: 'frame_gold', type: 'frame', name: '黃色星星頭像框', costType: 'yellow', cost: 5, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
   { id: 'fx_moon', type: 'effect', name: '月光術式', costType: 'purple', cost: 2, rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
   { id: 'title_budget', type: 'title', name: '預算守門人', costType: 'purple', cost: 3, rarity: 'SR', color: '#A8D8EA', iconKey: 'coin' },
 ]
@@ -68,13 +69,13 @@ function drawGacha(count = 1, gold = false) {
   return results
 }
 
-function CurrencyCard({ sprite, label, value }) {
+function CurrencyCard({ icon, label, value }) {
   return (
     <div className="academy-currency-card">
-      <ShopSprite name={sprite} />
-      <div className="min-w-0">
-        <div className="truncate text-[9px] font-black text-[#8E87A8]">{label}</div>
-        <div className="truncate">{value ?? 0}</div>
+      <GameIcon name={icon} />
+      <div className="min-w-0 text-center">
+        <div className="academy-currency-card__label">{label}</div>
+        <div className="academy-currency-card__value">{value ?? 0}</div>
       </div>
     </div>
   )
@@ -139,7 +140,7 @@ function CollectionGrid({ items, equipped, onEquip }) {
       <div className="py-8 text-center">
         <ShopSprite name="box" className="mx-auto mb-2 h-20 w-20" />
         <div className="text-sm font-black text-[#26324A]">還沒有收藏品</div>
-        <div className="text-xs font-bold text-[#8E87A8]">完成每日討伐來取得補給券</div>
+        <div className="text-xs font-bold text-[#8E87A8]">擊殺當日怪物來取得一般扭蛋券</div>
       </div>
     )
   }
@@ -184,7 +185,7 @@ export default function ShopScreen() {
     if (available < count) {
       dispatch({
         type: 'SET_NOTIFICATION',
-        notification: { type: 'shop', message: isGold ? '金券不足，先挑戰月底 Boss。' : '補給券不足，先完成每日討伐。' },
+        notification: { type: 'shop', message: isGold ? '金色扭蛋券不足，先完成公會月度挑戰。' : '一般扭蛋券不足，先擊殺當日怪物。' },
       })
       setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2400)
       return
@@ -251,7 +252,7 @@ export default function ShopScreen() {
     if (current < item.cost) {
       dispatch({
         type: 'SET_NOTIFICATION',
-        notification: { type: 'shop', message: item.costType === 'purple' ? '紫心不足。' : '黃星不足。' },
+        notification: { type: 'shop', message: item.costType === 'purple' ? '紫色星星不足。' : '黃色星星不足。' },
       })
       setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2200)
       return
@@ -289,10 +290,10 @@ export default function ShopScreen() {
 
       <div className="relative z-10 px-4">
         <div className="academy-currency-row mb-3">
-          <CurrencyCard sprite="star" label="黃星" value={stars.yellow} />
-          <CurrencyCard sprite="heart" label="紫心" value={stars.purple} />
-          <CurrencyCard sprite="ticket" label="補給券" value={tickets.normal} />
-          <CurrencyCard sprite="goldTicket" label="金券" value={tickets.gold} />
+          <CurrencyCard icon="yellow-star" label="黃色星星" value={stars.yellow} />
+          <CurrencyCard icon="purple-star" label="紫色星星" value={stars.purple} />
+          <CurrencyCard icon="normal-ticket" label="一般扭蛋券" value={tickets.normal} />
+          <CurrencyCard icon="gold-ticket" label="金色扭蛋券" value={tickets.gold} />
         </div>
         <div className="academy-tabs mb-3">
           <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>扭蛋補給</button>
@@ -310,7 +311,7 @@ export default function ShopScreen() {
                 <div>
                   <div className="text-base font-black text-[#26324A]">小魔女補給員</div>
                   <div className="mt-1 text-xs font-bold leading-5 text-[#8E87A8]">
-                    用每日討伐拿到的補給券，抽出攻擊特效、稱號和頭像框。
+                    用擊殺當日怪物拿到的一般扭蛋券，抽出攻擊特效、稱號和頭像框。
                   </div>
                 </div>
               </div>
@@ -339,28 +340,29 @@ export default function ShopScreen() {
                   抽 10 次
                 </button>
               </div>
-              <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有補給券：{tickets.normal}</div>
+              <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有一般扭蛋券：{tickets.normal}</div>
             </div>
 
             <div className="academy-card" style={{ border: '2px solid rgba(255,211,95,0.86)' }}>
               <div className="mb-3 flex items-center gap-3">
                 <ShopSprite name="goldTicket" className="h-14 w-14" />
                 <div>
-                  <div className="text-sm font-black text-[#26324A]">限定金券池</div>
-                  <div className="text-xs font-bold text-[#D79B26]">SSR 機率提升，月 Boss 掉落</div>
+                  <div className="text-sm font-black text-[#26324A]">限定金色池</div>
+                  <div className="text-xs font-bold text-[#D79B26]">SSR 機率提升，公會月度挑戰取得</div>
                 </div>
               </div>
               <button className={`academy-small-button w-full ${tickets.gold < 1 || isDrawing ? 'opacity-55' : ''}`} onClick={() => handleGacha(1, true)}>
-                金券抽 1 次
+                金色扭蛋券抽 1 次
               </button>
-              <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有金券：{tickets.gold}</div>
+              <div className="mt-2 text-center text-xs font-bold text-[#8E87A8]">持有金色扭蛋券：{tickets.gold}</div>
             </div>
 
             <div className="academy-card text-xs font-bold leading-6 text-[#8E87A8]">
-              <div className="mb-1 text-xs font-black text-[#26324A]">補給券獲得方式</div>
-              <div className="flex justify-between"><span>平日咒靈淨化</span><span>補給券 x1</span></div>
-              <div className="flex justify-between"><span>週末 Boss 淨化</span><span>補給券 x2</span></div>
-              <div className="flex justify-between text-[#B47B16]"><span>月底 Boss 淨化</span><span>金券 x1</span></div>
+              <div className="mb-1 text-xs font-black text-[#26324A]">貨幣獲得方式</div>
+              <div className="flex justify-between"><span>C/B/A 每日結算</span><span>黃色星星 x1～x3</span></div>
+              <div className="flex justify-between"><span>S 每日結算</span><span>紫色星星 x1</span></div>
+              <div className="flex justify-between"><span>擊殺當日怪物</span><span>一般扭蛋券 x1</span></div>
+              <div className="flex justify-between text-[#B47B16]"><span>公會月度挑戰</span><span>金色扭蛋券 x1</span></div>
             </div>
           </div>
         ) : tab === 'direct' ? (
@@ -375,7 +377,7 @@ export default function ShopScreen() {
                     <div className="text-xs font-bold text-[#8E87A8]">{item.type} / {item.rarity}</div>
                   </div>
                   <button className="academy-small-button" onClick={() => buyDirect(item)}>
-                    {owned ? '裝備' : `${item.costType === 'purple' ? '紫心' : '黃星'} ${item.cost}`}
+                    {owned ? '裝備' : `${item.costType === 'purple' ? '紫色星星' : '黃色星星'} ${item.cost}`}
                   </button>
                 </div>
               )
