@@ -7,8 +7,8 @@ import battleBg from '../assets/academy-art/home-bg.webp'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
 
 function TierBadge({ tier }) {
-  if (tier === 'monthboss') return <span className="academy-status academy-status--boss">月Boss</span>
-  if (tier === 'boss' || tier === 'weekend') return <span className="academy-status academy-status--boss">週末Boss</span>
+  if (tier === 'monthboss') return <span className="academy-status academy-status--boss">月底首領</span>
+  if (tier === 'boss' || tier === 'weekend') return <span className="academy-status academy-status--boss">週末首領</span>
   return <span className="academy-status">今日咒靈</span>
 }
 
@@ -32,7 +32,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
         </div>
 
         <div className="mb-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
-          <span>HP</span>
+          <span>血量</span>
           <span>{defeated ? '0' : formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
         </div>
         <div className="h-3.5 overflow-hidden rounded-full bg-[#ECE7F5]">
@@ -44,7 +44,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-2 flex h-48 w-48 items-center justify-center">
+      <div className="relative mx-auto mt-2 flex h-72 w-60 items-center justify-center">
         <motion.div
           className="absolute inset-4 rounded-full bg-[#9B7CFF]/25 blur-2xl"
           animate={{ scale: [0.92, 1.08, 0.92], opacity: [0.5, 0.8, 0.5] }}
@@ -84,7 +84,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
             animate={{ y: -64, opacity: 0, scale: 0.82 }}
             transition={{ duration: 0.9, ease: 'easeOut' }}
           >
-            {dn.crit ? 'CRIT ' : ''}-{formatMoney(dn.value)}
+            {dn.crit ? '爆擊 ' : ''}-{formatMoney(dn.value)}
           </motion.div>
         ))}
       </div>

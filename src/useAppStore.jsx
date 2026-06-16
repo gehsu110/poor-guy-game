@@ -41,6 +41,7 @@ const init = {
 }
 
 const DEMO_PROFILE = {
+  playerName: '窮鬼勇者',
   level: 1,
   exp: 0,
   expInLevel: 0,
@@ -61,6 +62,7 @@ const DEMO_PROFILE = {
   avatarGender: 'girl',
   consecutiveDays: 0,
   collection: [],
+  onboardingDone: false,
 }
 
 function calcCombat(monster, expenses, budget, dayRecord) {

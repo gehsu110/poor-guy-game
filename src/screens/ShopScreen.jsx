@@ -29,9 +29,16 @@ const DIRECT_ITEMS = [
 ]
 
 const RARITY_CONFIG = {
-  SSR: { color: '#FFD35F', bg: 'linear-gradient(135deg, #FFE981, #FFB84D)', prob: 3 },
-  SR: { color: '#B79BFF', bg: 'linear-gradient(135deg, #D4B9FF, #9A7CFF)', prob: 15 },
-  R: { color: '#8FD8EA', bg: 'linear-gradient(135deg, #BFEFFF, #74D3E8)', prob: 82 },
+  SSR: { label: '傳說', color: '#FFD35F', bg: 'linear-gradient(135deg, #FFE981, #FFB84D)', prob: 3 },
+  SR: { label: '稀有', color: '#B79BFF', bg: 'linear-gradient(135deg, #D4B9FF, #9A7CFF)', prob: 15 },
+  R: { label: '普通', color: '#8FD8EA', bg: 'linear-gradient(135deg, #BFEFFF, #74D3E8)', prob: 82 },
+}
+
+const TYPE_LABELS = {
+  background: '背景',
+  effect: '攻擊特效',
+  title: '稱號',
+  frame: '頭像框',
 }
 
 const SPRITE_BY_ICON = {
@@ -117,7 +124,7 @@ function GachaResult({ results, onClose }) {
                 <PrizeIcon item={item} />
               </div>
               <div className="text-[10px] font-black text-white" style={{ background: rar.bg, borderRadius: 999 }}>
-                {item.rarity}
+                {rar.label}
               </div>
               <div className="mt-1 text-xs font-black text-[#26324A]">{item.name}</div>
             </motion.div>
@@ -163,6 +170,37 @@ function CollectionGrid({ items, equipped, onEquip }) {
           </div>
         )
       })}
+    </div>
+  )
+}
+
+function RewardPreview() {
+  const previews = [
+    { type: 'effect', label: '星軌斬擊', sub: '攻擊特效' },
+    { type: 'title', label: '預算守門人', sub: '稱號' },
+    { type: 'frame', label: '星砂邊框', sub: '頭像框' },
+    { type: 'background', label: '薄荷晨光', sub: '背景' },
+  ]
+  return (
+    <div className="academy-card">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div>
+          <div className="text-sm font-black text-[#26324A]">獎勵預覽</div>
+          <div className="text-[10px] font-bold text-[#8E87A8]">先看收集品裝上去會長什麼樣</div>
+        </div>
+        <span className="academy-status">展示</span>
+      </div>
+      <div className="academy-reward-preview">
+        {previews.map(item => (
+          <div key={item.type} className="academy-reward-tile">
+            <div className={`academy-reward-tile__visual academy-reward-tile__visual--${item.type}`}>
+              {item.type === 'title' && <span className="text-[9px] font-black text-[#7B63D8]">稱號</span>}
+            </div>
+            <div className="academy-reward-tile__label">{item.label}</div>
+            <div className="academy-reward-tile__sub">{item.sub}</div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -328,7 +366,7 @@ export default function ShopScreen() {
               <div className="mb-3 flex gap-2">
                 {Object.entries(RARITY_CONFIG).map(([k, v]) => (
                   <div key={k} className="flex-1 rounded-2xl py-2 text-center text-xs font-black text-white" style={{ background: v.bg }}>
-                    {k} {v.prob}%
+                    {v.label} {v.prob}%
                   </div>
                 ))}
               </div>
@@ -348,7 +386,7 @@ export default function ShopScreen() {
                 <ShopSprite name="goldTicket" className="h-14 w-14" />
                 <div>
                   <div className="text-sm font-black text-[#26324A]">限定金色池</div>
-                  <div className="text-xs font-bold text-[#D79B26]">SSR 機率提升，公會月度挑戰取得</div>
+                  <div className="text-xs font-bold text-[#D79B26]">傳說機率提升，公會月度挑戰取得</div>
                 </div>
               </div>
               <button className={`academy-small-button w-full ${tickets.gold < 1 || isDrawing ? 'opacity-55' : ''}`} onClick={() => handleGacha(1, true)}>
@@ -359,22 +397,24 @@ export default function ShopScreen() {
 
             <div className="academy-card text-xs font-bold leading-6 text-[#8E87A8]">
               <div className="mb-1 text-xs font-black text-[#26324A]">貨幣獲得方式</div>
-              <div className="flex justify-between"><span>C/B/A 每日結算</span><span>黃色星星 x1～x3</span></div>
-              <div className="flex justify-between"><span>S 每日結算</span><span>紫色星星 x1</span></div>
-              <div className="flex justify-between"><span>擊殺當日怪物</span><span>一般扭蛋券 x1</span></div>
-              <div className="flex justify-between text-[#B47B16]"><span>公會月度挑戰</span><span>金色扭蛋券 x1</span></div>
+              <div className="flex justify-between"><span>C/B/A 每日結算</span><span>黃色星星 ×1～×3</span></div>
+              <div className="flex justify-between"><span>S 每日結算</span><span>紫色星星 ×1</span></div>
+              <div className="flex justify-between"><span>擊殺當日怪物</span><span>一般扭蛋券 ×1</span></div>
+              <div className="flex justify-between text-[#B47B16]"><span>公會月度挑戰</span><span>金色扭蛋券 ×1</span></div>
             </div>
           </div>
         ) : tab === 'direct' ? (
           <div className="flex flex-col gap-2">
+            <RewardPreview />
             {DIRECT_ITEMS.map(item => {
               const owned = collection.some(c => c.id === item.id)
+              const rarity = RARITY_CONFIG[item.rarity] ?? RARITY_CONFIG.R
               return (
                 <div key={item.id} className="academy-card flex items-center gap-3">
                   <PrizeIcon item={item} />
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-black text-[#26324A]">{item.name}</div>
-                    <div className="text-xs font-bold text-[#8E87A8]">{item.type} / {item.rarity}</div>
+                    <div className="text-xs font-bold text-[#8E87A8]">{TYPE_LABELS[item.type] ?? '收集品'} / {rarity.label}</div>
                   </div>
                   <button className="academy-small-button" onClick={() => buyDirect(item)}>
                     {owned ? '裝備' : `${item.costType === 'purple' ? '紫色星星' : '黃色星星'} ${item.cost}`}

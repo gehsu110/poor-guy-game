@@ -15,8 +15,8 @@ const NODE_CONFIG = {
   no_record: { bg: '#F0F0F0', border: '#DDD', icon: 'unknown', label: '未記' },
   today:     { bg: '#C8A8E9', border: '#A87DE0', icon: 'battle', label: '今日' },
   future:    { bg: '#E8E8E8', border: '#CCC', icon: 'unknown', label: '未來' },
-  boss:      { bg: '#FFB3C6', border: '#FF6B9D', icon: 'boss', label: 'Boss' },
-  monthboss: { bg: '#C8A8E9', border: '#7B5EA7', icon: 'boss', label: '月Boss' },
+  boss:      { bg: '#FFB3C6', border: '#FF6B9D', icon: 'boss', label: '首領' },
+  monthboss: { bg: '#C8A8E9', border: '#7B5EA7', icon: 'boss', label: '月底首領' },
 }
 
 function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
@@ -45,10 +45,10 @@ function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
   )
 }
 
-// 將天數排列成蛇形路徑（每排 5 個）
+// 將天數排列成蛇形路徑（每排 4 個，避免太像月曆）
 function buildPath(days) {
   const rows = []
-  const perRow = 5
+  const perRow = 4
   for (let i = 0; i < days.length; i += perRow) {
     const row = days.slice(i, i + perRow)
     rows.push(i % (perRow * 2) === 0 ? row : [...row].reverse())
@@ -161,7 +161,7 @@ export default function MapScreen() {
           { color: '#FFE4A0', label: '未滅' },
           { color: '#F0F0F0', label: '未記' },
           { color: '#C8A8E9', label: '今日' },
-          { color: '#FFB3C6', label: 'Boss' },
+          { color: '#FFB3C6', label: '首領' },
           { color: '#E8E8E8', label: '未來' },
         ].map(({ color, label }) => (
           <div key={label} className="flex items-center gap-1 whitespace-nowrap">
@@ -205,16 +205,19 @@ export default function MapScreen() {
           </div>
         </div>
 
-        <div className="academy-card academy-map-card flex flex-col gap-8 py-6">
+        <div className="academy-card academy-map-card flex flex-col gap-9 py-6">
           {loadingMonth && (
             <div className="absolute inset-x-8 top-3 rounded-full bg-white/82 px-3 py-1 text-center text-[10px] font-black text-[#8E87A8]">
               讀取遠征紀錄中
             </div>
           )}
           {rows.map((row, ri) => (
-            <div key={ri} className="flex justify-around items-center relative">
+            <div key={ri} className="academy-map-row">
               {/* 連接線 */}
               <div className="academy-map-line" />
+              {ri < rows.length - 1 && (
+                <div className={`academy-map-turn ${ri % 2 === 0 ? 'academy-map-turn--right' : 'academy-map-turn--left'}`} />
+              )}
               {row.map(node => (
                 <MapNode
                   key={node.day}
@@ -245,7 +248,7 @@ export default function MapScreen() {
           </div>
           <div className="flex gap-3 text-xs">
             <div className="academy-stat-box flex-1 text-center">
-              <div className="text-[#8E87A8]">怪物HP</div>
+              <div className="text-[#8E87A8]">怪物血量</div>
               <div className="font-bold text-[#26324A]">NT${formatMoney(selected.monster.maxHp)}</div>
             </div>
             <div className="academy-stat-box flex-1 text-center">

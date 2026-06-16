@@ -89,8 +89,8 @@ const ALIASES = {
   goldTicket: 'gold-ticket',
   home: 'guild',
   bag: 'shop',
-    boss: 'battle',
-  }
+  boss: 'battle',
+}
 
 export default function GameIcon({ name, className = '', title }) {
   const resolved = ALIASES[name] ?? name

@@ -20,7 +20,7 @@ function ExpBar({ expInLevel, expToNext }) {
   return (
     <div>
       <div className="mb-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
-        <span>EXP</span>
+        <span>經驗</span>
         <span>{expInLevel} / {expToNext}</span>
       </div>
       <div className="h-3 overflow-hidden rounded-full bg-[#ECE7F5]">
@@ -46,7 +46,7 @@ function TitleList({ currentLevel }) {
               <div className="truncate text-xs font-black text-[#26324A]">{t.name}</div>
               <div className="truncate text-[10px] font-bold text-[#8E87A8]">{t.desc}</div>
             </div>
-            <div className="text-[10px] font-black text-[#8E87A8]">Lv.{t.minLv}</div>
+            <div className="text-[10px] font-black text-[#8E87A8]">等級 {t.minLv}</div>
           </div>
         )
       })}
@@ -60,6 +60,8 @@ export default function ProfileScreen() {
   const [tab, setTab] = useState('stats')
   const [editBudget, setEditBudget] = useState(false)
   const [budgetInput, setBudgetInput] = useState(String(profile?.dailyBudget ?? 1000))
+  const [editName, setEditName] = useState(false)
+  const [nameInput, setNameInput] = useState(profile?.playerName ?? '窮鬼勇者')
   const [customName, setCustomName] = useState('')
   const [customColor, setCustomColor] = useState('#C8A8E9')
 
@@ -69,6 +71,7 @@ export default function ProfileScreen() {
   const title = getTitle(level)
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const avatarGender = profile?.avatarGender ?? 'girl'
+  const playerName = profile?.playerName?.trim() || '窮鬼勇者'
 
   async function handleGoogleLink() {
     try {
@@ -86,6 +89,21 @@ export default function ProfileScreen() {
     if (user) {
       try {
         await updateProfile(user.uid, { dailyBudget: val })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
+  async function savePlayerName() {
+    const nextName = nameInput.trim().slice(0, 12)
+    if (!nextName) return
+    const data = { playerName: nextName }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    setEditName(false)
+    if (user) {
+      try {
+        await updateProfile(user.uid, data)
       } catch (e) {
         console.error(e)
       }
@@ -157,8 +175,9 @@ export default function ProfileScreen() {
           <div className="mx-auto mb-2 flex justify-center">
             <AvatarPreview gender={avatarGender} />
           </div>
-          <div className="text-base font-black text-[#26324A]">{equippedTitle ?? title.name}</div>
-          <div className="text-xs font-bold text-[#8E87A8]">{title.desc}</div>
+          <div className="text-base font-black text-[#26324A]">{playerName}</div>
+          <div className="text-xs font-bold text-[#8E87A8]">稱號：{equippedTitle ?? title.name}</div>
+          <div className="text-[10px] font-bold text-[#8E87A8]">{title.desc}</div>
           <div className="mx-auto mt-2 w-52">
             <ExpBar expInLevel={expInLevel} expToNext={expToNext} />
           </div>
@@ -198,7 +217,7 @@ export default function ProfileScreen() {
                 { label: '今日消費', val: `NT$${formatMoney(state.totalSpent)}` },
                 { label: '今日預算', val: `NT$${formatMoney(profile?.dailyBudget ?? 1000)}` },
                 { label: '連續記帳', val: `${profile?.consecutiveDays ?? 0}天` },
-                { label: '咒靈HP', val: `${formatMoney(state.currentHp)}` },
+                { label: '咒靈血量', val: `${formatMoney(state.currentHp)}` },
               ].map(s => (
                 <div key={s.label} className="academy-stat-box">
                   <div className="text-[10px] font-bold text-[#8E87A8]">{s.label}</div>
@@ -218,6 +237,31 @@ export default function ProfileScreen() {
 
         {tab === 'settings' && (
           <div className="flex flex-col gap-3">
+            <div className="academy-card">
+              <div className="mb-3 text-xs font-black text-[#26324A]">玩家名稱</div>
+              {editName ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={nameInput}
+                    onChange={e => setNameInput(e.target.value)}
+                    className="min-w-0 flex-1 rounded-2xl border border-[#E7DEF6] bg-white px-3 py-2 text-sm font-bold outline-none"
+                    maxLength={12}
+                    placeholder="輸入玩家名稱"
+                  />
+                  <button className="academy-small-button" onClick={savePlayerName}>儲存</button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-[#26324A]">{playerName}</span>
+                  <button className="text-xs font-black text-[#8B7CFF]" onClick={() => {
+                    setNameInput(playerName)
+                    setEditName(true)
+                  }}>修改</button>
+                </div>
+              )}
+            </div>
+
             <div className="academy-card">
               <div className="mb-3 text-xs font-black text-[#26324A]">主角外觀</div>
               <div className="grid grid-cols-2 gap-2">
@@ -300,9 +344,9 @@ export default function ProfileScreen() {
               <div className="mb-3 text-xs font-black text-[#26324A]">帳號</div>
               {user?.isAnonymous ? (
                 <div>
-                  <div className="mb-2 text-xs font-bold text-[#8E87A8]">目前使用匿名登入，綁定 Google 帳號可保存進度</div>
+                  <div className="mb-2 text-xs font-bold text-[#8E87A8]">目前使用匿名登入，綁定雲端帳號可保存進度</div>
                   <button className="academy-small-button w-full" onClick={handleGoogleLink}>
-                    綁定 Google 帳號
+                    綁定雲端帳號
                   </button>
                 </div>
               ) : (

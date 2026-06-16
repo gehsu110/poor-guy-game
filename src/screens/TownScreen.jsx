@@ -17,6 +17,7 @@ function Avatar({ gender = 'girl', className = '' }) {
 function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   const title = profile ? getTitle(profile.level) : null
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
+  const playerName = profile?.playerName?.trim() || '窮鬼勇者'
   const remaining = todayBudget - spent
   const pct = todayBudget > 0 ? Math.min(spent / todayBudget, 1) : 0
 
@@ -28,8 +29,8 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
             <Avatar gender={profile?.avatarGender ?? 'girl'} className="academy-hud-avatar" />
           </button>
           <div className="min-w-0">
-            <div className="text-[10px] font-black text-[#8E87A8]">Lv.{profile?.level ?? 1}</div>
-            <div className="truncate text-sm font-black text-[#26324A]">{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</div>
+            <div className="text-[10px] font-black text-[#8E87A8]">等級 {profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</div>
+            <div className="truncate text-sm font-black text-[#26324A]">{playerName}</div>
           </div>
         </div>
         <div className="flex shrink-0 gap-1.5 text-[11px]">
@@ -86,8 +87,8 @@ function DailyMonster({ monster, currentHp }) {
           />
         </div>
         <div className="mt-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
-          <span>HP {formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
-          <span>{monster.tier === 'boss' ? '週末 Boss' : monster.tier === 'monthboss' ? '月底 Boss' : '每日怪'}</span>
+          <span>血量 {formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
+          <span>{monster.tier === 'boss' ? '週末首領' : monster.tier === 'monthboss' ? '月底首領' : '每日怪'}</span>
         </div>
       </div>
     </div>

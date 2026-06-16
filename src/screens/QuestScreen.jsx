@@ -239,7 +239,7 @@ export default function QuestScreen() {
               <div className="text-base font-black text-[#26324A]">家庭財務俱樂部</div>
               <div className="text-xs font-bold text-[#8E87A8]">收入、儲蓄、固定支出集中管理</div>
             </div>
-            <span className="academy-status">Lv.1</span>
+            <span className="academy-status">等級 1</span>
           </div>
           <div className="mt-4">
             <div className="mb-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
@@ -313,8 +313,8 @@ export default function QuestScreen() {
         <div className="academy-card mt-3">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <div className="text-xs font-black text-[#26324A]">固定支出 Boss</div>
-              <div className="text-[10px] font-bold text-[#8E87A8]">固定支出繳清後擊殺 Boss</div>
+              <div className="text-xs font-black text-[#26324A]">固定支出首領</div>
+              <div className="text-[10px] font-bold text-[#8E87A8]">固定支出繳清後擊殺首領</div>
             </div>
             <span className={`academy-status ${fixedBossDefeated ? 'academy-status--done' : ''}`}>
               {fixedBossHp <= 0 ? '未設定' : fixedBossDefeated ? '擊殺' : `${formatMoney(Math.min(fixedPaid, fixedBossHp))}/${formatMoney(fixedBossHp)}`}
@@ -328,7 +328,7 @@ export default function QuestScreen() {
           </div>
           <div className="mt-2 flex justify-between text-[10px] font-black text-[#8E87A8]">
             <span>已繳固定支出 NT${formatMoney(fixedPaid)}</span>
-            <span>{fixedBossHp > 0 ? `Boss HP NT${formatMoney(fixedBossHp)}` : '請先設定固定支出'}</span>
+            <span>{fixedBossHp > 0 ? `首領血量 NT${formatMoney(fixedBossHp)}` : '請先設定固定支出'}</span>
           </div>
         </div>
 
@@ -373,7 +373,7 @@ export default function QuestScreen() {
           />
           <ChallengeRow
             title="財務責任"
-            sub="固定支出 Boss 擊殺"
+            sub="固定支出首領擊殺"
             done={responsibilityChallengeDone}
             claimed={!!challengeClaims[`${monthlyKey}_responsibility`]}
             reward="金色券"
