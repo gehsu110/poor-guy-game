@@ -1011,8 +1011,8 @@ body {
 
 .academy-battle-monster {
   display: flex;
-  width: 230px;
-  height: 270px;
+  width: 188px;
+  height: 250px;
   align-items: center;
   justify-content: center;
 }
@@ -1035,6 +1035,30 @@ body {
   border: 1px solid #eadff7;
 }
 
+.academy-category-strip {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.academy-category-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.academy-category--compact {
+  min-width: 66px;
+  min-height: 48px;
+  border-radius: 16px;
+}
+
+.academy-category--compact .academy-category-symbol {
+  width: 19px;
+  height: 19px;
+  border-radius: 8px;
+}
+
 .academy-category.is-active {
   color: #7b63d8;
   background: #f1ecff;
@@ -1043,13 +1067,87 @@ body {
 }
 
 .academy-key {
-  min-height: 44px;
+  min-height: 42px;
   border-radius: 16px;
   color: #26324a;
   font-size: 15px;
   font-weight: 900;
   background: rgba(255,255,255,0.78);
   border: 1px solid #eadff7;
+}
+
+.academy-battle-arena {
+  position: relative;
+  display: flex;
+  height: 292px;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 4px;
+}
+
+.academy-battle-hp {
+  position: relative;
+  z-index: 4;
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.86);
+  padding: 10px 12px;
+  box-shadow: 0 10px 24px rgba(86,74,130,0.14);
+  backdrop-filter: blur(16px);
+}
+
+.academy-battle-monster-zone {
+  position: relative;
+  display: flex;
+  height: 176px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.academy-battle-monster-zone .academy-monster-sprite {
+  width: 132px;
+  height: 176px;
+}
+
+.academy-battle-log {
+  position: relative;
+  z-index: 5;
+  margin-top: -7px;
+}
+
+.academy-battle-log .flex.max-h-24 {
+  max-height: 50px;
+}
+
+.academy-battle-panel {
+  position: relative;
+  z-index: 6;
+  margin-top: 7px;
+  padding: 10px;
+  border-radius: 24px;
+}
+
+.academy-battle-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.academy-battle-entry-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.academy-battle-amount {
+  min-width: 0;
+  border-radius: 18px;
+  border: 1px solid #eadff7;
+  background: rgba(255,255,255,0.78);
+  padding: 6px 9px;
+  text-align: right;
 }
 
 .academy-key--op {

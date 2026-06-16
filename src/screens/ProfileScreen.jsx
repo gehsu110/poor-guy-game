@@ -110,6 +110,18 @@ export default function ProfileScreen() {
     }
   }
 
+  async function replayOnboarding() {
+    const data = { onboardingDone: false }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    if (user) {
+      try {
+        await updateProfile(user.uid, data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
   async function chooseAvatar(gender) {
     dispatch({ type: 'UPDATE_PROFILE', data: { avatarGender: gender } })
     if (user) {
@@ -299,6 +311,14 @@ export default function ProfileScreen() {
                   <button className="text-xs font-black text-[#8B7CFF]" onClick={() => setEditBudget(true)}>修改</button>
                 </div>
               )}
+            </div>
+
+            <div className="academy-card">
+              <div className="mb-3 text-xs font-black text-[#26324A]">新手教學</div>
+              <div className="mb-3 text-xs font-bold leading-5 text-[#8E87A8]">
+                重新查看今日、地圖、任務、補給、公會與設定入口說明。
+              </div>
+              <button className="academy-small-button w-full" onClick={replayOnboarding}>重新觀看教學</button>
             </div>
 
             <div className="academy-card">

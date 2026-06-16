@@ -13,9 +13,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png'],
       manifest: {
-        name: '記帳勇者 ExpenseQuest',
-        short_name: '記帳勇者',
-        description: '每一筆記帳都是一次攻擊！打倒今日的消費怪物！',
+        name: '窮鬼勇者',
+        short_name: '窮鬼勇者',
+        description: '記帳打怪，守住你的預算。',
         theme_color: '#C8A8E9',
         background_color: '#E8F4FD',
         display: 'standalone',

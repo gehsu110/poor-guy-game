@@ -19,11 +19,11 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
   const isAngry = hpPct < 0.3 && !defeated
 
   return (
-    <div className="relative flex h-full flex-col justify-end px-4 pb-3 pt-12">
-      <div className="academy-card">
-        <div className="mb-2 flex items-center justify-between gap-3">
+    <div className="academy-battle-arena">
+      <div className="academy-battle-hp">
+        <div className="mb-1.5 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="truncate text-base font-black text-[#26324A]">{monster.name}</div>
+            <div className="truncate text-sm font-black text-[#26324A]">{monster.name}</div>
             <div className="text-[10px] font-bold text-[#8E87A8]">
               {defeated ? '淨化完成，今天很穩。' : '輸入一筆消費，施放術式。'}
             </div>
@@ -35,7 +35,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
           <span>血量</span>
           <span>{defeated ? '0' : formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
         </div>
-        <div className="h-3.5 overflow-hidden rounded-full bg-[#ECE7F5]">
+        <div className="h-2.5 overflow-hidden rounded-full bg-[#ECE7F5]">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-[#52DED4] via-[#FFD166] to-[#FF7FA3]"
             animate={{ width: `${hpPct * 100}%` }}
@@ -44,7 +44,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-2 flex h-72 w-60 items-center justify-center">
+      <div className="academy-battle-monster-zone">
         <motion.div
           className="absolute inset-4 rounded-full bg-[#9B7CFF]/25 blur-2xl"
           animate={{ scale: [0.92, 1.08, 0.92], opacity: [0.5, 0.8, 0.5] }}
@@ -115,11 +115,11 @@ function CategoryIcon({ cat, className = '' }) {
 
 function CategoryPicker({ selected, onSelect, categories }) {
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="academy-category-strip">
       {categories.map(cat => (
         <motion.button
           key={cat.id}
-          className={`academy-category ${selected === cat.id ? 'is-active' : ''}`}
+          className={`academy-category academy-category--compact ${selected === cat.id ? 'is-active' : ''}`}
           onClick={() => onSelect(cat.id)}
           whileTap={{ scale: 0.92 }}
         >
@@ -175,7 +175,6 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
   const [category, setCategory] = useState(editingExpense?.category ?? null)
   const [note, setNote] = useState(editingExpense?.note ?? '')
   const [amount, setAmount] = useState(String(editingExpense?.amount ?? 0))
-  const [step, setStep] = useState('category')
   const [error, setError] = useState('')
 
   const remaining = budget - spent
@@ -189,7 +188,6 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
     }
     if (!category) {
       setError('請選擇分類')
-      setStep('category')
       return
     }
     setError('')
@@ -197,7 +195,6 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
     setAmount('0')
     setNote('')
     setCategory(null)
-    setStep('category')
     onCancelEdit?.()
   }
 
@@ -206,8 +203,8 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
     : null
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex justify-between text-xs font-black text-[#8E87A8]">
+    <div className="academy-battle-pad">
+      <div className="flex justify-between text-[11px] font-black text-[#8E87A8]">
         <span>今日消費 <b className="text-[#26324A]">NT${formatMoney(spent)}</b></span>
         <span className={remaining < 0 ? 'text-[#FF6D98]' : 'text-[#24B7B0]'}>
           {remaining < 0 ? `超支 NT$${formatMoney(-remaining)}` : `剩餘 NT$${formatMoney(remaining)}`}
@@ -221,62 +218,29 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
         </div>
       )}
 
-      <div className="academy-segment">
-        {[
-          { k: 'category', label: '選分類' },
-          { k: 'amount', label: '輸入金額' },
-        ].map(t => (
-          <button
-            key={t.k}
-            className={step === t.k ? 'is-active' : ''}
-            onClick={() => setStep(t.k)}
-          >
-            {t.label}
-          </button>
-        ))}
+      <CategoryPicker selected={category} categories={categories} onSelect={cat => setCategory(cat)} />
+
+      <div className="academy-battle-entry-row">
+        <input
+          type="text"
+          placeholder="備註，可跳過"
+          value={note}
+          onChange={e => setNote(e.target.value)}
+          className="min-w-0 rounded-2xl border border-[#E7DEF6] bg-white/90 px-3 py-2 text-xs font-bold text-[#26324A] outline-none placeholder:text-[#B8AECF] focus:border-[#8B7CFF]"
+          maxLength={20}
+        />
+        <div className="academy-battle-amount">
+          <div className="truncate text-[10px] font-black text-[#8E87A8]">
+            {currentCat ? currentCat.label : '選分類'}
+          </div>
+          <div className="truncate text-lg font-black text-[#26324A]">
+            NT$ {amount.includes('+') ? amount : formatMoney(Number(amount) || 0)}
+          </div>
+          {previewDmg && <div className="text-[10px] font-black text-[#FF6D98]">傷害 -{formatMoney(previewDmg)}</div>}
+        </div>
       </div>
 
-      <input
-        type="text"
-        placeholder="備註，可跳過"
-        value={note}
-        onChange={e => setNote(e.target.value)}
-        className="rounded-2xl border border-[#E7DEF6] bg-white/90 px-4 py-3 text-sm font-bold text-[#26324A] outline-none placeholder:text-[#B8AECF] focus:border-[#8B7CFF]"
-        maxLength={20}
-      />
-
-      {step === 'category' ? (
-        <>
-          <CategoryPicker selected={category} categories={categories} onSelect={cat => { setCategory(cat); setStep('amount') }} />
-          {category && (
-            <div className="text-center text-xs font-bold text-[#8E87A8]">
-              已選：{currentCat?.label}
-              <button className="ml-2 text-[#24B7B0]" onClick={() => setStep('amount')}>繼續</button>
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          <div className="academy-amount">
-            <div className="text-xs font-black text-[#8E87A8]">
-              {currentCat ? currentCat.label : '尚未選擇分類'}
-            </div>
-            <div className="mt-1 text-3xl font-black text-[#26324A]">
-              NT$ {amount.includes('+') ? amount : formatMoney(Number(amount) || 0)}
-            </div>
-            {previewDmg && (
-              <motion.div
-                className="mt-1 text-xs font-black text-[#FF6D98]"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                預估傷害 -{formatMoney(previewDmg)}
-              </motion.div>
-            )}
-          </div>
-          <CalcKeyboard value={amount} onChange={setAmount} onSubmit={handleAmountSubmit} />
-        </>
-      )}
+      <CalcKeyboard value={amount} onChange={setAmount} onSubmit={handleAmountSubmit} />
 
       {error && (
         <motion.div
@@ -367,23 +331,22 @@ export default function BattleScreen() {
         </div>
       </div>
 
-      <div className="relative z-10 min-h-[330px] flex-none">
+      <div className="relative z-10 flex-1 overflow-hidden px-4 pb-[92px]">
         <MonsterArea
           monster={monster}
           currentHp={currentHp}
           isHit={isHit}
           damageNumbers={damageNumbers}
         />
-      </div>
-
-      <div className="relative z-20 flex-1 overflow-y-auto px-4 pb-24">
-        <div className="mb-3">
-          <div className="mb-1 text-xs font-black text-[#26324A]">今日記錄</div>
+        <div className="academy-battle-log">
+          <div className="mb-1 flex items-center justify-between">
+            <div className="text-xs font-black text-[#26324A]">今日記錄</div>
+            <div className="text-[10px] font-black text-[#8E87A8]">{expenses.length} 筆</div>
+          </div>
           <ExpenseList expenses={expenses} categories={categories} onEdit={setEditingExpense} onDelete={deleteExpenseEntry} />
         </div>
 
-        <div className="academy-card p-3">
-          <div className="mb-2 text-center text-xs font-black text-[#8E87A8]">輸入消費即可施放術式</div>
+        <div className="academy-card academy-battle-panel">
           <ExpensePanel
             key={editingExpense?.id ?? 'new-expense'}
             onSubmit={handleSubmit}

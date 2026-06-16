@@ -4,17 +4,47 @@ import { useApp } from '../useAppStore'
 import { updateProfile, calcLevel } from '../firebase'
 import { BottomNav } from './TownScreen'
 import guildBg from '../assets/academy-art/guild-bg.webp'
-import { formatMoney, getTitle } from '../gameLogic'
+import { formatMoney, getTitle, todayStr } from '../gameLogic'
 
 function buildMissions(state) {
   const { profile, expenses, totalSpent, currentHp } = state
   const consecutiveDays = profile?.consecutiveDays ?? 0
   const collectionCount = profile?.collection?.length ?? 0
   const budget = profile?.dailyBudget ?? 1000
+  const notedCount = expenses.filter(e => e.note?.trim()).length
+  const smallCount = expenses.filter(e => Number(e.amount ?? 0) > 0 && Number(e.amount ?? 0) <= 200).length
+  const rotating = [
+    {
+      id: 'daily_notes',
+      title: '備註整理師',
+      desc: '今日 2 筆記帳有備註',
+      progress: Math.min(notedCount, 2),
+      target: 2,
+      reward: { exp: 35, yellow: 1 },
+    },
+    {
+      id: 'daily_small',
+      title: '小額警戒',
+      desc: '今日記下 2 筆 NT$200 以內消費',
+      progress: Math.min(smallCount, 2),
+      target: 2,
+      reward: { exp: 35, yellow: 1 },
+    },
+    {
+      id: 'daily_combo',
+      title: '五段連擊',
+      desc: '今日記帳 5 筆以上',
+      progress: Math.min(expenses.length, 5),
+      target: 5,
+      reward: { exp: 50, yellow: 2 },
+    },
+  ]
+  const day = Number((state.date ?? todayStr()).slice(-2))
 
   return [
     {
       id: 'first_expense',
+      group: 'daily',
       title: '第一次施放記帳術式',
       desc: '建立任一筆今日消費',
       progress: Math.min(expenses.length, 1),
@@ -23,6 +53,7 @@ function buildMissions(state) {
     },
     {
       id: 'three_entries',
+      group: 'daily',
       title: '今日三連記帳',
       desc: '今日記帳 3 筆以上',
       progress: Math.min(expenses.length, 3),
@@ -31,6 +62,7 @@ function buildMissions(state) {
     },
     {
       id: 'under_budget',
+      group: 'daily',
       title: '預算守門',
       desc: '今日仍在預算內',
       progress: totalSpent > 0 && totalSpent <= budget ? 1 : 0,
@@ -39,14 +71,17 @@ function buildMissions(state) {
     },
     {
       id: 'defeat_today',
+      group: 'daily',
       title: '今日咒靈淨化',
       desc: '擊殺今日怪物',
       progress: currentHp <= 0 ? 1 : 0,
       target: 1,
       reward: { exp: 80, purple: 1 },
     },
+    { ...rotating[day % rotating.length], group: 'daily' },
     {
       id: 'streak_7',
+      group: 'achievement',
       title: '七日習慣',
       desc: '連續記帳 7 天',
       progress: Math.min(consecutiveDays, 7),
@@ -55,6 +90,7 @@ function buildMissions(state) {
     },
     {
       id: 'collector_5',
+      group: 'achievement',
       title: '補給收藏家',
       desc: '收藏品達 5 件',
       progress: Math.min(collectionCount, 5),
@@ -77,10 +113,18 @@ export default function MissionScreen() {
   const { profile, user } = state
   const missions = useMemo(() => buildMissions(state), [state])
   const claimed = profile?.claimedMissions ?? {}
+  const dateKey = state.date ?? todayStr()
+  const dailyMissions = missions.filter(m => m.group === 'daily')
+  const achievementMissions = missions.filter(m => m.group === 'achievement')
   const completeCount = missions.filter(m => m.progress >= m.target).length
 
+  function claimKey(mission) {
+    return mission.group === 'daily' ? `${dateKey}:${mission.id}` : mission.id
+  }
+
   async function claim(mission) {
-    if (claimed[mission.id] || mission.progress < mission.target) return
+    const key = claimKey(mission)
+    if (claimed[key] || mission.progress < mission.target) return
     const reward = mission.reward
     const exp = (profile?.exp ?? 0) + (reward.exp ?? 0)
     const levelInfo = calcLevel(exp)
@@ -92,7 +136,7 @@ export default function MissionScreen() {
         yellow: (profile?.stars?.yellow ?? 0) + (reward.yellow ?? 0),
         purple: (profile?.stars?.purple ?? 0) + (reward.purple ?? 0),
       },
-      claimedMissions: { ...claimed, [mission.id]: true },
+      claimedMissions: { ...claimed, [key]: true },
     }
     dispatch({ type: 'UPDATE_PROFILE', data })
     dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'mission', message: `${mission.title} 獎勵已領取` } })
@@ -116,16 +160,17 @@ export default function MissionScreen() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-base font-black text-[#26324A]">習慣任務板</div>
-              <div className="text-xs font-bold text-[#8E87A8]">記帳、控支、收藏都會推進成長</div>
+              <div className="text-xs font-bold text-[#8E87A8]">每日任務每天重置，成就任務長期累積</div>
             </div>
             <span className="academy-status">{completeCount}/{missions.length}</span>
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
-          {missions.map((mission, i) => {
+          <div className="px-1 text-xs font-black text-[#26324A]">每日任務</div>
+          {dailyMissions.map((mission, i) => {
             const done = mission.progress >= mission.target
-            const isClaimed = !!claimed[mission.id]
+            const isClaimed = !!claimed[claimKey(mission)]
             const pct = Math.min(mission.progress / mission.target, 1)
             return (
               <motion.div
@@ -134,6 +179,44 @@ export default function MissionScreen() {
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: i * 0.03 }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`academy-icon ${done ? 'academy-icon--star' : 'academy-icon--unknown'}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-black text-[#26324A]">{mission.title}</div>
+                    <div className="text-[10px] font-bold text-[#8E87A8]">{mission.desc}</div>
+                  </div>
+                  <button
+                    className={`academy-status ${done && !isClaimed ? 'academy-status--done' : ''}`}
+                    onClick={() => claim(mission)}
+                  >
+                    {isClaimed ? '已領' : done ? '領取' : `${mission.progress}/${mission.target}`}
+                  </button>
+                </div>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#ECE7F5]">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-[#8B7CFF] to-[#52DED4]"
+                    animate={{ width: `${pct * 100}%` }}
+                  />
+                </div>
+                <div className="mt-2 text-right text-[10px] font-black text-[#8E87A8]">
+                  <RewardText reward={mission.reward} />
+                </div>
+              </motion.div>
+            )
+          })}
+          <div className="mt-2 px-1 text-xs font-black text-[#26324A]">長期成就</div>
+          {achievementMissions.map((mission, i) => {
+            const done = mission.progress >= mission.target
+            const isClaimed = !!claimed[claimKey(mission)]
+            const pct = Math.min(mission.progress / mission.target, 1)
+            return (
+              <motion.div
+                key={mission.id}
+                className="academy-card"
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: (i + dailyMissions.length) * 0.03 }}
               >
                 <div className="flex items-center gap-3">
                   <span className={`academy-icon ${done ? 'academy-icon--star' : 'academy-icon--unknown'}`} />

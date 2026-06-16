@@ -57,16 +57,43 @@ function OnboardingOverlay() {
     {
       title: '歡迎成為窮鬼勇者',
       text: '每一筆記帳都是一次攻擊。先記下消費，再看今日怪物扣血。',
+      hint: '目標：守住預算，擊殺今日怪物。',
       action: '下一步',
     },
     {
-      title: '先打今日怪物',
+      title: '今日：主要戰鬥',
       text: '底部「今日」是主入口。點「開始記帳攻擊」就能輸入分類、備註與金額。',
+      hint: '記帳金額會轉成傷害，預算剩越多越容易打倒怪物。',
       action: '下一步',
     },
     {
-      title: '頭像就是設定入口',
-      text: '點左上角頭像可以改名字、主角、每日預算與自訂分類。',
+      title: '地圖：看本月路線',
+      text: '地圖會把每天的結果變成路線節點，擊殺、未滅、未記帳和首領都會分開顯示。',
+      hint: '節點可點開，看當天怪物、花費、評級與獎勵。',
+      action: '下一步',
+    },
+    {
+      title: '任務：每日與成就',
+      text: '每日任務每天重置，長期成就會累積。完成後記得進任務頁領獎。',
+      hint: '任務獎勵會給經驗、黃色星星或紫色星星。',
+      action: '下一步',
+    },
+    {
+      title: '補給：四種貨幣',
+      text: '黃色星星和紫色星星可直購收集品；一般扭蛋券抽一般池，金色扭蛋券抽限定池。',
+      hint: '金色扭蛋券主要來自公會月度挑戰。',
+      action: '下一步',
+    },
+    {
+      title: '公會：家庭財務基地',
+      text: '公會不是聊天公會，第一版是你的財務基地：收入、固定支出、儲蓄和共用基金都在這裡。',
+      hint: '月度挑戰完成後可拿金色扭蛋券。',
+      action: '下一步',
+    },
+    {
+      title: '頭像：資料與設定',
+      text: '點左上角頭像可以改玩家名稱、男/女主角、每日預算、自訂分類，也能查看稱號和收藏。',
+      hint: '找不到設定時，先點頭像。',
       action: '開始冒險',
     },
   ]
@@ -97,9 +124,10 @@ function OnboardingOverlay() {
         initial={{ y: 18, scale: 0.98 }}
         animate={{ y: 0, scale: 1 }}
       >
-        <div className="academy-onboarding__badge">{step + 1}/3</div>
+        <div className="academy-onboarding__badge">{step + 1}/{pages.length}</div>
         <div className="academy-onboarding__title">{page.title}</div>
         <div className="academy-onboarding__text">{page.text}</div>
+        <div className="academy-onboarding__hint">{page.hint}</div>
         <div className="academy-onboarding__dots">
           {pages.map((_, i) => <span key={i} className={i === step ? 'is-active' : ''} />)}
         </div>
@@ -107,6 +135,11 @@ function OnboardingOverlay() {
           {step > 0 && (
             <button className="academy-onboarding__ghost" onClick={() => setStep(v => v - 1)}>
               上一步
+            </button>
+          )}
+          {step < pages.length - 1 && (
+            <button className="academy-onboarding__ghost" onClick={finish}>
+              略過
             </button>
           )}
           <button
