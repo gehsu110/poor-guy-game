@@ -61,7 +61,7 @@ const DEFAULT_PROFILE = {
   sharedFund: 0,
   guildLedger: [],
   customCategories: [],
-  equipped: {},
+  equipped: { outfit: 'academy', accessory: 'none', frame: 'soft_gold' },
   claimedMissions: {},
   guildChallengeClaims: {},
   avatarGender: 'girl',

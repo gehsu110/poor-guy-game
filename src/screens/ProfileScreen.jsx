@@ -4,15 +4,28 @@ import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, DEFAULT_CATEGORIES, getTitle, TITLES, formatMoney } from '../gameLogic'
 import { loginWithGoogle, updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
+import Avatar from '../components/Avatar'
 import profileBg from '../assets/academy-art/profile-bg.webp'
-import avatars from '../assets/academy-art/avatars.png'
 
-function AvatarPreview({ gender = 'girl' }) {
-  return (
-    <div className={`academy-avatar academy-profile-avatar academy-avatar--${gender}`}>
-      <img src={avatars} alt="" draggable="false" />
-    </div>
-  )
+const WARDROBE = {
+  outfit: [
+    { id: 'academy', name: '星術學院服', desc: '預設主角服裝', owned: true },
+    { id: 'night_cape', name: '星夜斗篷', desc: '紫色斗篷感', owned: true },
+    { id: 'mint_coat', name: '薄荷外套', desc: '清爽補給色', owned: true },
+    { id: 'pink_robe', name: '粉晶禮服', desc: '可愛柔粉風', owned: false },
+  ],
+  accessory: [
+    { id: 'none', name: '不戴頭飾', desc: '乾淨頭像', owned: true },
+    { id: 'star_pin', name: '星星髮夾', desc: '亮晶晶小標記', owned: true },
+    { id: 'ribbon', name: '粉色緞帶', desc: '更可愛的感覺', owned: true },
+    { id: 'crown', name: '勇者小冠', desc: '月底挑戰感', owned: false },
+  ],
+  frame: [
+    { id: 'soft_gold', name: '柔金頭像框', desc: '預設邊框', owned: true },
+    { id: 'ribbon', name: '緞帶頭像框', desc: '粉色收藏框', owned: true },
+    { id: 'moon', name: '月光頭像框', desc: '限定感外框', owned: true },
+    { id: 'crystal', name: '冰晶頭像框', desc: '紫星直購預覽', owned: false },
+  ],
 }
 
 function ExpBar({ expInLevel, expToNext }) {
@@ -70,6 +83,8 @@ export default function ProfileScreen() {
   const expToNext = profile?.expToNext ?? 100
   const title = getTitle(level)
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
+  const equipped = profile?.equipped ?? {}
+  const collectionIds = new Set((profile?.collection ?? []).map(item => item.id))
   const avatarGender = profile?.avatarGender ?? 'girl'
   const playerName = profile?.playerName?.trim() || '窮鬼勇者'
 
@@ -133,6 +148,18 @@ export default function ProfileScreen() {
     }
   }
 
+  async function equipCosmetic(slot, itemId) {
+    const data = { equipped: { ...equipped, [slot]: itemId } }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    if (user) {
+      try {
+        await updateProfile(user.uid, data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
   async function saveCategories(nextCategories) {
     dispatch({ type: 'UPDATE_PROFILE', data: { customCategories: nextCategories } })
     if (user) {
@@ -185,7 +212,14 @@ export default function ProfileScreen() {
       <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
         <div className="academy-card mb-3 text-center">
           <div className="mx-auto mb-2 flex justify-center">
-            <AvatarPreview gender={avatarGender} />
+            <Avatar
+              gender={avatarGender}
+              variant="bust"
+              frame={equipped.frame ?? 'soft_gold'}
+              outfit={equipped.outfit ?? 'academy'}
+              accessory={equipped.accessory ?? 'none'}
+              className="academy-profile-avatar"
+            />
           </div>
           <div className="text-base font-black text-[#26324A]">{playerName}</div>
           <div className="text-xs font-bold text-[#8E87A8]">稱號：{equippedTitle ?? title.name}</div>
@@ -213,6 +247,7 @@ export default function ProfileScreen() {
           {[
             { k: 'stats', label: '狀態' },
             { k: 'titles', label: '稱號' },
+            { k: 'wardrobe', label: '衣櫃' },
             { k: 'settings', label: '設定' },
           ].map(t => (
             <button key={t.k} className={tab === t.k ? 'is-active' : ''} onClick={() => setTab(t.k)}>
@@ -244,6 +279,62 @@ export default function ProfileScreen() {
           <div className="academy-card">
             <div className="mb-3 text-xs font-black text-[#26324A]">所有稱號</div>
             <TitleList currentLevel={level} />
+          </div>
+        )}
+
+        {tab === 'wardrobe' && (
+          <div className="flex flex-col gap-3">
+            <div className="academy-card">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-black text-[#26324A]">造型預覽</div>
+                  <div className="text-[10px] font-bold text-[#8E87A8]">先做成衣櫃結構，之後可接扭蛋和商店</div>
+                </div>
+                <span className="academy-status">雛形</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Avatar
+                  gender={avatarGender}
+                  variant="full"
+                  frame={equipped.frame ?? 'soft_gold'}
+                  outfit={equipped.outfit ?? 'academy'}
+                  accessory={equipped.accessory ?? 'none'}
+                  className="academy-wardrobe-hero"
+                />
+                <div className="min-w-0 flex-1 text-xs font-bold leading-6 text-[#8E87A8]">
+                  <div>服裝：{WARDROBE.outfit.find(i => i.id === (equipped.outfit ?? 'academy'))?.name}</div>
+                  <div>頭飾：{WARDROBE.accessory.find(i => i.id === (equipped.accessory ?? 'none'))?.name}</div>
+                  <div>頭像框：{WARDROBE.frame.find(i => i.id === (equipped.frame ?? 'soft_gold'))?.name}</div>
+                </div>
+              </div>
+            </div>
+
+            {[
+              { slot: 'outfit', title: '服裝' },
+              { slot: 'accessory', title: '頭飾' },
+              { slot: 'frame', title: '頭像框' },
+            ].map(group => (
+              <div key={group.slot} className="academy-card">
+                <div className="mb-3 text-xs font-black text-[#26324A]">{group.title}</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {WARDROBE[group.slot].map(item => {
+                    const owned = item.owned || collectionIds.has(item.id)
+                    const active = (equipped[group.slot] ?? (group.slot === 'accessory' ? 'none' : group.slot === 'frame' ? 'soft_gold' : 'academy')) === item.id
+                    return (
+                      <button
+                        key={item.id}
+                        className={`academy-wardrobe-item ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
+                        onClick={() => owned && equipCosmetic(group.slot, item.id)}
+                      >
+                        <span className={`academy-wardrobe-swatch academy-wardrobe-swatch--${item.id}`} />
+                        <b>{item.name}</b>
+                        <small>{owned ? item.desc : '未解鎖'}</small>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -286,7 +377,14 @@ export default function ProfileScreen() {
                     className={`academy-avatar-option ${avatarGender === a.k ? 'is-active' : ''}`}
                     onClick={() => chooseAvatar(a.k)}
                   >
-                    <AvatarPreview gender={a.k} />
+                    <Avatar
+                      gender={a.k}
+                      variant="full"
+                      frame={equipped.frame ?? 'soft_gold'}
+                      outfit={equipped.outfit ?? 'academy'}
+                      accessory={equipped.accessory ?? 'none'}
+                      className="academy-avatar-choice"
+                    />
                     <span>{a.label}</span>
                   </button>
                 ))}

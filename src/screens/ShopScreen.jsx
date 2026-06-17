@@ -18,12 +18,18 @@ const GACHA_POOL = [
   { id: 'frame_stars', type: 'frame', name: '星砂邊框', rarity: 'R', color: '#FFE4A0', iconKey: 'ticket' },
   { id: 'frame_ribbon', type: 'frame', name: '緞帶邊框', rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'frame_moon', type: 'frame', name: '月光邊框', rarity: 'SSR', color: '#C8A8E9', iconKey: 'goldTicket' },
+  { id: 'night_cape', type: 'outfit', name: '星夜斗篷', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
+  { id: 'ribbon', type: 'accessory', name: '粉色緞帶', rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
+  { id: 'crown', type: 'accessory', name: '勇者小冠', rarity: 'SSR', color: '#FFE4A0', iconKey: 'goldTicket' },
 ]
 
 const DIRECT_ITEMS = [
   { id: 'bg_mint', type: 'background', name: '薄荷晨光背景', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'bg_ribbon', type: 'background', name: '緞帶學園背景', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'frame_gold', type: 'frame', name: '黃色星星頭像框', costType: 'yellow', cost: 5, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
+  { id: 'mint_coat', type: 'outfit', name: '薄荷外套', costType: 'yellow', cost: 8, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
+  { id: 'pink_robe', type: 'outfit', name: '粉晶禮服', costType: 'purple', cost: 4, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
+  { id: 'star_pin', type: 'accessory', name: '星星髮夾', costType: 'yellow', cost: 3, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
   { id: 'fx_moon', type: 'effect', name: '月光術式', costType: 'purple', cost: 2, rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
   { id: 'title_budget', type: 'title', name: '預算守門人', costType: 'purple', cost: 3, rarity: 'SR', color: '#A8D8EA', iconKey: 'coin' },
 ]
@@ -39,6 +45,8 @@ const TYPE_LABELS = {
   effect: '攻擊特效',
   title: '稱號',
   frame: '頭像框',
+  outfit: '服裝',
+  accessory: '頭飾',
 }
 
 const SPRITE_BY_ICON = {

@@ -2,17 +2,9 @@ import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, generateDayMonster, getTitle } from '../gameLogic'
 import GameIcon from '../components/GameIcon'
+import Avatar from '../components/Avatar'
 import homeBg from '../assets/academy-art/home-bg.webp'
-import avatars from '../assets/academy-art/avatars.png'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
-
-function Avatar({ gender = 'girl', className = '' }) {
-  return (
-    <div className={`academy-avatar academy-avatar--${gender} ${className}`}>
-      <img src={avatars} alt="" draggable="false" />
-    </div>
-  )
-}
 
 function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   const title = profile ? getTitle(profile.level) : null
@@ -26,7 +18,14 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
           <button onClick={onAvatarClick} className="shrink-0">
-            <Avatar gender={profile?.avatarGender ?? 'girl'} className="academy-hud-avatar" />
+            <Avatar
+              gender={profile?.avatarGender ?? 'girl'}
+              variant="portrait"
+              frame={profile?.equipped?.frame ?? 'soft_gold'}
+              outfit={profile?.equipped?.outfit ?? 'academy'}
+              accessory={profile?.equipped?.accessory ?? 'none'}
+              className="academy-hud-avatar"
+            />
           </button>
           <div className="min-w-0">
             <div className="text-[10px] font-black text-[#8E87A8]">等級 {profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</div>
