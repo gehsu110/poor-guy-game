@@ -19,6 +19,8 @@ const GACHA_POOL = [
   { id: 'frame_ribbon', type: 'frame', name: '緞帶邊框', rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'frame_moon', type: 'frame', name: '月光邊框', rarity: 'SSR', color: '#C8A8E9', iconKey: 'goldTicket' },
   { id: 'night_cape', type: 'outfit', name: '星夜斗篷', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
+  { id: 'night_cape_set', type: 'set', name: '星夜斗篷套裝', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
+  { id: 'moonlight_set', type: 'set', name: '月光限定套裝', rarity: 'SSR', color: '#FFE4A0', iconKey: 'goldTicket' },
   { id: 'ribbon', type: 'accessory', name: '粉色緞帶', rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'crown', type: 'accessory', name: '勇者小冠', rarity: 'SSR', color: '#FFE4A0', iconKey: 'goldTicket' },
 ]
@@ -28,7 +30,9 @@ const DIRECT_ITEMS = [
   { id: 'bg_ribbon', type: 'background', name: '緞帶學園背景', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'frame_gold', type: 'frame', name: '黃色星星頭像框', costType: 'yellow', cost: 5, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
   { id: 'mint_coat', type: 'outfit', name: '薄荷外套', costType: 'yellow', cost: 8, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
+  { id: 'mint_supply_set', type: 'set', name: '薄荷補給套裝', costType: 'yellow', cost: 12, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'pink_robe', type: 'outfit', name: '粉晶禮服', costType: 'purple', cost: 4, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
+  { id: 'pink_magic_set', type: 'set', name: '粉晶魔法套裝', costType: 'purple', cost: 6, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
   { id: 'star_pin', type: 'accessory', name: '星星髮夾', costType: 'yellow', cost: 3, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
   { id: 'fx_moon', type: 'effect', name: '月光術式', costType: 'purple', cost: 2, rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
   { id: 'title_budget', type: 'title', name: '預算守門人', costType: 'purple', cost: 3, rarity: 'SR', color: '#A8D8EA', iconKey: 'coin' },
@@ -47,6 +51,7 @@ const TYPE_LABELS = {
   frame: '頭像框',
   outfit: '服裝',
   accessory: '頭飾',
+  set: '套裝',
 }
 
 const SPRITE_BY_ICON = {
@@ -316,7 +321,15 @@ export default function ShopScreen() {
   }
 
   async function equipItem(item) {
-    const data = { equipped: { ...equipped, [item.type]: item.id } }
+    const SET_EQUIP = {
+      mint_supply_set: { outfit: 'mint_coat', accessory: 'star_pin', frame: 'crystal' },
+      pink_magic_set: { outfit: 'pink_robe', accessory: 'ribbon', frame: 'frame_ribbon' },
+      night_cape_set: { outfit: 'night_cape', accessory: 'crown', frame: 'moon' },
+      moonlight_set: { outfit: 'moonlight', accessory: 'crown', frame: 'frame_moon' },
+    }
+    const data = item.type === 'set'
+      ? { equipped: { ...equipped, ...SET_EQUIP[item.id], set: item.id } }
+      : { equipped: { ...equipped, [item.type]: item.id } }
     dispatch({ type: 'UPDATE_PROFILE', data })
     dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'shop', message: `${item.name} 已裝備` } })
     setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 1800)

@@ -56,7 +56,7 @@ const DEMO_PROFILE = {
   sharedFund: 0,
   guildLedger: [],
   customCategories: [],
-  equipped: { outfit: 'academy', accessory: 'none', frame: 'soft_gold' },
+  equipped: { set: 'academy_set', outfit: 'academy', accessory: 'star_pin', frame: 'soft_gold' },
   claimedMissions: {},
   guildChallengeClaims: {},
   avatarGender: 'girl',

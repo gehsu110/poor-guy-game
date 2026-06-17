@@ -8,11 +8,69 @@ import Avatar from '../components/Avatar'
 import profileBg from '../assets/academy-art/profile-bg.webp'
 
 const WARDROBE = {
+  set: [
+    {
+      id: 'academy_set',
+      name: '星術學院套裝',
+      desc: '預設主角造型',
+      outfit: 'academy',
+      accessory: 'star_pin',
+      frame: 'soft_gold',
+      owned: true,
+    },
+    {
+      id: 'saving_hero_set',
+      name: '省錢勇者套裝',
+      desc: '初期成就造型',
+      outfit: 'saving_hero',
+      accessory: 'none',
+      frame: 'frame_stars',
+      owned: true,
+    },
+    {
+      id: 'mint_supply_set',
+      name: '薄荷補給套裝',
+      desc: '黃星直購造型',
+      outfit: 'mint_coat',
+      accessory: 'star_pin',
+      frame: 'crystal',
+      owned: false,
+    },
+    {
+      id: 'pink_magic_set',
+      name: '粉晶魔法套裝',
+      desc: '紫星直購造型',
+      outfit: 'pink_robe',
+      accessory: 'ribbon',
+      frame: 'frame_ribbon',
+      owned: false,
+    },
+    {
+      id: 'night_cape_set',
+      name: '星夜斗篷套裝',
+      desc: '一般扭蛋稀有',
+      outfit: 'night_cape',
+      accessory: 'crown',
+      frame: 'moon',
+      owned: false,
+    },
+    {
+      id: 'moonlight_set',
+      name: '月光限定套裝',
+      desc: '金色池限定',
+      outfit: 'moonlight',
+      accessory: 'crown',
+      frame: 'frame_moon',
+      owned: false,
+    },
+  ],
   outfit: [
     { id: 'academy', name: '星術學院服', desc: '預設主角服裝', owned: true },
+    { id: 'saving_hero', name: '省錢勇者裝', desc: '初期成就服裝', owned: true },
     { id: 'night_cape', name: '星夜斗篷', desc: '紫色斗篷感', owned: true },
     { id: 'mint_coat', name: '薄荷外套', desc: '清爽補給色', owned: true },
     { id: 'pink_robe', name: '粉晶禮服', desc: '可愛柔粉風', owned: false },
+    { id: 'moonlight', name: '月光限定服', desc: '限定池套裝', owned: false },
   ],
   accessory: [
     { id: 'none', name: '不戴頭飾', desc: '乾淨頭像', owned: true },
@@ -87,6 +145,11 @@ export default function ProfileScreen() {
   const collectionIds = new Set((profile?.collection ?? []).map(item => item.id))
   const avatarGender = profile?.avatarGender ?? 'girl'
   const playerName = profile?.playerName?.trim() || '窮鬼勇者'
+  const activeSet = WARDROBE.set.find(set => (
+    (equipped.outfit ?? 'academy') === set.outfit &&
+    (equipped.accessory ?? 'star_pin') === set.accessory &&
+    (equipped.frame ?? 'soft_gold') === set.frame
+  ))
 
   async function handleGoogleLink() {
     try {
@@ -160,6 +223,26 @@ export default function ProfileScreen() {
     }
   }
 
+  async function equipSet(set) {
+    const data = {
+      equipped: {
+        ...equipped,
+        outfit: set.outfit,
+        accessory: set.accessory,
+        frame: set.frame,
+        set: set.id,
+      },
+    }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    if (user) {
+      try {
+        await updateProfile(user.uid, data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
   async function saveCategories(nextCategories) {
     dispatch({ type: 'UPDATE_PROFILE', data: { customCategories: nextCategories } })
     if (user) {
@@ -217,7 +300,7 @@ export default function ProfileScreen() {
               variant="bust"
               frame={equipped.frame ?? 'soft_gold'}
               outfit={equipped.outfit ?? 'academy'}
-              accessory={equipped.accessory ?? 'none'}
+              accessory={equipped.accessory ?? 'star_pin'}
               className="academy-profile-avatar"
             />
           </div>
@@ -288,9 +371,9 @@ export default function ProfileScreen() {
               <div className="mb-3 flex items-center justify-between">
                 <div>
                   <div className="text-sm font-black text-[#26324A]">造型預覽</div>
-                  <div className="text-[10px] font-bold text-[#8E87A8]">先做成衣櫃結構，之後可接扭蛋和商店</div>
+                  <div className="text-[10px] font-bold text-[#8E87A8]">以套裝為主，頭飾與頭像框可再微調</div>
                 </div>
-                <span className="academy-status">雛形</span>
+                <span className="academy-status">{activeSet?.name ?? '自訂搭配'}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Avatar
@@ -298,14 +381,42 @@ export default function ProfileScreen() {
                   variant="full"
                   frame={equipped.frame ?? 'soft_gold'}
                   outfit={equipped.outfit ?? 'academy'}
-                  accessory={equipped.accessory ?? 'none'}
+                  accessory={equipped.accessory ?? 'star_pin'}
                   className="academy-wardrobe-hero"
                 />
                 <div className="min-w-0 flex-1 text-xs font-bold leading-6 text-[#8E87A8]">
                   <div>服裝：{WARDROBE.outfit.find(i => i.id === (equipped.outfit ?? 'academy'))?.name}</div>
-                  <div>頭飾：{WARDROBE.accessory.find(i => i.id === (equipped.accessory ?? 'none'))?.name}</div>
+                  <div>頭飾：{WARDROBE.accessory.find(i => i.id === (equipped.accessory ?? 'star_pin'))?.name}</div>
                   <div>頭像框：{WARDROBE.frame.find(i => i.id === (equipped.frame ?? 'soft_gold'))?.name}</div>
                 </div>
+              </div>
+            </div>
+
+            <div className="academy-card">
+              <div className="mb-3 text-xs font-black text-[#26324A]">套裝立繪</div>
+              <div className="grid grid-cols-2 gap-2">
+                {WARDROBE.set.map(set => {
+                  const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
+                  const active = activeSet?.id === set.id
+                  return (
+                    <button
+                      key={set.id}
+                      className={`academy-outfit-set ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
+                      onClick={() => owned && equipSet(set)}
+                    >
+                      <Avatar
+                        gender={avatarGender}
+                        variant="full"
+                        frame={set.frame}
+                        outfit={set.outfit}
+                        accessory={set.accessory}
+                        className="academy-outfit-set__avatar"
+                      />
+                      <b>{set.name}</b>
+                      <small>{owned ? set.desc : '未解鎖'}</small>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -319,7 +430,7 @@ export default function ProfileScreen() {
                 <div className="grid grid-cols-2 gap-2">
                   {WARDROBE[group.slot].map(item => {
                     const owned = item.owned || collectionIds.has(item.id)
-                    const active = (equipped[group.slot] ?? (group.slot === 'accessory' ? 'none' : group.slot === 'frame' ? 'soft_gold' : 'academy')) === item.id
+                    const active = (equipped[group.slot] ?? (group.slot === 'accessory' ? 'star_pin' : group.slot === 'frame' ? 'soft_gold' : 'academy')) === item.id
                     return (
                       <button
                         key={item.id}
@@ -382,7 +493,7 @@ export default function ProfileScreen() {
                       variant="full"
                       frame={equipped.frame ?? 'soft_gold'}
                       outfit={equipped.outfit ?? 'academy'}
-                      accessory={equipped.accessory ?? 'none'}
+                      accessory={equipped.accessory ?? 'star_pin'}
                       className="academy-avatar-choice"
                     />
                     <span>{a.label}</span>

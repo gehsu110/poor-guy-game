@@ -23,7 +23,7 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
               variant="portrait"
               frame={profile?.equipped?.frame ?? 'soft_gold'}
               outfit={profile?.equipped?.outfit ?? 'academy'}
-              accessory={profile?.equipped?.accessory ?? 'none'}
+              accessory={profile?.equipped?.accessory ?? 'star_pin'}
               className="academy-hud-avatar"
             />
           </button>

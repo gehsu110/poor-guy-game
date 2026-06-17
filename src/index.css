@@ -835,6 +835,10 @@ body {
   background: radial-gradient(circle at 50% 36%, #ffffff 0%, #f2ebff 50%, #dff8ff 100%);
 }
 
+.academy-avatar-outfit--saving_hero {
+  background: radial-gradient(circle at 50% 36%, #ffffff 0%, #fff4c9 46%, #a8d8ea 100%);
+}
+
 .academy-avatar-outfit--night_cape {
   background: radial-gradient(circle at 50% 36%, #ffffff 0%, #efe7ff 44%, #b9a8ff 100%);
 }
@@ -845,6 +849,12 @@ body {
 
 .academy-avatar-outfit--pink_robe {
   background: radial-gradient(circle at 50% 36%, #ffffff 0%, #ffe5ee 46%, #ffb3c6 100%);
+}
+
+.academy-avatar-outfit--moonlight {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(255,247,183,0.92) 0 10%, transparent 11%),
+    radial-gradient(circle at 50% 36%, #ffffff 0%, #f1ecff 42%, #8b7cff 100%);
 }
 
 .academy-avatar-accessory--star_pin::after,
@@ -1363,6 +1373,52 @@ body {
   border-radius: 32px;
 }
 
+.academy-outfit-set {
+  display: flex;
+  min-height: 188px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  border-radius: 24px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.76), rgba(255,255,255,0.52)),
+    rgba(255,255,255,0.64);
+  padding: 10px;
+  text-align: center;
+}
+
+.academy-outfit-set.is-active {
+  border-color: rgba(139,124,255,0.58);
+  background: #f1ecff;
+  box-shadow: 0 12px 22px rgba(139,124,255,0.12);
+}
+
+.academy-outfit-set.is-locked {
+  opacity: 0.48;
+}
+
+.academy-outfit-set__avatar {
+  width: 98px;
+  height: 98px;
+  border-radius: 26px;
+}
+
+.academy-outfit-set b {
+  color: #26324a;
+  font-size: 12px;
+  font-weight: 1000;
+  line-height: 1.25;
+}
+
+.academy-outfit-set small {
+  color: #8e87a8;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
 .academy-wardrobe-item {
   display: grid;
   min-height: 86px;
@@ -1410,23 +1466,38 @@ body {
 }
 
 .academy-wardrobe-swatch--academy,
+.academy-wardrobe-swatch--academy_set,
 .academy-wardrobe-swatch--soft_gold {
   background: linear-gradient(135deg, #f2ebff, #ffd166);
 }
 
+.academy-wardrobe-swatch--saving_hero,
+.academy-wardrobe-swatch--saving_hero_set,
+.academy-wardrobe-swatch--frame_stars {
+  background: linear-gradient(135deg, #fff4c9, #a8d8ea);
+}
+
 .academy-wardrobe-swatch--night_cape,
+.academy-wardrobe-swatch--night_cape_set,
 .academy-wardrobe-swatch--moon {
   background: linear-gradient(135deg, #8b7cff, #d7b7ff);
 }
 
 .academy-wardrobe-swatch--mint_coat,
+.academy-wardrobe-swatch--mint_supply_set,
 .academy-wardrobe-swatch--crystal {
   background: linear-gradient(135deg, #52ded4, #dff8f5);
 }
 
 .academy-wardrobe-swatch--pink_robe,
+.academy-wardrobe-swatch--pink_magic_set,
 .academy-wardrobe-swatch--ribbon {
   background: linear-gradient(135deg, #ff7fa3, #ffe5ee);
+}
+
+.academy-wardrobe-swatch--moonlight,
+.academy-wardrobe-swatch--moonlight_set {
+  background: linear-gradient(135deg, #fff7b7, #8b7cff);
 }
 
 .academy-wardrobe-swatch--none {
