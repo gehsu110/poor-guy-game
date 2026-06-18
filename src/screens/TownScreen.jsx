@@ -56,13 +56,29 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   )
 }
 
-function DailyMonster({ monster, currentHp }) {
+function DailyMonster({ monster, currentHp, profile }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
 
   return (
     <div className="academy-monster-stage">
+      <motion.div
+        className="academy-player-stage"
+        initial={{ y: 18, opacity: 0 }}
+        animate={{ y: [0, -6, 0], opacity: 1 }}
+        transition={{ y: { duration: 3.2, repeat: Infinity }, opacity: { duration: 0.35 } }}
+      >
+        <Avatar
+          gender={profile?.avatarGender ?? 'girl'}
+          variant="full"
+          frame={profile?.equipped?.frame ?? 'soft_gold'}
+          outfit={profile?.equipped?.outfit ?? 'academy'}
+          accessory={profile?.equipped?.accessory ?? 'star_pin'}
+          className="academy-stage-avatar"
+        />
+        <div className="academy-player-name">{profile?.playerName?.trim() || '窮鬼勇者'}</div>
+      </motion.div>
       <motion.div
         className={`academy-monster-img academy-monster-sprite academy-monster-sprite--${monster.id}`}
         animate={defeated ? { rotate: [-5, 4, -4] } : { y: [0, -8, 0] }}
@@ -142,7 +158,7 @@ export default function TownScreen() {
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <DailyMonster monster={monsterToShow} currentHp={hpToShow} />
+        <DailyMonster monster={monsterToShow} currentHp={hpToShow} profile={profile} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 
