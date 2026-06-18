@@ -929,7 +929,7 @@ body {
 .academy-monster-stage {
   position: relative;
   display: flex;
-  min-height: 390px;
+  min-height: 352px;
   flex: 1;
   align-items: flex-end;
   justify-content: center;
@@ -941,112 +941,33 @@ body {
   content: '';
   position: absolute;
   z-index: 0;
-  bottom: 76px;
-  width: 300px;
-  height: 72px;
+  bottom: 70px;
+  width: 260px;
+  height: 64px;
   border-radius: 50%;
   background: radial-gradient(ellipse, rgba(255,209,102,0.3), rgba(139,124,255,0.18), rgba(82,222,212,0.08), transparent 72%);
   filter: blur(2px);
 }
 
-.academy-monster-stage::after {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  inset: 58px 8px 84px;
-  border-radius: 38px;
-  background:
-    radial-gradient(circle at 18% 42%, rgba(255,229,238,0.72), transparent 28%),
-    radial-gradient(circle at 78% 35%, rgba(223,248,245,0.65), transparent 26%),
-    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.42));
-  opacity: 0.88;
-  pointer-events: none;
-}
-
-.academy-player-stage {
-  position: absolute;
-  z-index: 2;
-  left: 6px;
-  bottom: 126px;
-  width: 176px;
-  text-align: center;
-  filter: drop-shadow(0 18px 22px rgba(86,74,130,0.18));
-}
-
-.academy-stage-avatar {
-  width: 170px;
-  height: 216px;
-  margin: 0 auto;
-  border-radius: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.academy-stage-avatar img {
-  top: 52%;
-  width: 178%;
-}
-
-.academy-stage-avatar.academy-avatar--girl img {
-  left: -84%;
-}
-
-.academy-stage-avatar.academy-avatar--boy img {
-  left: 0%;
-}
-
-.academy-player-name {
-  position: relative;
-  z-index: 4;
-  margin: -24px auto 0;
-  max-width: 128px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.84);
-  background: rgba(255,255,255,0.84);
-  padding: 5px 10px;
-  color: #26324a;
-  font-size: 11px;
-  font-weight: 1000;
-  box-shadow: 0 8px 16px rgba(86,74,130,0.12);
-}
-
 @media (max-height: 760px) {
   .academy-monster-stage {
-    min-height: 342px;
+    min-height: 318px;
     padding-bottom: 14px;
   }
 
-  .academy-player-stage {
-    bottom: 106px;
-    width: 146px;
-  }
-
-  .academy-stage-avatar {
-    width: 142px;
-    height: 176px;
-  }
-
   .academy-monster-img {
-    right: 12px;
-    bottom: 112px;
-    width: 126px;
-    height: 158px;
-  }
-
-  .academy-player-name {
-    max-width: 116px;
-    font-size: 10px;
+    bottom: 86px;
+    width: 164px;
+    height: 210px;
   }
 }
 
 .academy-monster-img {
   position: absolute;
   z-index: 2;
-  right: 18px;
-  bottom: 130px;
-  width: 150px;
-  height: 188px;
+  bottom: 94px;
+  width: 188px;
+  height: 238px;
   max-width: none;
   filter: drop-shadow(0 14px 18px rgba(93,72,130,0.2));
 }
