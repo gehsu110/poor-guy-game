@@ -5,6 +5,8 @@ import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import homeBg from '../assets/academy-art/home-bg.webp'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
+import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy.png'
+import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl.png'
 
 function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   const title = profile ? getTitle(profile.level) : null
@@ -56,13 +58,21 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   )
 }
 
-function DailyMonster({ monster, currentHp }) {
+function DailyMonster({ monster, currentHp, profile }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
+  const companionImage = (profile?.avatarGender ?? 'girl') === 'boy' ? homeHeroBoy : homeHeroGirl
 
   return (
     <div className="academy-monster-stage">
+      <div className="academy-companion-card">
+        <img src={companionImage} alt="" draggable="false" />
+        <div>
+          <span>今日夥伴</span>
+          <b>{profile?.playerName?.trim() || '窮鬼勇者'}</b>
+        </div>
+      </div>
       <motion.div
         className={`academy-monster-img academy-monster-sprite academy-monster-sprite--${monster.id}`}
         animate={defeated ? { rotate: [-5, 4, -4] } : { y: [0, -8, 0] }}
@@ -142,7 +152,7 @@ export default function TownScreen() {
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <DailyMonster monster={monsterToShow} currentHp={hpToShow} />
+        <DailyMonster monster={monsterToShow} currentHp={hpToShow} profile={profile} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 
