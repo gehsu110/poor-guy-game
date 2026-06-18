@@ -72,9 +72,9 @@ function DailyMonster({ monster, currentHp, profile }) {
         <Avatar
           gender={profile?.avatarGender ?? 'girl'}
           variant="full"
-          frame={profile?.equipped?.frame ?? 'soft_gold'}
+          frame="stage"
           outfit={profile?.equipped?.outfit ?? 'academy'}
-          accessory={profile?.equipped?.accessory ?? 'star_pin'}
+          accessory="none"
           className="academy-stage-avatar"
         />
         <div className="academy-player-name">{profile?.playerName?.trim() || '窮鬼勇者'}</div>
