@@ -1,12 +1,11 @@
 import { useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
 import battleBg from '../assets/academy-art/home-bg.webp'
-import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy-v2.png'
-import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl-v2.png'
 import monsterSlime from '../assets/academy-art/generated/monster-slime.png'
 import monsterRabbit from '../assets/academy-art/generated/monster-rabbit.png'
 import monsterMushroom from '../assets/academy-art/generated/monster-mushroom.png'
@@ -31,11 +30,10 @@ const MONSTER_ART = {
 function AttackProjectile({ isCrit }) {
   return (
     <motion.div
-      className="pointer-events-none absolute z-50"
-      style={{ left: '22%', top: '53%' }}
-      initial={{ x: 0, y: 0, opacity: 1 }}
-      animate={{ x: 120, y: -14, opacity: [1, 1, 0] }}
-      transition={{ duration: 0.28, ease: 'easeIn' }}
+      className="academy-first-person-projectile pointer-events-none absolute z-50"
+      initial={{ x: '-50%', y: 0, opacity: 0, scale: 0.4 }}
+      animate={{ x: '-50%', y: -116, opacity: [0, 1, 1, 0], scale: [0.4, 1, 0.75] }}
+      transition={{ duration: 0.34, ease: 'easeIn' }}
     >
       <div style={{
         width: isCrit ? 22 : 14,
@@ -74,7 +72,7 @@ function ImpactBurst({ isCrit }) {
   }) : [], [isCrit])
 
   return (
-    <div className="pointer-events-none absolute z-50" style={{ left: '64%', top: '46%' }}>
+    <div className="pointer-events-none absolute z-50" style={{ left: '50%', top: '43%' }}>
       {/* 中央閃光 */}
       <motion.div
         className="absolute rounded-full"
@@ -117,7 +115,7 @@ function ImpactBurst({ isCrit }) {
           initial={{ x: 0, y: 0, opacity: 1, rotate: 0, scale: 0.5 }}
           animate={{ x: Math.cos(rad) * 68, y: Math.sin(rad) * 68, opacity: 0, rotate: 360, scale: 0 }}
           transition={{ duration: 0.72, ease: 'easeOut' }}
-        >⭐</motion.div>
+        ><span className="academy-impact-star" /></motion.div>
       ))}
     </div>
   )
@@ -130,8 +128,8 @@ function ScreenFlash({ isCrit }) {
       className="pointer-events-none absolute inset-0 z-40 rounded-[inherit]"
       style={{
         background: isCrit
-          ? 'radial-gradient(ellipse at 65% 50%, rgba(255,209,102,0.50) 0%, transparent 65%)'
-          : 'radial-gradient(ellipse at 65% 50%, rgba(200,168,233,0.40) 0%, transparent 65%)',
+          ? 'radial-gradient(ellipse at 50% 45%, rgba(255,209,102,0.50) 0%, transparent 65%)'
+          : 'radial-gradient(ellipse at 50% 45%, rgba(200,168,233,0.40) 0%, transparent 65%)',
       }}
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
@@ -146,12 +144,11 @@ function TierBadge({ tier }) {
   return <span className="academy-status">今日咒靈</span>
 }
 
-function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile, hitKey, isCrit, showProjectile, showImpact }) {
+function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit, showProjectile, showImpact }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
   const isAngry = hpPct < 0.3 && !defeated
-  const heroImage = (profile?.avatarGender ?? 'girl') === 'boy' ? homeHeroBoy : homeHeroGirl
 
   return (
     <div className="academy-battle-arena">
@@ -180,21 +177,6 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile, hitKey
       </div>
 
       <div className={`academy-battle-stage ${isHit ? 'is-casting' : ''}`}>
-        <motion.div
-          className="academy-battle-hero"
-          animate={isHit ? { x: [0, 12, -4, 0], y: [0, -5, 0] } : { y: [0, -6, 0] }}
-          transition={{ duration: isHit ? 0.38 : 2.8, repeat: isHit ? 0 : Infinity, ease: 'easeInOut' }}
-        >
-          <img src={heroImage} alt="" draggable="false" />
-        </motion.div>
-
-        <motion.div
-          className="academy-battle-cast-line"
-          initial={false}
-          animate={isHit ? { opacity: [0, 1, 0], scaleX: [0.25, 1.1, 0.75] } : { opacity: 0, scaleX: 0.3 }}
-          transition={{ duration: 0.45 }}
-        />
-
         <motion.div
           className={`academy-battle-monster ${isHit ? 'monster-hit' : ''}`}
           animate={
@@ -296,7 +278,7 @@ function CategoryPicker({ selected, onSelect, categories }) {
   )
 }
 
-function CalcKeyboard({ value, onChange, onSubmit }) {
+function CalcKeyboard({ value, onChange }) {
   function press(k) {
     if (k === '⌫') onChange(value.slice(0, -1) || '0')
     else if (k === 'AC') onChange('0')
@@ -320,7 +302,7 @@ function CalcKeyboard({ value, onChange, onSubmit }) {
           <motion.button
             key={k}
             className={`academy-key ${isOp ? 'academy-key--op' : ''} ${isEqual ? 'academy-key--submit' : ''}`}
-            onClick={() => isEqual ? onSubmit(evalValue()) : press(k)}
+            onClick={() => isEqual ? onChange(String(evalValue())) : press(k)}
             whileTap={{ scale: 0.9 }}
           >
             {k}
@@ -423,7 +405,28 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
         </button>
       </div>
 
-      {showCalculator && <CalcKeyboard value={amount || '0'} onChange={setAmount} onSubmit={handleAmountSubmit} />}
+      {createPortal(
+        <AnimatePresence>
+          {showCalculator && (
+          <motion.div
+            className="academy-calculator-sheet"
+            initial={{ y: 24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 24, opacity: 0 }}
+          >
+            <div className="academy-calculator-sheet__header">
+              <div>
+                <span>加總計算</span>
+                <b>NT$ {formatMoney(evaluatedAmount)}</b>
+              </div>
+              <button onClick={() => setShowCalculator(false)}>完成</button>
+            </div>
+            <CalcKeyboard value={amount || '0'} onChange={setAmount} />
+          </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
 
       {error && (
         <motion.div
@@ -543,7 +546,6 @@ export default function BattleScreen() {
           currentHp={currentHp}
           isHit={isHit}
           damageNumbers={damageNumbers}
-          profile={profile}
           hitKey={hitKey}
           isCrit={isCrit}
           showProjectile={showProjectile}
