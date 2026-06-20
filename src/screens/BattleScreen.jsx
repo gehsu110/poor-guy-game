@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
@@ -8,13 +8,124 @@ import monsterSprites from '../assets/academy-art/monster-sprites.png'
 import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy.png'
 import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl.png'
 
+// ─── 攻擊特效：投射物 ────────────────────────────────────────────────────────
+function AttackProjectile({ isCrit }) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute z-50"
+      style={{ left: '22%', top: '53%' }}
+      initial={{ x: 0, y: 0, opacity: 1 }}
+      animate={{ x: 120, y: -14, opacity: [1, 1, 0] }}
+      transition={{ duration: 0.28, ease: 'easeIn' }}
+    >
+      <div style={{
+        width: isCrit ? 22 : 14,
+        height: isCrit ? 22 : 14,
+        borderRadius: '50%',
+        background: isCrit
+          ? 'radial-gradient(circle, #fff 10%, #FFD166 50%, #FF7FA3)'
+          : 'radial-gradient(circle, #fff 10%, #C8A8E9 50%, #7B63D8)',
+        boxShadow: isCrit ? '0 0 16px 6px #FFD166' : '0 0 10px 4px #C8A8E9',
+      }} />
+    </motion.div>
+  )
+}
+
+// ─── 攻擊特效：命中爆炸粒子 ──────────────────────────────────────────────────
+function ImpactBurst({ isCrit }) {
+  const count = isCrit ? 14 : 9
+  const colors = isCrit
+    ? ['#FFD166', '#FFFFFF', '#FF7FA3', '#FFE99A', '#C8A8E9']
+    : ['#C8A8E9', '#FF7FA3', '#A8E6CF', '#FFFFFF', '#B8E0FF']
+
+  const particles = useMemo(() => Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * 360
+    const rad = (angle * Math.PI) / 180
+    const dist = isCrit ? 52 + Math.random() * 36 : 28 + Math.random() * 22
+    const size = isCrit ? 7 + Math.random() * 5 : 4 + Math.random() * 4
+    return { i, rad, dist, size, color: colors[i % colors.length] }
+  }), [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  const stars = useMemo(() => isCrit ? Array.from({ length: 5 }, (_, i) => {
+    const angle = (i / 5) * 360 + 36
+    const rad = (angle * Math.PI) / 180
+    return { i, rad }
+  }) : [], [isCrit])
+
+  return (
+    <div className="pointer-events-none absolute z-50" style={{ left: '64%', top: '46%' }}>
+      {/* 中央閃光 */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: isCrit ? 56 : 36,
+          height: isCrit ? 56 : 36,
+          background: isCrit
+            ? 'radial-gradient(circle, #FFFFFF 0%, #FFD166 40%, transparent 70%)'
+            : 'radial-gradient(circle, #FFFFFF 0%, #C8A8E9 40%, transparent 70%)',
+          left: '50%', top: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+        initial={{ scale: 0, opacity: 1 }}
+        animate={{ scale: isCrit ? 3.5 : 2.5, opacity: 0 }}
+        transition={{ duration: 0.42, ease: 'easeOut' }}
+      />
+      {/* 粒子 */}
+      {particles.map(({ i, rad, dist, size, color }) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: size, height: size,
+            background: color,
+            left: '50%', top: '50%',
+            marginLeft: -size / 2, marginTop: -size / 2,
+            boxShadow: `0 0 ${size + 2}px ${color}`,
+          }}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, opacity: 0, scale: 0.2 }}
+          transition={{ duration: 0.55, ease: 'easeOut', delay: 0.015 * (i % 4) }}
+        />
+      ))}
+      {/* 爆擊星星 */}
+      {stars.map(({ i, rad }) => (
+        <motion.div
+          key={`star-${i}`}
+          className="absolute text-base"
+          style={{ left: '50%', top: '50%', marginLeft: -10, marginTop: -10 }}
+          initial={{ x: 0, y: 0, opacity: 1, rotate: 0, scale: 0.5 }}
+          animate={{ x: Math.cos(rad) * 68, y: Math.sin(rad) * 68, opacity: 0, rotate: 360, scale: 0 }}
+          transition={{ duration: 0.72, ease: 'easeOut' }}
+        >⭐</motion.div>
+      ))}
+    </div>
+  )
+}
+
+// ─── 攻擊特效：畫面閃光 ──────────────────────────────────────────────────────
+function ScreenFlash({ isCrit }) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute inset-0 z-40 rounded-[inherit]"
+      style={{
+        background: isCrit
+          ? 'radial-gradient(ellipse at 65% 50%, rgba(255,209,102,0.50) 0%, transparent 65%)'
+          : 'radial-gradient(ellipse at 65% 50%, rgba(200,168,233,0.40) 0%, transparent 65%)',
+      }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    />
+  )
+}
+
 function TierBadge({ tier }) {
   if (tier === 'monthboss') return <span className="academy-status academy-status--boss">月底首領</span>
   if (tier === 'boss' || tier === 'weekend') return <span className="academy-status academy-status--boss">週末首領</span>
   return <span className="academy-status">今日咒靈</span>
 }
 
-function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile }) {
+function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile, hitKey, isCrit, showProjectile, showImpact }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
@@ -50,8 +161,8 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile }) {
       <div className={`academy-battle-stage ${isHit ? 'is-casting' : ''}`}>
         <motion.div
           className="academy-battle-hero"
-          animate={isHit ? { x: [0, 10, 0], y: [0, -3, 0] } : { y: [0, -6, 0] }}
-          transition={{ duration: isHit ? 0.42 : 2.8, repeat: isHit ? 0 : Infinity, ease: 'easeInOut' }}
+          animate={isHit ? { x: [0, 12, -4, 0], y: [0, -5, 0] } : { y: [0, -6, 0] }}
+          transition={{ duration: isHit ? 0.38 : 2.8, repeat: isHit ? 0 : Infinity, ease: 'easeInOut' }}
         >
           <img src={heroImage} alt="" draggable="false" />
         </motion.div>
@@ -67,16 +178,28 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile }) {
           className={`academy-battle-monster ${isHit ? 'monster-hit' : ''}`}
           animate={
             defeated ? { rotate: [-4, 4, -4], scale: 0.9 } :
+            isHit ? { x: [0, 12, -8, 4, 0], scale: [1, 0.88, 1.05, 0.97, 1] } :
             isAngry ? { scale: [1, 1.08, 1] } :
             { y: [0, -8, 0] }
           }
-          transition={{ duration: defeated ? 1 : isAngry ? 0.45 : 2.4, repeat: Infinity }}
+          transition={{ duration: defeated ? 1 : isHit ? 0.4 : isAngry ? 0.45 : 2.4, repeat: (defeated || isAngry) ? Infinity : 0 }}
         >
           {defeated
             ? <span className="academy-icon academy-icon--star h-16 w-16" />
             : <span className={`academy-monster-sprite academy-monster-sprite--${monster.id}`} />}
         </motion.div>
         {isAngry && <div className="academy-battle-alert" />}
+
+        {/* 攻擊特效層 */}
+        <AnimatePresence>
+          {showProjectile && <AttackProjectile key={`proj-${hitKey}`} isCrit={isCrit} />}
+        </AnimatePresence>
+        <AnimatePresence>
+          {showImpact && <ImpactBurst key={`burst-${hitKey}`} isCrit={isCrit} />}
+        </AnimatePresence>
+        <AnimatePresence>
+          {showImpact && <ScreenFlash key={`flash-${hitKey}`} isCrit={isCrit} />}
+        </AnimatePresence>
 
         {damageNumbers.map(dn => (
           <motion.div
@@ -87,12 +210,13 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile }) {
               top: `${dn.y}%`,
               color: dn.crit ? '#FFD166' : '#FF7FA3',
               fontSize: dn.crit ? 30 : 24,
+              textShadow: dn.crit ? '0 0 12px #FFD166' : '0 0 8px #FF7FA3',
             }}
-            initial={{ y: 0, opacity: 1, scale: dn.crit ? 1.35 : 1.15 }}
-            animate={{ y: -64, opacity: 0, scale: 0.82 }}
-            transition={{ duration: 0.9, ease: 'easeOut' }}
+            initial={{ y: 0, opacity: 1, scale: dn.crit ? 1.5 : 1.2 }}
+            animate={{ y: -72, opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.95, ease: 'easeOut' }}
           >
-            {dn.crit ? '爆擊 ' : ''}-{formatMoney(dn.value)}
+            {dn.crit ? '💥 爆擊 ' : ''}-{formatMoney(dn.value)}
           </motion.div>
         ))}
       </div>
@@ -303,13 +427,36 @@ export default function BattleScreen() {
   const { state, navigate, submitExpense, updateExpenseEntry, deleteExpenseEntry } = useApp()
   const { profile, monster, currentHp, totalSpent, damageNumbers, expenses } = state
   const [isHit, setIsHit] = useState(false)
+  const [isCrit, setIsCrit] = useState(false)
+  const [showProjectile, setShowProjectile] = useState(false)
+  const [showImpact, setShowImpact] = useState(false)
+  const [hitKey, setHitKey] = useState(0)
   const [editingExpense, setEditingExpense] = useState(null)
   const budget = profile?.dailyBudget ?? 1000
   const categories = [...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])]
 
   async function handleSubmit(data) {
-    setIsHit(true)
-    setTimeout(() => setIsHit(false), 500)
+    const spentBase = editingExpense ? totalSpent - Number(editingExpense.amount ?? 0) : totalSpent
+    const { mult } = calcDamage(data.amount, spentBase, budget)
+    const crit = mult >= 1.2
+
+    setIsCrit(crit)
+    setHitKey(k => k + 1)
+    setShowProjectile(true)
+
+    // 投射物飛行後命中
+    setTimeout(() => {
+      setShowProjectile(false)
+      setIsHit(true)
+      setShowImpact(true)
+    }, 280)
+
+    // 清除命中狀態
+    setTimeout(() => {
+      setIsHit(false)
+      setShowImpact(false)
+    }, 950)
+
     if (editingExpense) {
       await updateExpenseEntry(editingExpense.id, data)
       setEditingExpense(null)
@@ -346,6 +493,10 @@ export default function BattleScreen() {
           isHit={isHit}
           damageNumbers={damageNumbers}
           profile={profile}
+          hitKey={hitKey}
+          isCrit={isCrit}
+          showProjectile={showProjectile}
+          showImpact={showImpact}
         />
         <div className="academy-battle-log">
           <div className="mb-1 flex items-center justify-between">
