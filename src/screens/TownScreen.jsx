@@ -59,8 +59,6 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
 
 function HeroShowcase({ profile, onProfileClick }) {
   const heroImage = (profile?.avatarGender ?? 'girl') === 'boy' ? homeHeroBoy : homeHeroGirl
-  const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
-  const title = profile ? getTitle(profile.level) : null
 
   return (
     <section className="academy-home-hero">
@@ -73,14 +71,10 @@ function HeroShowcase({ profile, onProfileClick }) {
         animate={{ y: [0, -8, 0] }}
         transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <div className="academy-home-hero__info">
-        <div>
-          <span>我的主角</span>
-          <b>{profile?.playerName?.trim() || '窮鬼勇者'}</b>
-          <small>{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
-        </div>
-        <button onClick={onProfileClick}>更換造型</button>
-      </div>
+      <button className="academy-home-hero__style-button" onClick={onProfileClick} aria-label="更換造型">
+        <GameIcon name="shop" />
+        <span>造型</span>
+      </button>
       <div className="academy-home-collect">
         {[
           { icon: 'shop', title: '造型', sub: '整套主角外觀' },

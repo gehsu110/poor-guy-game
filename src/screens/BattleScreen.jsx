@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import { BottomNav } from './TownScreen'
+import GameIcon from '../components/GameIcon'
 import battleBg from '../assets/academy-art/home-bg.webp'
 import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy-v2.png'
 import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl-v2.png'
@@ -236,7 +237,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile, hitKey
             animate={{ y: -72, opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.95, ease: 'easeOut' }}
           >
-            {dn.crit ? '💥 爆擊 ' : ''}-{formatMoney(dn.value)}
+            {dn.crit ? '爆擊 ' : ''}-{formatMoney(dn.value)}
           </motion.div>
         ))}
       </div>
@@ -262,7 +263,19 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile, hitKey
 }
 
 function CategoryIcon({ cat, className = '' }) {
-  return <span className={`academy-category-symbol ${className}`} style={{ '--cat-color': cat?.color ?? '#C8A8E9' }} />
+  return (
+    <span className={`academy-category-symbol ${className}`} style={{ '--cat-color': cat?.color ?? '#C8A8E9' }}>
+      <GameIcon name={cat?.iconKey ?? 'other'} />
+    </span>
+  )
+}
+
+function evaluateAmount(value) {
+  return String(value)
+    .split('+')
+    .map(Number)
+    .filter(Number.isFinite)
+    .reduce((sum, number) => sum + number, 0)
 }
 
 function CategoryPicker({ selected, onSelect, categories }) {
@@ -293,12 +306,7 @@ function CalcKeyboard({ value, onChange, onSubmit }) {
   }
 
   function evalValue() {
-    try {
-      const parts = value.split('+').map(Number).filter(n => !isNaN(n))
-      return parts.reduce((a, b) => a + b, 0)
-    } catch {
-      return 0
-    }
+    return evaluateAmount(value)
   }
 
   const keys = ['7', '8', '9', '⌫', '4', '5', '6', '+', '1', '2', '3', 'AC', '0', '.', '=']
@@ -328,6 +336,7 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
   const [note, setNote] = useState(editingExpense?.note ?? '')
   const [amount, setAmount] = useState(String(editingExpense?.amount ?? 0))
   const [error, setError] = useState('')
+  const [showCalculator, setShowCalculator] = useState(false)
 
   const remaining = budget - spent
   const currentCat = categories.find(c => c.id === category)
@@ -350,8 +359,9 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
     onCancelEdit?.()
   }
 
-  const previewDmg = amount !== '0' && Number(amount) > 0
-    ? calcDamage(Number(amount), spent, budget).damage
+  const evaluatedAmount = evaluateAmount(amount)
+  const previewDmg = evaluatedAmount > 0
+    ? calcDamage(evaluatedAmount, spent, budget).damage
     : null
 
   return (
@@ -381,18 +391,39 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
           className="min-w-0 rounded-2xl border border-[#E7DEF6] bg-white/90 px-3 py-2 text-xs font-bold text-[#26324A] outline-none placeholder:text-[#B8AECF] focus:border-[#8B7CFF]"
           maxLength={20}
         />
-        <div className="academy-battle-amount">
+        <label className="academy-battle-amount">
           <div className="truncate text-[10px] font-black text-[#8E87A8]">
             {currentCat ? currentCat.label : '選分類'}
           </div>
-          <div className="truncate text-lg font-black text-[#26324A]">
-            NT$ {amount.includes('+') ? amount : formatMoney(Number(amount) || 0)}
-          </div>
+          <span className="academy-battle-amount__input">
+            <b>NT$</b>
+            <input
+              type="text"
+              inputMode="decimal"
+              enterKeyHint="done"
+              aria-label="消費金額"
+              value={amount === '0' ? '' : amount}
+              placeholder="0"
+              onChange={event => setAmount(event.target.value.replace(/[^0-9.+]/g, ''))}
+              onKeyDown={event => {
+                if (event.key === 'Enter') handleAmountSubmit(evaluatedAmount)
+              }}
+            />
+          </span>
           {previewDmg && <div className="text-[10px] font-black text-[#FF6D98]">傷害 -{formatMoney(previewDmg)}</div>}
-        </div>
+        </label>
       </div>
 
-      <CalcKeyboard value={amount} onChange={setAmount} onSubmit={handleAmountSubmit} />
+      <div className="academy-battle-actions">
+        <button className="academy-calculator-toggle" onClick={() => setShowCalculator(value => !value)}>
+          {showCalculator ? '收起計算' : '加總計算'}
+        </button>
+        <button className="academy-battle-submit" onClick={() => handleAmountSubmit(evaluatedAmount)}>
+          記帳攻擊
+        </button>
+      </div>
+
+      {showCalculator && <CalcKeyboard value={amount || '0'} onChange={setAmount} onSubmit={handleAmountSubmit} />}
 
       {error && (
         <motion.div

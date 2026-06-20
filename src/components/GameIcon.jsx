@@ -78,6 +78,60 @@ const PATHS = {
       <circle className="game-icon__dot" cx="32" cy="32" r="4" />
     </>
   ),
+  food: (
+    <>
+      <path className="game-icon__plate" d="M12 10h40v44H12z" />
+      <path className="game-icon__line" d="M22 11v18M17 11v12c0 4 2 6 5 6s5-2 5-6V11M22 29v24M41 11c-5 5-7 12-7 20h9V11h-2zM39 31v22" />
+    </>
+  ),
+  transport: (
+    <>
+      <path className="game-icon__plate" d="M13 22c0-7 6-12 13-12h12c7 0 13 5 13 12v25H13V22z" />
+      <path className="game-icon__line" d="M18 29h28M20 18h24M18 41h28M22 47v7M42 47v7" />
+      <circle className="game-icon__accent" cx="22" cy="37" r="3" />
+      <circle className="game-icon__accent" cx="42" cy="37" r="3" />
+    </>
+  ),
+  shopping: (
+    <>
+      <path className="game-icon__plate" d="M13 23h38l-4 31H17l-4-31z" />
+      <path className="game-icon__line" d="M23 25c0-10 3-15 9-15s9 5 9 15" />
+      <path className="game-icon__accent" d="M26 35h12M32 29v12" />
+    </>
+  ),
+  play: (
+    <>
+      <path className="game-icon__plate" d="M18 22c3-5 8-8 14-8s11 3 14 8l7 21c2 7-6 12-11 7l-6-6h-8l-6 6c-5 5-13 0-11-7l7-21z" />
+      <path className="game-icon__line" d="M24 27v12M18 33h12" />
+      <circle className="game-icon__accent" cx="41" cy="29" r="3" />
+      <circle className="game-icon__accent" cx="46" cy="36" r="3" />
+    </>
+  ),
+  health: (
+    <>
+      <path className="game-icon__plate" d="M32 54S12 43 12 27c0-9 11-14 20-5 9-9 20-4 20 5 0 16-20 27-20 27z" />
+      <path className="game-icon__accent" d="M28 27h8v7h7v8h-7v7h-8v-7h-7v-8h7v-7z" />
+    </>
+  ),
+  daily: (
+    <>
+      <path className="game-icon__plate" d="M17 13h30v42H17z" />
+      <path className="game-icon__line" d="M23 13V8M41 13V8M17 23h30M23 32h6M35 32h6M23 42h6M35 42h6" />
+    </>
+  ),
+  learn: (
+    <>
+      <path className="game-icon__plate" d="M10 18l22-9 22 9-22 10-22-10zM18 25v18c9 6 19 6 28 0V25" />
+      <path className="game-icon__line" d="M54 18v22" />
+      <circle className="game-icon__accent" cx="54" cy="44" r="4" />
+    </>
+  ),
+  other: (
+    <>
+      <path className="game-icon__plate" d="M32 8l7 8 11-1-1 11 7 8-9 6-2 11-11-3-10 6-5-10-10-4 5-10-3-11 11-2 8-9 8 8z" />
+      <circle className="game-icon__accent" cx="32" cy="32" r="6" />
+    </>
+  ),
 }
 
 const ALIASES = {
