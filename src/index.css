@@ -928,10 +928,8 @@ body {
 
 .academy-home-hero {
   position: relative;
-  display: grid;
   height: 368px;
   flex: 0 0 auto;
-  grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
   border-radius: 34px;
   border: 1px solid rgba(255,255,255,0.72);
@@ -966,32 +964,32 @@ body {
 }
 
 .academy-home-hero__character {
-  position: relative;
+  position: absolute;
+  top: 2px;
+  right: 0;
+  bottom: 90px;
+  left: 0;
   z-index: 1;
   display: block;
-  align-self: end;
-  justify-self: center;
-  width: min(64%, 230px);
-  height: 218px;
-  overflow: hidden;
-  border: 3px solid rgba(255,255,255,0.9);
-  border-radius: 34px;
-  background: linear-gradient(180deg, #fff9f1, #f3ecff);
-  object-fit: cover;
-  object-position: center top;
-  box-shadow:
-    0 20px 34px rgba(86,74,130,0.2),
-    inset 0 0 0 1px rgba(255,209,102,0.44);
+  width: auto;
+  height: 272px;
+  max-width: 68%;
+  margin: 0 auto;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 18px 18px rgba(78, 61, 122, 0.22));
 }
 
 .academy-home-hero__info {
-  position: relative;
+  position: absolute;
+  right: 12px;
+  bottom: 82px;
+  left: 12px;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin: 0 12px 12px;
   border-radius: 24px;
   border: 1px solid rgba(255,255,255,0.78);
   background: rgba(255,255,255,0.86);
@@ -1039,12 +1037,14 @@ body {
 }
 
 .academy-home-collect {
-  position: relative;
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
   z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
-  margin: 0 12px 12px;
 }
 
 .academy-home-collect div {
@@ -1089,10 +1089,12 @@ body {
   }
 
   .academy-home-hero__character {
-    width: min(58%, 206px);
-    height: 214px;
-    border-radius: 30px;
+    bottom: 72px;
+    height: 226px;
+    max-width: 62%;
   }
+
+  .academy-home-hero__info { bottom: 12px; }
 
   .academy-home-collect {
     display: none;
@@ -1361,7 +1363,7 @@ body {
   position: relative;
   display: grid;
   height: 158px;
-  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
   align-items: center;
   justify-items: center;
   margin-top: 0;
@@ -1384,15 +1386,8 @@ body {
   position: relative;
   z-index: 3;
   align-self: end;
-  width: 112px;
+  width: 126px;
   height: 148px;
-  overflow: hidden;
-  border-radius: 30px;
-  border: 1px solid rgba(255,255,255,0.72);
-  background:
-    radial-gradient(circle at 50% 26%, rgba(255,255,255,0.82), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,0.88), rgba(241,236,255,0.72));
-  box-shadow: 0 14px 24px rgba(86,74,130,0.16);
 }
 
 .academy-battle-hero img {
@@ -1401,7 +1396,7 @@ body {
   height: 100%;
   object-fit: contain;
   object-position: center bottom;
-  filter: drop-shadow(0 12px 16px rgba(86,74,130,0.18));
+  filter: drop-shadow(0 12px 12px rgba(86,74,130,0.2));
 }
 
 .academy-battle-cast-line {
@@ -1415,9 +1410,13 @@ body {
   transform-origin: left center;
 }
 
-.academy-battle-stage .academy-monster-sprite {
-  width: 118px;
-  height: 148px;
+.academy-battle-monster-art {
+  display: block;
+  width: 132px;
+  height: 132px;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 12px 12px rgba(86,74,130,0.2));
 }
 
 .academy-battle-alert {
@@ -1466,9 +1465,8 @@ body {
   }
 
   .academy-battle-hero {
-    width: 96px;
+    width: 108px;
     height: 124px;
-    border-radius: 26px;
   }
 
   .academy-battle-monster {
@@ -1476,9 +1474,9 @@ body {
     height: 130px;
   }
 
-  .academy-battle-stage .academy-monster-sprite {
-    width: 98px;
-    height: 124px;
+  .academy-battle-monster-art {
+    width: 112px;
+    height: 112px;
   }
 
   .academy-category--compact {

@@ -4,9 +4,27 @@ import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import { BottomNav } from './TownScreen'
 import battleBg from '../assets/academy-art/home-bg.webp'
-import monsterSprites from '../assets/academy-art/monster-sprites.png'
-import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy.png'
-import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl.png'
+import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy-v2.png'
+import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl-v2.png'
+import monsterSlime from '../assets/academy-art/generated/monster-slime.png'
+import monsterRabbit from '../assets/academy-art/generated/monster-rabbit.png'
+import monsterMushroom from '../assets/academy-art/generated/monster-mushroom.png'
+import monsterCoin from '../assets/academy-art/generated/monster-coin.png'
+import monsterCat from '../assets/academy-art/generated/monster-cat.png'
+import monsterWeekend from '../assets/academy-art/generated/monster-weekend.png'
+import monsterSunday from '../assets/academy-art/generated/monster-sunday.png'
+import monsterMonth from '../assets/academy-art/generated/monster-month.png'
+
+const MONSTER_ART = {
+  slime: monsterSlime,
+  rabbit: monsterRabbit,
+  mushroom: monsterMushroom,
+  coin: monsterCoin,
+  cat: monsterCat,
+  weekend: monsterWeekend,
+  sunday: monsterSunday,
+  month: monsterMonth,
+}
 
 // ─── 攻擊特效：投射物 ────────────────────────────────────────────────────────
 function AttackProjectile({ isCrit }) {
@@ -41,8 +59,10 @@ function ImpactBurst({ isCrit }) {
   const particles = useMemo(() => Array.from({ length: count }, (_, i) => {
     const angle = (i / count) * 360
     const rad = (angle * Math.PI) / 180
-    const dist = isCrit ? 52 + Math.random() * 36 : 28 + Math.random() * 22
-    const size = isCrit ? 7 + Math.random() * 5 : 4 + Math.random() * 4
+    const variance = ((i * 37) % 11) / 10
+    const sizeVariance = ((i * 19) % 7) / 6
+    const dist = isCrit ? 52 + variance * 36 : 28 + variance * 22
+    const size = isCrit ? 7 + sizeVariance * 5 : 4 + sizeVariance * 4
     return { i, rad, dist, size, color: colors[i % colors.length] }
   }), [])  // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -186,7 +206,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile, hitKey
         >
           {defeated
             ? <span className="academy-icon academy-icon--star h-16 w-16" />
-            : <span className={`academy-monster-sprite academy-monster-sprite--${monster.id}`} />}
+            : <img className="academy-battle-monster-art" src={MONSTER_ART[monster.id]} alt="" draggable="false" />}
         </motion.div>
         {isAngry && <div className="academy-battle-alert" />}
 
@@ -466,7 +486,7 @@ export default function BattleScreen() {
   }
 
   return (
-    <div className="academy-screen" style={{ '--monster-sprites': `url(${monsterSprites})` }}>
+    <div className="academy-screen">
       <img src={battleBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 

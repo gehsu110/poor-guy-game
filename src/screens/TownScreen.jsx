@@ -4,8 +4,8 @@ import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import homeBg from '../assets/academy-art/home-bg.webp'
-import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy.png'
-import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl.png'
+import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy-v2.png'
+import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl-v2.png'
 
 function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   const title = profile ? getTitle(profile.level) : null
