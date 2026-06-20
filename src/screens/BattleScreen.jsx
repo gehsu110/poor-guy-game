@@ -5,6 +5,8 @@ import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import { BottomNav } from './TownScreen'
 import battleBg from '../assets/academy-art/home-bg.webp'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
+import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy.png'
+import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl.png'
 
 function TierBadge({ tier }) {
   if (tier === 'monthboss') return <span className="academy-status academy-status--boss">月底首領</span>
@@ -12,11 +14,12 @@ function TierBadge({ tier }) {
   return <span className="academy-status">今日咒靈</span>
 }
 
-function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
+function MonsterArea({ monster, currentHp, isHit, damageNumbers, profile }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
   const isAngry = hpPct < 0.3 && !defeated
+  const heroImage = (profile?.avatarGender ?? 'girl') === 'boy' ? homeHeroBoy : homeHeroGirl
 
   return (
     <div className="academy-battle-arena">
@@ -44,17 +47,22 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
         </div>
       </div>
 
-      <div className="academy-battle-monster-zone">
+      <div className={`academy-battle-stage ${isHit ? 'is-casting' : ''}`}>
         <motion.div
-          className="absolute inset-4 rounded-full bg-[#9B7CFF]/25 blur-2xl"
-          animate={{ scale: [0.92, 1.08, 0.92], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
+          className="academy-battle-hero"
+          animate={isHit ? { x: [0, 10, 0], y: [0, -3, 0] } : { y: [0, -6, 0] }}
+          transition={{ duration: isHit ? 0.42 : 2.8, repeat: isHit ? 0 : Infinity, ease: 'easeInOut' }}
+        >
+          <img src={heroImage} alt="" draggable="false" />
+        </motion.div>
+
         <motion.div
-          className="absolute bottom-2 h-8 w-36 rounded-full bg-[#8B7CFF]/20 blur-md"
-          animate={{ scaleX: defeated ? 0.8 : [0.9, 1.05, 0.9] }}
-          transition={{ duration: 2.4, repeat: Infinity }}
+          className="academy-battle-cast-line"
+          initial={false}
+          animate={isHit ? { opacity: [0, 1, 0], scaleX: [0.25, 1.1, 0.75] } : { opacity: 0, scaleX: 0.3 }}
+          transition={{ duration: 0.45 }}
         />
+
         <motion.div
           className={`academy-battle-monster ${isHit ? 'monster-hit' : ''}`}
           animate={
@@ -68,7 +76,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers }) {
             ? <span className="academy-icon academy-icon--star h-16 w-16" />
             : <span className={`academy-monster-sprite academy-monster-sprite--${monster.id}`} />}
         </motion.div>
-        {isAngry && <div className="absolute right-6 top-4 h-5 w-5 rounded-full bg-[#FF7FA3] shadow-[0_0_18px_rgba(255,127,163,0.58)]" />}
+        {isAngry && <div className="academy-battle-alert" />}
 
         {damageNumbers.map(dn => (
           <motion.div
@@ -337,6 +345,7 @@ export default function BattleScreen() {
           currentHp={currentHp}
           isHit={isHit}
           damageNumbers={damageNumbers}
+          profile={profile}
         />
         <div className="academy-battle-log">
           <div className="mb-1 flex items-center justify-between">

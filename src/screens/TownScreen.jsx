@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { COLLECTIBLE_TITLES, formatMoney, generateDayMonster, getTitle } from '../gameLogic'
+import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import homeBg from '../assets/academy-art/home-bg.webp'
-import monsterSprites from '../assets/academy-art/monster-sprites.png'
 import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy.png'
 import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl.png'
 
@@ -58,49 +57,44 @@ function TopHUD({ profile, todayBudget, spent, onAvatarClick }) {
   )
 }
 
-function DailyMonster({ monster, currentHp, profile }) {
-  if (!monster) return null
-  const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
-  const defeated = currentHp <= 0
-  const companionImage = (profile?.avatarGender ?? 'girl') === 'boy' ? homeHeroBoy : homeHeroGirl
+function HeroShowcase({ profile, onProfileClick }) {
+  const heroImage = (profile?.avatarGender ?? 'girl') === 'boy' ? homeHeroBoy : homeHeroGirl
+  const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
+  const title = profile ? getTitle(profile.level) : null
 
   return (
-    <div className="academy-monster-stage">
-      <div className="academy-companion-card">
-        <img src={companionImage} alt="" draggable="false" />
-        <div>
-          <span>今日夥伴</span>
-          <b>{profile?.playerName?.trim() || '窮鬼勇者'}</b>
-        </div>
-      </div>
-      <motion.div
-        className={`academy-monster-img academy-monster-sprite academy-monster-sprite--${monster.id}`}
-        animate={defeated ? { rotate: [-5, 4, -4] } : { y: [0, -8, 0] }}
-        transition={{ duration: defeated ? 0.8 : 2.4, repeat: Infinity }}
+    <section className="academy-home-hero">
+      <div className="academy-home-hero__shine" />
+      <motion.img
+        src={heroImage}
+        alt=""
+        draggable="false"
+        className="academy-home-hero__character"
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <div className="academy-hp-card">
-        <div className="mb-1 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="truncate text-base font-black text-[#26324A]">{monster.name}</div>
-            <div className="text-[10px] font-bold text-[#8E87A8]">
-              {defeated ? '今日咒靈已淨化' : '今日消費咒靈'}
-            </div>
-          </div>
-          <span className={defeated ? 'academy-status academy-status--done' : 'academy-status'}>{defeated ? '完成' : '挑戰中'}</span>
+      <div className="academy-home-hero__info">
+        <div>
+          <span>我的主角</span>
+          <b>{profile?.playerName?.trim() || '窮鬼勇者'}</b>
+          <small>{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
         </div>
-        <div className="h-3 overflow-hidden rounded-full bg-[#ECE7F5]">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#52DED4] via-[#FFD166] to-[#FF7FA3]"
-            animate={{ width: `${hpPct * 100}%` }}
-            transition={{ duration: 0.55 }}
-          />
-        </div>
-        <div className="mt-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
-          <span>血量 {formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
-          <span>{monster.tier === 'boss' ? '週末首領' : monster.tier === 'monthboss' ? '月底首領' : '每日怪'}</span>
-        </div>
+        <button onClick={onProfileClick}>更換造型</button>
       </div>
-    </div>
+      <div className="academy-home-collect">
+        {[
+          { icon: 'shop', title: '造型', sub: '整套主角外觀' },
+          { icon: 'yellow-star', title: '夥伴', sub: '陪你記帳' },
+          { icon: 'battle', title: '特效', sub: '攻擊時發動' },
+        ].map(item => (
+          <div key={item.title}>
+            <GameIcon name={item.icon} />
+            <b>{item.title}</b>
+            <span>{item.sub}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -137,13 +131,11 @@ function AttackEntry({ spent, budget, onClick }) {
 
 export default function TownScreen() {
   const { state, navigate } = useApp()
-  const { profile, monster, currentHp, totalSpent } = state
+  const { profile, totalSpent } = state
   const budget = profile?.dailyBudget ?? 1000
-  const monsterToShow = monster ?? generateDayMonster(state.date, budget)
-  const hpToShow = monster ? currentHp : monsterToShow.maxHp
 
   return (
-    <div className="academy-screen" style={{ '--monster-sprites': `url(${monsterSprites})` }}>
+    <div className="academy-screen">
       <img src={homeBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
@@ -152,7 +144,7 @@ export default function TownScreen() {
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <DailyMonster monster={monsterToShow} currentHp={hpToShow} profile={profile} />
+        <HeroShowcase profile={profile} onProfileClick={() => navigate('profile')} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 
