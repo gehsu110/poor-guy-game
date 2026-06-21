@@ -26,6 +26,8 @@ import homeBg from './assets/academy-art/home-bg.webp'
 // ── 影片 (暫用 CDN URL，下載後改為 import) ─────────────────────
 // TODO: 下載後改為 import girlAcademyVideo from './assets/academy-art/generated/videos/girl-academy.mp4'
 const GIRL_ACADEMY_VIDEO = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260621_043751_f35c2192-a987-4c3d-b350-651f049fd22d.mp4'
+// TODO: 下載後改為 import boyAcademyVideo from './assets/academy-art/generated/videos/boy-academy.mp4'
+const BOY_ACADEMY_VIDEO  = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260621_051042_e7fd9f49-4eb3-4f43-8e9e-a2f5bb1e388d.mp4'
 
 // ── 主設定表 ────────────────────────────────────────────────────
 export const OUTFIT_CONFIG = {
@@ -35,7 +37,7 @@ export const OUTFIT_CONFIG = {
     girlImage: girlBaseImg,
     boyImage:  boyBaseImg,
     girlVideo: GIRL_ACADEMY_VIDEO,
-    boyVideo:  null,          // TODO: 生成後填入
+    boyVideo:  BOY_ACADEMY_VIDEO,
     bg:        homeBg,        // TODO: 學院廣場背景
     bgTheme:   'academy',
   },
@@ -44,8 +46,8 @@ export const OUTFIT_CONFIG = {
     desc: '初期成就造型',
     girlImage: girlBaseImg,
     boyImage:  boyBaseImg,
-    girlVideo: GIRL_ACADEMY_VIDEO,  // 暫借用
-    boyVideo:  null,
+    girlVideo: GIRL_ACADEMY_VIDEO,
+    boyVideo:  BOY_ACADEMY_VIDEO,
     bg:        homeBg,
     bgTheme:   'hero',
   },
