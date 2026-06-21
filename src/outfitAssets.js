@@ -23,11 +23,10 @@ import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png
 import homeBg from './assets/academy-art/home-bg.webp'
 // TODO: 每套裝專屬背景，生成後在此 import 並填入 OUTFIT_CONFIG
 
-// ── 影片 (暫用 CDN URL，下載後改為 import) ─────────────────────
-// TODO: 下載後改為 import girlAcademyVideo from './assets/academy-art/generated/videos/girl-academy.mp4'
-const GIRL_ACADEMY_VIDEO = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260621_043751_f35c2192-a987-4c3d-b350-651f049fd22d.mp4'
-// TODO: 下載後改為 import boyAcademyVideo from './assets/academy-art/generated/videos/boy-academy.mp4'
-const BOY_ACADEMY_VIDEO  = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260621_051042_e7fd9f49-4eb3-4f43-8e9e-a2f5bb1e388d.mp4'
+// ── 影片（白底版，用 mix-blend-mode: multiply 去背）──────────────
+// 白底影片：白色部分消失，角色浮在遊戲背景上
+const GIRL_ACADEMY_VIDEO = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260621_054410_01292d79-9926-4f1d-88bb-6f4f25b887f0.mp4'
+const BOY_ACADEMY_VIDEO  = null  // TODO: 生成男生白底版
 
 // ── 主設定表 ────────────────────────────────────────────────────
 export const OUTFIT_CONFIG = {
