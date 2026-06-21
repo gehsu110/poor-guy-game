@@ -23,20 +23,16 @@ import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png
 import homeBg from './assets/academy-art/home-bg.webp'
 // TODO: 每套裝專屬背景，生成後在此 import 並填入 OUTFIT_CONFIG
 
-// ── 影片（白底版，用 mix-blend-mode: multiply 去背）──────────────
-// 白底影片：白色部分消失，角色浮在遊戲背景上
-const GIRL_ACADEMY_VIDEO = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260621_054410_01292d79-9926-4f1d-88bb-6f4f25b887f0.mp4'
-const BOY_ACADEMY_VIDEO  = null  // TODO: 生成男生白底版
-
 // ── 主設定表 ────────────────────────────────────────────────────
+// 影片欄位保留供未來支援真正透明背景影片（WebM alpha 等方案）
 export const OUTFIT_CONFIG = {
   academy: {
     name: '星術學院套裝',
     desc: '預設主角造型',
     girlImage: girlBaseImg,
     boyImage:  boyBaseImg,
-    girlVideo: GIRL_ACADEMY_VIDEO,
-    boyVideo:  BOY_ACADEMY_VIDEO,
+    girlVideo: null,
+    boyVideo:  null,
     bg:        homeBg,        // TODO: 學院廣場背景
     bgTheme:   'academy',
   },

@@ -1,4 +1,3 @@
-import { useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
@@ -96,18 +95,6 @@ export default function TownScreen() {
   const outfitId = profile?.equipped?.outfit ?? 'academy'
   const { bg, image, video } = getOutfitAssets(outfitId, gender)
 
-  // 點角色解除靜音
-  const videoRef  = useRef(null)
-  const muteTimer = useRef(null)
-  const handleCharacterTap = useCallback(() => {
-    if (!videoRef.current) return
-    clearTimeout(muteTimer.current)
-    videoRef.current.muted = false
-    muteTimer.current = setTimeout(() => {
-      if (videoRef.current) videoRef.current.muted = true
-    }, 3000)
-  }, [])
-
   return (
     <div className="academy-screen">
       {/* 全螢幕背景 */}
@@ -116,26 +103,22 @@ export default function TownScreen() {
 
       {/* ── 角色層：直接放在 screen 根層，與 academy-bg 同層 ──
           這樣 mix-blend-mode: multiply 才能跨越 z-index 跟遊戲背景合成 */}
-      {video ? (
-        <video
-          ref={videoRef}
-          key={video}
-          src={video}
-          autoPlay loop muted playsInline
-          className="academy-screen-character academy-screen-character--tap"
-          onClick={handleCharacterTap}
-        />
-      ) : image ? (
+      {image && (
         <motion.img
           key={image}
           src={image}
           alt=""
           draggable="false"
           className="academy-screen-character academy-screen-character--tap"
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+          initial={{ opacity: 0, y: 24, scale: 0.92 }}
+          animate={{ opacity: 1, y: [0, -10, 0], scale: 1 }}
+          transition={{
+            opacity: { duration: 0.5 },
+            scale:   { duration: 0.5 },
+            y: { duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
+          }}
         />
-      ) : null}
+      )}
 
       {/* UI 層（z-10，疊在角色上） */}
       <div className="relative z-10 px-4 pt-4">
