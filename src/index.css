@@ -1046,6 +1046,9 @@ img.academy-screen-character {
   /* 呼吸光暈：drop-shadow 脈動 */
   animation: character-glow 4s ease-in-out infinite;
 }
+canvas.academy-screen-character {
+  background: transparent;
+}
 
 @keyframes character-glow {
   0%, 100% { filter: drop-shadow(0 18px 18px rgba(78,61,122,0.22)) drop-shadow(0 0 0px rgba(139,124,255,0)); }

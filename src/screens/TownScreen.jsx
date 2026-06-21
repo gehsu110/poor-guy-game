@@ -108,7 +108,7 @@ export default function TownScreen() {
         <ChromaKeyCanvas
           src={video}
           keyColor={[0, 255, 0]}
-          threshold={90}
+          threshold={130}
           className="academy-screen-character academy-screen-character--tap"
         />
       ) : frames?.length > 0 ? (

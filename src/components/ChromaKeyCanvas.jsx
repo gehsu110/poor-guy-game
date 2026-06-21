@@ -49,6 +49,9 @@ export default function ChromaKeyCanvas({
           inited = true
         }
 
+        // 清空到透明（防閃黑）
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
         // 繪製當前幀
         ctx.drawImage(video, 0, 0)
 
