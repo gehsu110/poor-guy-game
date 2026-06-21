@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, DEFAULT_CATEGORIES, getTitle, TITLES, formatMoney } from '../gameLogic'
@@ -84,6 +84,107 @@ const WARDROBE = {
     { id: 'moon', name: '月光頭像框', desc: '限定感外框', owned: true },
     { id: 'crystal', name: '冰晶頭像框', desc: '紫星直購預覽', owned: false },
   ],
+}
+
+const WARDROBE_CATS = [
+  { key: 'set', label: '套裝' },
+  { key: 'outfit', label: '服裝' },
+  { key: 'accessory', label: '頭飾' },
+  { key: 'frame', label: '頭像框' },
+]
+
+const DEFAULT_EQUIPPED = { outfit: 'academy', accessory: 'star_pin', frame: 'soft_gold' }
+
+function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEquipSet, onEquipCosmetic }) {
+  const [cat, setCat] = useState('set')
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="academy-card">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="text-sm font-black text-[#26324A]">目前造型</div>
+          <span className="academy-status">{activeSet?.name ?? '自訂搭配'}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Avatar
+            gender={avatarGender}
+            variant="full"
+            frame={equipped.frame ?? 'soft_gold'}
+            outfit={equipped.outfit ?? 'academy'}
+            accessory={equipped.accessory ?? 'star_pin'}
+            className="academy-wardrobe-hero"
+          />
+          <div className="min-w-0 flex-1 text-xs font-bold leading-6 text-[#8E87A8]">
+            <div>服裝：{WARDROBE.outfit.find(i => i.id === (equipped.outfit ?? 'academy'))?.name}</div>
+            <div>頭飾：{WARDROBE.accessory.find(i => i.id === (equipped.accessory ?? 'star_pin'))?.name}</div>
+            <div>頭像框：{WARDROBE.frame.find(i => i.id === (equipped.frame ?? 'soft_gold'))?.name}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="academy-card">
+        <div className="academy-wardrobe-cats mb-3">
+          {WARDROBE_CATS.map(c => (
+            <button
+              key={c.key}
+              className={`academy-wardrobe-cat-btn ${cat === c.key ? 'is-active' : ''}`}
+              onClick={() => setCat(c.key)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        {cat === 'set' && (
+          <div className="grid grid-cols-2 gap-2">
+            {WARDROBE.set.map(set => {
+              const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
+              const active = activeSet?.id === set.id
+              return (
+                <button
+                  key={set.id}
+                  className={`academy-outfit-set ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
+                  onClick={() => owned && onEquipSet(set)}
+                >
+                  <Avatar
+                    gender={avatarGender}
+                    variant="full"
+                    frame={set.frame}
+                    outfit={set.outfit}
+                    accessory={set.accessory}
+                    className="academy-outfit-set__avatar"
+                  />
+                  <b>{set.name}</b>
+                  <small>{owned ? set.desc : '未解鎖'}</small>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {['outfit', 'accessory', 'frame'].includes(cat) && (
+          <div className="grid grid-cols-2 gap-2">
+            {WARDROBE[cat].map(item => {
+              const owned = item.owned || collectionIds.has(item.id)
+              const defaultVal = DEFAULT_EQUIPPED[cat]
+              const active = (equipped[cat] ?? defaultVal) === item.id
+              return (
+                <button
+                  key={item.id}
+                  className={`academy-wardrobe-item ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
+                  onClick={() => owned && onEquipCosmetic(cat, item.id)}
+                >
+                  <span className={`academy-wardrobe-swatch academy-wardrobe-swatch--${item.id}`} />
+                  <b>{item.name}</b>
+                  <small>{owned ? item.desc : '未解鎖'}</small>
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 function ExpBar({ expInLevel, expToNext }) {
@@ -366,87 +467,14 @@ export default function ProfileScreen() {
         )}
 
         {tab === 'wardrobe' && (
-          <div className="flex flex-col gap-3">
-            <div className="academy-card">
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-black text-[#26324A]">造型預覽</div>
-                  <div className="text-[10px] font-bold text-[#8E87A8]">以套裝為主，頭飾與頭像框可再微調</div>
-                </div>
-                <span className="academy-status">{activeSet?.name ?? '自訂搭配'}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Avatar
-                  gender={avatarGender}
-                  variant="full"
-                  frame={equipped.frame ?? 'soft_gold'}
-                  outfit={equipped.outfit ?? 'academy'}
-                  accessory={equipped.accessory ?? 'star_pin'}
-                  className="academy-wardrobe-hero"
-                />
-                <div className="min-w-0 flex-1 text-xs font-bold leading-6 text-[#8E87A8]">
-                  <div>服裝：{WARDROBE.outfit.find(i => i.id === (equipped.outfit ?? 'academy'))?.name}</div>
-                  <div>頭飾：{WARDROBE.accessory.find(i => i.id === (equipped.accessory ?? 'star_pin'))?.name}</div>
-                  <div>頭像框：{WARDROBE.frame.find(i => i.id === (equipped.frame ?? 'soft_gold'))?.name}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="academy-card">
-              <div className="mb-3 text-xs font-black text-[#26324A]">套裝立繪</div>
-              <div className="grid grid-cols-2 gap-2">
-                {WARDROBE.set.map(set => {
-                  const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
-                  const active = activeSet?.id === set.id
-                  return (
-                    <button
-                      key={set.id}
-                      className={`academy-outfit-set ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-                      onClick={() => owned && equipSet(set)}
-                    >
-                      <Avatar
-                        gender={avatarGender}
-                        variant="full"
-                        frame={set.frame}
-                        outfit={set.outfit}
-                        accessory={set.accessory}
-                        className="academy-outfit-set__avatar"
-                      />
-                      <b>{set.name}</b>
-                      <small>{owned ? set.desc : '未解鎖'}</small>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {[
-              { slot: 'outfit', title: '服裝' },
-              { slot: 'accessory', title: '頭飾' },
-              { slot: 'frame', title: '頭像框' },
-            ].map(group => (
-              <div key={group.slot} className="academy-card">
-                <div className="mb-3 text-xs font-black text-[#26324A]">{group.title}</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {WARDROBE[group.slot].map(item => {
-                    const owned = item.owned || collectionIds.has(item.id)
-                    const active = (equipped[group.slot] ?? (group.slot === 'accessory' ? 'star_pin' : group.slot === 'frame' ? 'soft_gold' : 'academy')) === item.id
-                    return (
-                      <button
-                        key={item.id}
-                        className={`academy-wardrobe-item ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-                        onClick={() => owned && equipCosmetic(group.slot, item.id)}
-                      >
-                        <span className={`academy-wardrobe-swatch academy-wardrobe-swatch--${item.id}`} />
-                        <b>{item.name}</b>
-                        <small>{owned ? item.desc : '未解鎖'}</small>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+          <WardrobePanel
+            avatarGender={avatarGender}
+            equipped={equipped}
+            activeSet={activeSet}
+            collectionIds={collectionIds}
+            onEquipSet={equipSet}
+            onEquipCosmetic={equipCosmetic}
+          />
         )}
 
         {tab === 'settings' && (
