@@ -1000,6 +1000,14 @@ body {
   filter: drop-shadow(0 18px 18px rgba(78, 61, 122, 0.22));
 }
 
+.academy-home-hero__character--tap {
+  cursor: pointer;
+}
+.academy-home-hero__character--tap:active {
+  transform: scale(0.96);
+  transition: transform 0.1s ease;
+}
+
 .academy-home-hero__style-button {
   position: absolute;
   top: 14px;

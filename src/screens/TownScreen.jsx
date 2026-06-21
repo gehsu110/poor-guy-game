@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
@@ -34,6 +35,19 @@ function HeroShowcase({ profile, onProfileClick }) {
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const playerName    = profile?.playerName?.trim() || '窮鬼勇者'
 
+  const videoRef   = useRef(null)
+  const muteTimer  = useRef(null)
+
+  // 點角色：暫時解除靜音播放音效，3 秒後自動靜音
+  const handleCharacterTap = useCallback(() => {
+    if (!videoRef.current) return
+    clearTimeout(muteTimer.current)
+    videoRef.current.muted = false
+    muteTimer.current = setTimeout(() => {
+      if (videoRef.current) videoRef.current.muted = true
+    }, 3000)
+  }, [])
+
   return (
     <section className="academy-home-hero">
       <div className="academy-home-hero__shine" />
@@ -41,13 +55,15 @@ function HeroShowcase({ profile, onProfileClick }) {
       {/* 角色：有影片用影片，否則靜態圖 + 上下動畫 */}
       {video ? (
         <video
-          key={video}           /* key 讓換裝時強制重新播放 */
+          ref={videoRef}
+          key={video}
           src={video}
           autoPlay
           loop
           muted
           playsInline
-          className="academy-home-hero__character"
+          className="academy-home-hero__character academy-home-hero__character--tap"
+          onClick={handleCharacterTap}
         />
       ) : image ? (
         <motion.img
@@ -55,7 +71,7 @@ function HeroShowcase({ profile, onProfileClick }) {
           src={image}
           alt=""
           draggable="false"
-          className="academy-home-hero__character"
+          className="academy-home-hero__character academy-home-hero__character--tap"
           animate={{ y: [0, -8, 0] }}
           transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
         />
