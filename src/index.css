@@ -995,6 +995,8 @@ body {
   margin: 0 auto;
   object-fit: contain;
   object-position: center bottom;
+  background: transparent;        /* 去除 video letterbox 黑邊 */
+  mix-blend-mode: multiply;       /* 白色背景消失，融入場景 */
   filter: drop-shadow(0 18px 18px rgba(78, 61, 122, 0.22));
 }
 
