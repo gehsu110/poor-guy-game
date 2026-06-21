@@ -540,7 +540,7 @@ export default function BattleScreen() {
         </div>
       </div>
 
-      <div className="relative z-10 flex-1 overflow-hidden px-4 pb-[92px]">
+      <div className="academy-battle-content relative z-10 flex-1 overflow-hidden px-4 pb-[92px]">
         <MonsterArea
           monster={monster}
           currentHp={currentHp}

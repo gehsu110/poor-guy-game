@@ -137,7 +137,7 @@ export default function TownScreen() {
         <TopHUD profile={profile} todayBudget={budget} spent={totalSpent} onAvatarClick={() => navigate('profile')} />
       </div>
 
-      <div className="relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
+      <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
         <HeroShowcase profile={profile} onProfileClick={() => navigate('profile')} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
