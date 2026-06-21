@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 
 /**
- * SpriteCharacter — 多幀 idle 動畫組件
+ * SpriteCharacter — 多幀 idle 動畫組件（ping-pong 無縫循環）
  *
  * Props:
  *   frames      : string[]   — 透明 PNG 的 URL / import 陣列（順序即播放順序）
@@ -25,18 +25,26 @@ export default function SpriteCharacter({
   const animRef   = useRef(null)
   const idxRef    = useRef(0)
 
+  // ping-pong：[0,1,...,n-1, n-2,...,1] → 無縫往返，消除第 12→1 幀的硬跳
+  const pingPongFrames = useMemo(() => {
+    if (frames.length <= 2) return frames
+    const forward  = frames
+    const backward = frames.slice(1, -1).reverse()
+    return [...forward, ...backward]
+  }, [frames])
+
   // ── 主動畫 loop ──────────────────────────────────────────────
   useEffect(() => {
-    if (frames.length <= 1) return
+    if (pingPongFrames.length <= 1) return
     const ms = 1000 / fps
 
     animRef.current = setInterval(() => {
-      idxRef.current = (idxRef.current + 1) % frames.length
+      idxRef.current = (idxRef.current + 1) % pingPongFrames.length
       setFrameIdx(idxRef.current)
     }, ms)
 
     return () => clearInterval(animRef.current)
-  }, [frames, fps])
+  }, [pingPongFrames, fps])
 
   // ── 眨眼（插入 blinkFrames，不打斷主 loop）──────────────────
   useEffect(() => {
@@ -64,7 +72,7 @@ export default function SpriteCharacter({
   const visibleFrames = isBlinking && blinkFrames.length > 0 ? blinkFrames : null
   const src = visibleFrames
     ? frames[visibleFrames[Math.floor((Date.now() / (1000 / fps)) % visibleFrames.length)]]
-    : frames[frameIdx]
+    : pingPongFrames[frameIdx]
 
   return (
     <img
