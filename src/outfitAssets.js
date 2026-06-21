@@ -8,8 +8,8 @@
  */
 
 // ── 靜態圖 imports ──────────────────────────────────────────────
-import girlBaseImg  from './assets/academy-art/home-hero-girl-v2.png'
-import boyBaseImg   from './assets/academy-art/home-hero-boy-v2.png'
+import girlBaseImg  from './assets/academy-art/generated/home-hero-girl-v2.png'
+import boyBaseImg   from './assets/academy-art/generated/home-hero-boy-v2.png'
 
 import girlCrystalGown from './assets/academy-art/generated/outfits/girl-crystal-gown.png'
 import girlStarcloak   from './assets/academy-art/generated/outfits/girl-starcloak.png'
