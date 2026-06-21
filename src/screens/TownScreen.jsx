@@ -26,56 +26,15 @@ function TopHUD({ todayBudget, spent }) {
   )
 }
 
-function HeroShowcase({ profile, onProfileClick }) {
-  const gender    = profile?.avatarGender ?? 'girl'
-  const outfitId  = profile?.equipped?.outfit ?? 'academy'
-  const { image, video } = getOutfitAssets(outfitId, gender)
-
+// 角色資訊卡（不含角色圖，角色已移到 screen 層）
+function HeroShowcase({ profile, onProfileClick, hasVideo }) {
   const title         = profile ? getTitle(profile.level) : null
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const playerName    = profile?.playerName?.trim() || '窮鬼勇者'
 
-  const videoRef   = useRef(null)
-  const muteTimer  = useRef(null)
-
-  // 點角色：暫時解除靜音播放音效，3 秒後自動靜音
-  const handleCharacterTap = useCallback(() => {
-    if (!videoRef.current) return
-    clearTimeout(muteTimer.current)
-    videoRef.current.muted = false
-    muteTimer.current = setTimeout(() => {
-      if (videoRef.current) videoRef.current.muted = true
-    }, 3000)
-  }, [])
-
   return (
-    <section className={`academy-home-hero${video ? ' has-video' : ''}`}>
+    <section className={`academy-home-hero${hasVideo ? ' has-video' : ''}`}>
       <div className="academy-home-hero__shine" />
-
-      {/* 角色：有影片用影片，否則靜態圖 + 上下動畫 */}
-      {video ? (
-        <video
-          ref={videoRef}
-          key={video}
-          src={video}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="academy-home-hero__character academy-home-hero__character--tap"
-          onClick={handleCharacterTap}
-        />
-      ) : image ? (
-        <motion.img
-          key={image}
-          src={image}
-          alt=""
-          draggable="false"
-          className="academy-home-hero__character academy-home-hero__character--tap"
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      ) : null}
 
       <button className="academy-home-hero__style-button" onClick={onProfileClick} aria-label="前往成長頁">
         <GameIcon name="shop" />
@@ -135,20 +94,56 @@ export default function TownScreen() {
   const budget   = profile?.dailyBudget ?? 1000
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
-  const { bg }   = getOutfitAssets(outfitId, gender)
+  const { bg, image, video } = getOutfitAssets(outfitId, gender)
+
+  // 點角色解除靜音
+  const videoRef  = useRef(null)
+  const muteTimer = useRef(null)
+  const handleCharacterTap = useCallback(() => {
+    if (!videoRef.current) return
+    clearTimeout(muteTimer.current)
+    videoRef.current.muted = false
+    muteTimer.current = setTimeout(() => {
+      if (videoRef.current) videoRef.current.muted = true
+    }, 3000)
+  }, [])
 
   return (
     <div className="academy-screen">
-      {/* 全螢幕背景（套裝主題） */}
+      {/* 全螢幕背景 */}
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
+      {/* ── 角色層：直接放在 screen 根層，與 academy-bg 同層 ──
+          這樣 mix-blend-mode: multiply 才能跨越 z-index 跟遊戲背景合成 */}
+      {video ? (
+        <video
+          ref={videoRef}
+          key={video}
+          src={video}
+          autoPlay loop muted playsInline
+          className="academy-screen-character academy-screen-character--tap"
+          onClick={handleCharacterTap}
+        />
+      ) : image ? (
+        <motion.img
+          key={image}
+          src={image}
+          alt=""
+          draggable="false"
+          className="academy-screen-character academy-screen-character--tap"
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      ) : null}
+
+      {/* UI 層（z-10，疊在角色上） */}
       <div className="relative z-10 px-4 pt-4">
         <TopHUD todayBudget={budget} spent={totalSpent} />
       </div>
 
       <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <HeroShowcase profile={profile} onProfileClick={() => navigate('profile')} />
+        <HeroShowcase profile={profile} onProfileClick={() => navigate('profile')} hasVideo={!!video} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 

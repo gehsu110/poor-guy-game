@@ -1023,6 +1023,45 @@ video.academy-home-hero__character {
   transition: transform 0.1s ease;
 }
 
+/* ── Screen 層角色（不在任何 stacking context 內，multiply 直接跟遊戲背景合成）── */
+.academy-screen-character {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 56px;
+  height: calc(100% - 300px);
+  max-height: 380px;
+  min-height: 200px;
+  width: auto;
+  max-width: 72%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 18px 18px rgba(78, 61, 122, 0.22));
+  pointer-events: auto;
+}
+
+img.academy-screen-character {
+  background: transparent;
+}
+
+video.academy-screen-character {
+  background: white;
+  mix-blend-mode: multiply;
+}
+
+.academy-screen-character--tap { cursor: pointer; }
+.academy-screen-character--tap:active {
+  transform: translateX(-50%) scale(0.96);
+  transition: transform 0.1s ease;
+}
+
+/* 有影片時英雄卡透明（角色已在 screen 層，卡片只負責 info） */
+.academy-home-hero.has-video {
+  background: transparent;
+  isolation: auto;
+}
+
 .academy-home-hero__style-button {
   position: absolute;
   top: 14px;
