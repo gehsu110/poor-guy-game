@@ -39,7 +39,7 @@ const WARDROBE = {
     },
     {
       id: 'pink_magic_set',
-      name: '粉晶魔法套裝',
+      name: '粉晶禮服套裝',
       desc: '紫星直購造型',
       outfit: 'pink_robe',
       accessory: 'ribbon',
@@ -49,7 +49,7 @@ const WARDROBE = {
     {
       id: 'night_cape_set',
       name: '星夜斗篷套裝',
-      desc: '一般扭蛋稀有',
+      desc: '扭蛋稀有造型',
       outfit: 'night_cape',
       accessory: 'crown',
       frame: 'moon',
@@ -77,10 +77,10 @@ const WARDROBE = {
   outfit: [
     { id: 'academy',     name: '星術學院服',   desc: '預設主角服裝', owned: true },
     { id: 'saving_hero', name: '省錢勇者裝',   desc: '初期成就服裝', owned: true },
-    { id: 'night_cape',  name: '星夜斗篷',     desc: '紫色斗篷感',   owned: true },
-    { id: 'mint_coat',   name: '薄荷外套',     desc: '清爽補給色',   owned: true },
+    { id: 'night_cape',  name: '星夜斗篷',     desc: '扭蛋稀有服裝', owned: false },
+    { id: 'mint_coat',   name: '薄荷外套',     desc: '清爽補給色',   owned: false },
     { id: 'pink_robe',   name: '粉晶禮服',     desc: '可愛柔粉風',   owned: false },
-    { id: 'suit',        name: '都市精英西裝',  desc: '職場感套裝',   owned: false },
+    { id: 'suit',        name: '都市精英套裝', desc: '職場感套裝',   owned: false },
     { id: 'moonlight',   name: '月光限定服',   desc: '限定池套裝',   owned: false },
   ],
   accessory: [
