@@ -957,6 +957,12 @@ body {
   isolation: isolate;
 }
 
+/* 有影片時：移除白色背景和 isolation，讓 multiply 直接跟遊戲背景合成 */
+.academy-home-hero.has-video {
+  background: transparent;
+  isolation: auto;
+}
+
 .academy-home-hero::before {
   content: '';
   position: absolute;

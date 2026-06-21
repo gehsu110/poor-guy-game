@@ -49,7 +49,7 @@ function HeroShowcase({ profile, onProfileClick }) {
   }, [])
 
   return (
-    <section className="academy-home-hero">
+    <section className={`academy-home-hero${video ? ' has-video' : ''}`}>
       <div className="academy-home-hero__shine" />
 
       {/* 角色：有影片用影片，否則靜態圖 + 上下動畫 */}
