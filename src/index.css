@@ -995,9 +995,18 @@ body {
   margin: 0 auto;
   object-fit: contain;
   object-position: center bottom;
-  background: transparent;        /* 去除 video letterbox 黑邊 */
-  mix-blend-mode: multiply;       /* 白色背景消失，融入場景 */
   filter: drop-shadow(0 18px 18px rgba(78, 61, 122, 0.22));
+}
+
+/* 靜態圖已去背（透明 PNG），不需要 blend */
+img.academy-home-hero__character {
+  background: transparent;
+}
+
+/* 影片：白底 letterbox + multiply 讓白色消失融入背景 */
+video.academy-home-hero__character {
+  background: white;
+  mix-blend-mode: multiply;
 }
 
 .academy-home-hero__character--tap {
