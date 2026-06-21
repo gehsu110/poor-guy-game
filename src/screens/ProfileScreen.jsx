@@ -5,6 +5,7 @@ import { COLLECTIBLE_TITLES, DEFAULT_CATEGORIES, getTitle, TITLES, formatMoney }
 import { loginWithGoogle, updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
 import Avatar from '../components/Avatar'
+import { getOutfitAssets } from '../outfitAssets'
 import profileBg from '../assets/academy-art/profile-bg.webp'
 
 const WARDROBE = {
@@ -55,6 +56,15 @@ const WARDROBE = {
       owned: false,
     },
     {
+      id: 'suit_set',
+      name: '都市精英套裝',
+      desc: '職場感限定套裝',
+      outfit: 'suit',
+      accessory: 'none',
+      frame: 'soft_gold',
+      owned: false,
+    },
+    {
       id: 'moonlight_set',
       name: '月光限定套裝',
       desc: '金色池限定',
@@ -65,12 +75,13 @@ const WARDROBE = {
     },
   ],
   outfit: [
-    { id: 'academy', name: '星術學院服', desc: '預設主角服裝', owned: true },
-    { id: 'saving_hero', name: '省錢勇者裝', desc: '初期成就服裝', owned: true },
-    { id: 'night_cape', name: '星夜斗篷', desc: '紫色斗篷感', owned: true },
-    { id: 'mint_coat', name: '薄荷外套', desc: '清爽補給色', owned: true },
-    { id: 'pink_robe', name: '粉晶禮服', desc: '可愛柔粉風', owned: false },
-    { id: 'moonlight', name: '月光限定服', desc: '限定池套裝', owned: false },
+    { id: 'academy',     name: '星術學院服',   desc: '預設主角服裝', owned: true },
+    { id: 'saving_hero', name: '省錢勇者裝',   desc: '初期成就服裝', owned: true },
+    { id: 'night_cape',  name: '星夜斗篷',     desc: '紫色斗篷感',   owned: true },
+    { id: 'mint_coat',   name: '薄荷外套',     desc: '清爽補給色',   owned: true },
+    { id: 'pink_robe',   name: '粉晶禮服',     desc: '可愛柔粉風',   owned: false },
+    { id: 'suit',        name: '都市精英西裝',  desc: '職場感套裝',   owned: false },
+    { id: 'moonlight',   name: '月光限定服',   desc: '限定池套裝',   owned: false },
   ],
   accessory: [
     { id: 'none', name: '不戴頭飾', desc: '乾淨頭像', owned: true },
@@ -95,6 +106,15 @@ const WARDROBE_CATS = [
 
 const DEFAULT_EQUIPPED = { outfit: 'academy', accessory: 'star_pin', frame: 'soft_gold' }
 
+/** 顯示套裝縮圖：優先用真實生成圖，沒有則 fallback 到 Avatar 元件 */
+function OutfitPreview({ gender, outfitId, className }) {
+  const { image } = getOutfitAssets(outfitId, gender)
+  if (image) {
+    return <img src={image} alt="" className={className} style={{ objectFit: 'contain' }} />
+  }
+  return <Avatar gender={gender} variant="full" outfit={outfitId} className={className} />
+}
+
 function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEquipSet, onEquipCosmetic }) {
   const [cat, setCat] = useState('set')
 
@@ -106,12 +126,9 @@ function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEqu
           <span className="academy-status">{activeSet?.name ?? '自訂搭配'}</span>
         </div>
         <div className="flex items-center gap-3">
-          <Avatar
+          <OutfitPreview
             gender={avatarGender}
-            variant="full"
-            frame={equipped.frame ?? 'soft_gold'}
-            outfit={equipped.outfit ?? 'academy'}
-            accessory={equipped.accessory ?? 'star_pin'}
+            outfitId={equipped.outfit ?? 'academy'}
             className="academy-wardrobe-hero"
           />
           <div className="min-w-0 flex-1 text-xs font-bold leading-6 text-[#8E87A8]">
@@ -146,12 +163,9 @@ function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEqu
                   className={`academy-outfit-set ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
                   onClick={() => owned && onEquipSet(set)}
                 >
-                  <Avatar
+                  <OutfitPreview
                     gender={avatarGender}
-                    variant="full"
-                    frame={set.frame}
-                    outfit={set.outfit}
-                    accessory={set.accessory}
+                    outfitId={set.outfit}
                     className="academy-outfit-set__avatar"
                   />
                   <b>{set.name}</b>

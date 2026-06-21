@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
+import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
-import homeBg from '../assets/academy-art/home-bg.webp'
-import homeHeroBoy from '../assets/academy-art/generated/home-hero-boy-v2.png'
-import homeHeroGirl from '../assets/academy-art/generated/home-hero-girl-v2.png'
 
 function TopHUD({ todayBudget, spent }) {
   const remaining = todayBudget - spent
@@ -28,26 +26,46 @@ function TopHUD({ todayBudget, spent }) {
 }
 
 function HeroShowcase({ profile, onProfileClick }) {
-  const heroImage = (profile?.avatarGender ?? 'girl') === 'boy' ? homeHeroBoy : homeHeroGirl
-  const title = profile ? getTitle(profile.level) : null
+  const gender    = profile?.avatarGender ?? 'girl'
+  const outfitId  = profile?.equipped?.outfit ?? 'academy'
+  const { image, video } = getOutfitAssets(outfitId, gender)
+
+  const title         = profile ? getTitle(profile.level) : null
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
-  const playerName = profile?.playerName?.trim() || '窮鬼勇者'
+  const playerName    = profile?.playerName?.trim() || '窮鬼勇者'
 
   return (
     <section className="academy-home-hero">
       <div className="academy-home-hero__shine" />
-      <motion.img
-        src={heroImage}
-        alt=""
-        draggable="false"
-        className="academy-home-hero__character"
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-      />
+
+      {/* 角色：有影片用影片，否則靜態圖 + 上下動畫 */}
+      {video ? (
+        <video
+          key={video}           /* key 讓換裝時強制重新播放 */
+          src={video}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="academy-home-hero__character"
+        />
+      ) : image ? (
+        <motion.img
+          key={image}
+          src={image}
+          alt=""
+          draggable="false"
+          className="academy-home-hero__character"
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      ) : null}
+
       <button className="academy-home-hero__style-button" onClick={onProfileClick} aria-label="前往成長頁">
         <GameIcon name="shop" />
         <span>成長</span>
       </button>
+
       <div className="academy-home-player-info">
         <div className="academy-home-player-info__left">
           <div className="academy-home-player-info__name">{playerName}</div>
@@ -98,11 +116,15 @@ function AttackEntry({ spent, budget, onClick }) {
 export default function TownScreen() {
   const { state, navigate } = useApp()
   const { profile, totalSpent } = state
-  const budget = profile?.dailyBudget ?? 1000
+  const budget   = profile?.dailyBudget ?? 1000
+  const gender   = profile?.avatarGender ?? 'girl'
+  const outfitId = profile?.equipped?.outfit ?? 'academy'
+  const { bg }   = getOutfitAssets(outfitId, gender)
 
   return (
     <div className="academy-screen">
-      <img src={homeBg} alt="" className="academy-bg" draggable="false" />
+      {/* 全螢幕背景（套裝主題） */}
+      <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
       <div className="relative z-10 px-4 pt-4">
