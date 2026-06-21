@@ -115,7 +115,7 @@ export default function TownScreen() {
         <SpriteCharacter
           frames={frames}
           blink={blink ?? []}
-          fps={6}
+          fps={4}
           blinkInterval={3500}
           className="academy-screen-character academy-screen-character--tap"
         />

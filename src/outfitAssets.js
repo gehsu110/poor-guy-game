@@ -16,25 +16,24 @@ import boyCrystalGown  from './assets/academy-art/generated/outfits/boy-crystal-
 import boyStarcloak    from './assets/academy-art/generated/outfits/boy-starcloak.png'
 import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png'
 
-// ── 影片 imports（本地同源，供 ChromaKeyCanvas 使用）────────────
-import girlAcademyIdleVideo from './assets/academy-art/generated/videos/girl-academy-idle.mp4'
-
 // ── 背景 imports ────────────────────────────────────────────────
 import homeBg from './assets/academy-art/home-bg.webp'
 
-// ── 多幀 idle 動畫（透明 PNG，CDN 暫存；之後移本地）──────────────
-// 動畫順序：吐氣中性 → 微吸氣 → 吸氣高點 → 微吸氣 → 回中性（loop）
-// 眨眼幀獨立傳入 SpriteCharacter，間歇性插入
-const CDN = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz'
-const GIRL_ACADEMY_FRAMES = [
-  `${CDN}/hf_20260621_070219_5402d913-4277-413d-b843-a99a031850e3.png`, // F0 中性吐氣
-  `${CDN}/hf_20260621_065959_62fc3c72-f6d2-4ff4-a128-a09284a58a21.png`, // F1 微吸氣
-  `${CDN}/hf_20260621_070211_433537d3-f230-4748-b29a-71ecd4f2bf5c.png`, // F2 吸氣高點
-  `${CDN}/hf_20260621_065959_62fc3c72-f6d2-4ff4-a128-a09284a58a21.png`, // F3 微吸氣（回程）
-]
-const GIRL_ACADEMY_BLINK = [
-  `${CDN}/hf_20260621_070224_3a13ffe6-009f-4bbe-a547-a22bc930fac6.png`, // 眼睛閉上
-]
+// ── 女生學院服 idle 幀（從影片抽幀 + 黑底去背，4fps × 12幀 = 3s loop）──
+import gaF01 from './assets/academy-art/generated/frames/girl-academy/f01.png'
+import gaF02 from './assets/academy-art/generated/frames/girl-academy/f02.png'
+import gaF03 from './assets/academy-art/generated/frames/girl-academy/f03.png'
+import gaF04 from './assets/academy-art/generated/frames/girl-academy/f04.png'
+import gaF05 from './assets/academy-art/generated/frames/girl-academy/f05.png'
+import gaF06 from './assets/academy-art/generated/frames/girl-academy/f06.png'
+import gaF07 from './assets/academy-art/generated/frames/girl-academy/f07.png'
+import gaF08 from './assets/academy-art/generated/frames/girl-academy/f08.png'
+import gaF09 from './assets/academy-art/generated/frames/girl-academy/f09.png'
+import gaF10 from './assets/academy-art/generated/frames/girl-academy/f10.png'
+import gaF11 from './assets/academy-art/generated/frames/girl-academy/f11.png'
+import gaF12 from './assets/academy-art/generated/frames/girl-academy/f12.png'
+
+const GIRL_ACADEMY_FRAMES = [gaF01,gaF02,gaF03,gaF04,gaF05,gaF06,gaF07,gaF08,gaF09,gaF10,gaF11,gaF12]
 
 // ── 主設定表 ────────────────────────────────────────────────────
 export const OUTFIT_CONFIG = {
@@ -45,9 +44,9 @@ export const OUTFIT_CONFIG = {
     boyImage:   boyBaseImg,
     girlFrames: GIRL_ACADEMY_FRAMES,
     boyFrames:  null,           // TODO: 生成男生幀
-    girlBlink:  GIRL_ACADEMY_BLINK,
+    girlBlink:  null,
     boyBlink:   null,
-    girlVideo:  girlAcademyIdleVideo,
+    girlVideo:  null,
     boyVideo:   null,
     bg:         homeBg,
     bgTheme:    'academy',
