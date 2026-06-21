@@ -33,8 +33,7 @@ export default function ChromaKeyCanvas({
     video.loop = true
     video.muted = true
     video.playsInline = true
-    // crossOrigin 必須設定才能讀取 canvas 像素（影片需同源）
-    video.crossOrigin = 'anonymous'
+    // 本地同源資源不設 crossOrigin，避免 canvas 被 taint
 
     let rafId
     let inited = false
@@ -53,26 +52,30 @@ export default function ChromaKeyCanvas({
         // 繪製當前幀
         ctx.drawImage(video, 0, 0)
 
-        // 逐像素去背
-        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        const d = frame.data
+        // 逐像素去背（try/catch 防止 tainted canvas SecurityError）
+        try {
+          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height)
+          const d = frame.data
 
-        for (let i = 0; i < d.length; i += 4) {
-          const dr = d[i]   - kr
-          const dg = d[i+1] - kg
-          const db = d[i+2] - kb
-          if (dr*dr + dg*dg + db*db < t2) {
-            d[i+3] = 0  // 設為透明
+          for (let i = 0; i < d.length; i += 4) {
+            const dr = d[i]   - kr
+            const dg = d[i+1] - kg
+            const db = d[i+2] - kb
+            if (dr*dr + dg*dg + db*db < t2) {
+              d[i+3] = 0  // 設為透明
+            }
           }
-        }
 
-        ctx.putImageData(frame, 0, 0)
+          ctx.putImageData(frame, 0, 0)
+        } catch (e) {
+          console.error('[ChromaKeyCanvas] getImageData 失敗:', e)
+        }
       }
 
       rafId = requestAnimationFrame(processFrame)
     }
 
-    video.play().catch(() => {})
+    video.play().catch(e => console.warn('[ChromaKeyCanvas] 影片播放失敗:', e))
     rafId = requestAnimationFrame(processFrame)
 
     return () => {
