@@ -176,7 +176,31 @@ function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEqu
           </div>
         )}
 
-        {['outfit', 'accessory', 'frame'].includes(cat) && (
+        {cat === 'outfit' && (
+          <div className="grid grid-cols-2 gap-2">
+            {WARDROBE.outfit.map(item => {
+              const owned = item.owned || collectionIds.has(item.id)
+              const active = (equipped.outfit ?? 'academy') === item.id
+              return (
+                <button
+                  key={item.id}
+                  className={`academy-outfit-set ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
+                  onClick={() => owned && onEquipCosmetic('outfit', item.id)}
+                >
+                  <OutfitPreview
+                    gender={avatarGender}
+                    outfitId={item.id}
+                    className="academy-outfit-set__avatar"
+                  />
+                  <b>{item.name}</b>
+                  <small>{owned ? item.desc : '未解鎖'}</small>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {['accessory', 'frame'].includes(cat) && (
           <div className="grid grid-cols-2 gap-2">
             {WARDROBE[cat].map(item => {
               const owned = item.owned || collectionIds.has(item.id)

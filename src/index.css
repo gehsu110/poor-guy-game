@@ -1003,10 +1003,10 @@ img.academy-home-hero__character {
   background: transparent;
 }
 
-/* 影片：白底 letterbox + multiply 讓白色消失融入背景 */
+/* 影片：黑底 letterbox 用 screen 讓黑色透明融入背景 */
 video.academy-home-hero__character {
-  background: white;
-  mix-blend-mode: multiply;
+  background: transparent;
+  mix-blend-mode: screen;
 }
 
 .academy-home-hero__character--tap {
