@@ -3,6 +3,7 @@ import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
 import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
+import SpriteCharacter from '../components/SpriteCharacter'
 
 function TopHUD({ todayBudget, spent }) {
   const remaining = todayBudget - spent
@@ -93,7 +94,7 @@ export default function TownScreen() {
   const budget   = profile?.dailyBudget ?? 1000
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
-  const { bg, image, video } = getOutfitAssets(outfitId, gender)
+  const { bg, frames, blink, image } = getOutfitAssets(outfitId, gender)
 
   return (
     <div className="academy-screen">
@@ -101,9 +102,16 @@ export default function TownScreen() {
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
-      {/* ── 角色層：直接放在 screen 根層，與 academy-bg 同層 ──
-          這樣 mix-blend-mode: multiply 才能跨越 z-index 跟遊戲背景合成 */}
-      {image && (
+      {/* 角色：多幀動畫優先，無幀則靜態圖 + CSS 動畫 */}
+      {frames?.length > 0 ? (
+        <SpriteCharacter
+          frames={frames}
+          blink={blink ?? []}
+          fps={6}
+          blinkInterval={3500}
+          className="academy-screen-character academy-screen-character--tap"
+        />
+      ) : image ? (
         <motion.img
           key={image}
           src={image}
@@ -118,7 +126,7 @@ export default function TownScreen() {
             y: { duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
           }}
         />
-      )}
+      ) : null}
 
       {/* UI 層（z-10，疊在角色上） */}
       <div className="relative z-10 px-4 pt-4">
@@ -126,7 +134,7 @@ export default function TownScreen() {
       </div>
 
       <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <HeroShowcase profile={profile} onProfileClick={() => navigate('profile')} hasVideo={!!video} />
+        <HeroShowcase profile={profile} onProfileClick={() => navigate('profile')} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 
