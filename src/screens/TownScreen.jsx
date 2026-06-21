@@ -3,6 +3,7 @@ import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
 import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
+import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
 
 function TopHUD({ todayBudget, spent }) {
@@ -94,7 +95,7 @@ export default function TownScreen() {
   const budget   = profile?.dailyBudget ?? 1000
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
-  const { bg, frames, blink, image } = getOutfitAssets(outfitId, gender)
+  const { bg, frames, blink, image, video } = getOutfitAssets(outfitId, gender)
 
   return (
     <div className="academy-screen">
@@ -102,8 +103,15 @@ export default function TownScreen() {
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
-      {/* 角色：多幀動畫優先，無幀則靜態圖 + CSS 動畫 */}
-      {frames?.length > 0 ? (
+      {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
+      {video ? (
+        <ChromaKeyCanvas
+          src={video}
+          keyColor={[0, 255, 0]}
+          threshold={90}
+          className="academy-screen-character academy-screen-character--tap"
+        />
+      ) : frames?.length > 0 ? (
         <SpriteCharacter
           frames={frames}
           blink={blink ?? []}

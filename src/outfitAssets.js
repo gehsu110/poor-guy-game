@@ -16,6 +16,9 @@ import boyCrystalGown  from './assets/academy-art/generated/outfits/boy-crystal-
 import boyStarcloak    from './assets/academy-art/generated/outfits/boy-starcloak.png'
 import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png'
 
+// ── 影片 imports（本地同源，供 ChromaKeyCanvas 使用）────────────
+import girlAcademyIdleVideo from './assets/academy-art/generated/videos/girl-academy-idle.mp4'
+
 // ── 背景 imports ────────────────────────────────────────────────
 import homeBg from './assets/academy-art/home-bg.webp'
 
@@ -44,7 +47,7 @@ export const OUTFIT_CONFIG = {
     boyFrames:  null,           // TODO: 生成男生幀
     girlBlink:  GIRL_ACADEMY_BLINK,
     boyBlink:   null,
-    girlVideo:  null,
+    girlVideo:  girlAcademyIdleVideo,
     boyVideo:   null,
     bg:         homeBg,
     bgTheme:    'academy',

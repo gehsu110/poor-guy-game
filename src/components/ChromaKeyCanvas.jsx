@@ -1,0 +1,92 @@
+import { useEffect, useRef } from 'react'
+
+/**
+ * ChromaKeyCanvas
+ * 播放影片並即時去掉指定顏色（預設純綠 #00FF00），讓角色浮在任何背景上。
+ *
+ * Props:
+ *   src         : string  — 影片 URL（必須同源，否則 canvas 無法讀取像素）
+ *   keyColor    : [r,g,b] — 要去掉的顏色，預設 [0, 255, 0]（純綠）
+ *   threshold   : number  — 顏色容差距離（預設 90，越大去得越多）
+ *   className   : string
+ *   onClick     : () => void
+ */
+export default function ChromaKeyCanvas({
+  src,
+  keyColor = [0, 255, 0],
+  threshold = 90,
+  className = '',
+  onClick,
+}) {
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    if (!src) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+
+    // 建立隱藏 video element
+    const video = document.createElement('video')
+    video.src = src
+    video.autoplay = true
+    video.loop = true
+    video.muted = true
+    video.playsInline = true
+    // crossOrigin 必須設定才能讀取 canvas 像素（影片需同源）
+    video.crossOrigin = 'anonymous'
+
+    let rafId
+    let inited = false
+    const [kr, kg, kb] = keyColor
+    const t2 = threshold * threshold  // 用距離平方，避免 sqrt
+
+    function processFrame() {
+      if (video.readyState >= 2) {
+        if (!inited) {
+          // 初始化 canvas 尺寸（依影片比例，寬度固定由 CSS 控制）
+          canvas.width  = video.videoWidth  || 1280
+          canvas.height = video.videoHeight || 720
+          inited = true
+        }
+
+        // 繪製當前幀
+        ctx.drawImage(video, 0, 0)
+
+        // 逐像素去背
+        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const d = frame.data
+
+        for (let i = 0; i < d.length; i += 4) {
+          const dr = d[i]   - kr
+          const dg = d[i+1] - kg
+          const db = d[i+2] - kb
+          if (dr*dr + dg*dg + db*db < t2) {
+            d[i+3] = 0  // 設為透明
+          }
+        }
+
+        ctx.putImageData(frame, 0, 0)
+      }
+
+      rafId = requestAnimationFrame(processFrame)
+    }
+
+    video.play().catch(() => {})
+    rafId = requestAnimationFrame(processFrame)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      video.pause()
+      video.src = ''
+    }
+  }, [src, threshold])  // keyColor 不入 dep，避免重建（通常固定）
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className={className}
+      onClick={onClick}
+    />
+  )
+}
