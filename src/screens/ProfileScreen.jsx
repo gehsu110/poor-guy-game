@@ -19,24 +19,7 @@ const WARDROBE = {
       frame: 'soft_gold',
       owned: true,
     },
-    {
-      id: 'saving_hero_set',
-      name: '省錢勇者套裝',
-      desc: '初期成就造型',
-      outfit: 'saving_hero',
-      accessory: 'none',
-      frame: 'frame_stars',
-      owned: true,
-    },
-    {
-      id: 'mint_supply_set',
-      name: '薄荷補給套裝',
-      desc: '黃星直購造型',
-      outfit: 'mint_coat',
-      accessory: 'star_pin',
-      frame: 'crystal',
-      owned: false,
-    },
+    // saving_hero_set 暫時隱藏（外觀與學院服重複，待製作獨立素材）
     {
       id: 'pink_magic_set',
       name: '粉晶禮服套裝',
@@ -44,7 +27,7 @@ const WARDROBE = {
       outfit: 'pink_robe',
       accessory: 'ribbon',
       frame: 'frame_ribbon',
-      owned: false,
+      owned: true,   // 暫時解鎖測試用
     },
     {
       id: 'night_cape_set',
@@ -53,7 +36,7 @@ const WARDROBE = {
       outfit: 'night_cape',
       accessory: 'crown',
       frame: 'moon',
-      owned: false,
+      owned: true,   // 暫時解鎖測試用
     },
     {
       id: 'suit_set',
@@ -62,6 +45,15 @@ const WARDROBE = {
       outfit: 'suit',
       accessory: 'none',
       frame: 'soft_gold',
+      owned: true,   // 暫時解鎖測試用
+    },
+    {
+      id: 'mint_supply_set',
+      name: '薄荷補給套裝',
+      desc: '黃星直購造型',
+      outfit: 'mint_coat',
+      accessory: 'star_pin',
+      frame: 'crystal',
       owned: false,
     },
     {
@@ -75,25 +67,25 @@ const WARDROBE = {
     },
   ],
   outfit: [
-    { id: 'academy',     name: '星術學院服',   desc: '預設主角服裝', owned: true },
-    { id: 'saving_hero', name: '省錢勇者裝',   desc: '初期成就服裝', owned: true },
-    { id: 'night_cape',  name: '星夜斗篷',     desc: '扭蛋稀有服裝', owned: false },
-    { id: 'mint_coat',   name: '薄荷外套',     desc: '清爽補給色',   owned: false },
-    { id: 'pink_robe',   name: '粉晶禮服',     desc: '可愛柔粉風',   owned: false },
-    { id: 'suit',        name: '都市精英套裝', desc: '職場感套裝',   owned: false },
-    { id: 'moonlight',   name: '月光限定服',   desc: '限定池套裝',   owned: false },
+    { id: 'academy',    name: '星術學院服', desc: '預設主角服裝', owned: true },
+    // saving_hero 暫時隱藏，待製作獨立素材
+    { id: 'pink_robe',  name: '粉晶禮服',   desc: '可愛柔粉風',   owned: true },  // 暫時解鎖
+    { id: 'night_cape', name: '星夜斗篷',   desc: '扭蛋稀有服裝', owned: true },  // 暫時解鎖
+    { id: 'suit',       name: '都市精英套裝',desc: '職場感套裝',   owned: true },  // 暫時解鎖
+    { id: 'mint_coat',  name: '薄荷外套',   desc: '清爽補給色',   owned: false },
+    { id: 'moonlight',  name: '月光限定服', desc: '限定池套裝',   owned: false },
   ],
   accessory: [
-    { id: 'none', name: '不戴頭飾', desc: '乾淨頭像', owned: true },
-    { id: 'star_pin', name: '星星髮夾', desc: '亮晶晶小標記', owned: true },
-    { id: 'ribbon', name: '粉色緞帶', desc: '更可愛的感覺', owned: true },
-    { id: 'crown', name: '勇者小冠', desc: '月底挑戰感', owned: false },
+    { id: 'none',     name: '不戴頭飾',   desc: '乾淨頭像',       owned: true },
+    { id: 'star_pin', name: '星星髮夾',   desc: '亮晶晶小標記',   owned: true },
+    { id: 'ribbon',   name: '粉色緞帶',   desc: '更可愛的感覺',   owned: true },
+    { id: 'crown',    name: '勇者小冠',   desc: '月底挑戰感',     owned: false },
   ],
   frame: [
-    { id: 'soft_gold', name: '柔金頭像框', desc: '預設邊框', owned: true },
-    { id: 'ribbon', name: '緞帶頭像框', desc: '粉色收藏框', owned: true },
-    { id: 'moon', name: '月光頭像框', desc: '限定感外框', owned: true },
-    { id: 'crystal', name: '冰晶頭像框', desc: '紫星直購預覽', owned: false },
+    { id: 'soft_gold', name: '柔金頭像框', desc: '預設邊框',       owned: true },
+    { id: 'ribbon',    name: '緞帶頭像框', desc: '粉色收藏框',     owned: true },
+    { id: 'moon',      name: '月光頭像框', desc: '限定感外框',     owned: true },
+    { id: 'crystal',   name: '冰晶頭像框', desc: '紫星直購預覽',   owned: false },
   ],
 }
 
