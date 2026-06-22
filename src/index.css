@@ -1306,9 +1306,9 @@ video.academy-screen-character {
 
 .academy-dock-item.is-active span {
   transform: scale(1.08);
-  background: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.88);
   border-radius: 18px;
-  box-shadow: 0 4px 16px rgba(139,124,255,0.22);
+  box-shadow: 0 4px 18px rgba(139,124,255,0.32), 0 2px 6px rgba(0,0,0,0.12);
 }
 
 /* active 底部指示條 */
@@ -1330,12 +1330,12 @@ video.academy-screen-character {
 }
 
 .academy-dock-item:not(.is-active) .game-icon {
-  opacity: 0.45;
-  filter: saturate(0.5);
+  opacity: 0.75;
+  filter: saturate(0.8) drop-shadow(0 2px 6px rgba(0,0,0,0.28));
 }
 
 .academy-dock-item.is-active .game-icon {
-  filter: saturate(1.2) contrast(1.05) drop-shadow(0 3px 8px rgba(139,124,255,0.38));
+  filter: saturate(1.3) contrast(1.08) drop-shadow(0 4px 10px rgba(139,124,255,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 .academy-battle-monster {
