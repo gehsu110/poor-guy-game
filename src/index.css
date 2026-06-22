@@ -1254,19 +1254,25 @@ video.academy-screen-character {
   background: #ff7fa3;
 }
 
+/* ── 浮動 Tab Bar ── */
 .academy-dock {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  right: 12px;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  left: 12px;
   z-index: 40;
   display: flex;
-  gap: 2px;
-  border-top: 1px solid rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.88);
-  padding: 7px 8px max(9px, env(safe-area-inset-bottom));
-  box-shadow: 0 -12px 30px rgba(86,74,130,0.12);
-  backdrop-filter: blur(18px);
+  height: 72px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.82);
+  padding: 0 6px;
+  box-shadow:
+    0 10px 36px rgba(86,74,130,0.18),
+    0 2px 8px rgba(86,74,130,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 .academy-dock-item {
@@ -1275,54 +1281,61 @@ video.academy-screen-character {
   flex: 1 1 0;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  border-radius: 18px;
-  padding: 5px 0;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 22px;
+  padding: 6px 0;
   color: #9d94b5;
   font-size: 10px;
   font-weight: 900;
+  transition: color 0.18s ease;
 }
 
 .academy-dock-item span {
   display: flex;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
-  color: #7b63d8;
-  font-size: 16px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.9), rgba(244,239,255,0.78)),
-    #f1ecff;
-  border: 1px solid rgba(255,255,255,0.82);
-  box-shadow:
-    inset 0 -2px 5px rgba(126,96,215,0.08),
-    0 8px 14px rgba(86,74,130,0.08);
+  background: none;
+  border: none;
+  box-shadow: none;
+  transition: transform 0.18s ease;
 }
 
 .academy-dock-item.is-active {
-  color: #26324a;
+  color: #7b63d8;
 }
 
 .academy-dock-item.is-active span {
-  color: white;
-  background:
-    linear-gradient(135deg, rgba(139,124,255,0.92), rgba(82,222,212,0.82)),
-    #8b7cff;
-  box-shadow:
-    0 8px 18px rgba(139,124,255,0.28),
-    inset 0 1px 0 rgba(255,255,255,0.62);
+  transform: scale(1.08);
+}
+
+/* active 底部指示條 */
+.academy-dock-item.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #8b7cff, #52ded4);
 }
 
 .academy-dock-item .game-icon {
-  width: 30px;
-  height: 30px;
-  filter: saturate(1.18) contrast(1.04);
+  width: 44px;
+  height: 44px;
 }
 
 .academy-dock-item:not(.is-active) .game-icon {
-  opacity: 0.92;
+  opacity: 0.45;
+  filter: saturate(0.5);
+}
+
+.academy-dock-item.is-active .game-icon {
+  filter: saturate(1.2) contrast(1.05) drop-shadow(0 3px 8px rgba(139,124,255,0.38));
 }
 
 .academy-battle-monster {
@@ -2179,20 +2192,17 @@ video.academy-screen-character {
 }
 
 /* 3D Pikmin-Bloom 風格圖示（img 版本） */
+/* 3D 圖示（透明背景 PNG）—— 不需要 mix-blend-mode */
 .game-icon--img {
-  overflow: hidden;
-  object-fit: cover;
-  mix-blend-mode: multiply;
+  object-fit: contain;
 }
 
 .academy-dock-item .game-icon--img {
-  border-radius: 10px;
-  mix-blend-mode: multiply;
+  /* tab 圖示：44×44px，無需圓角（透明背景） */
 }
 
 .academy-pill .game-icon--img {
-  mix-blend-mode: multiply;
-  border-radius: 4px;
+  /* 貨幣圖示：透明背景，直接顯示 */
 }
 
 .game-icon--yellow-star { color: #d99a18; }

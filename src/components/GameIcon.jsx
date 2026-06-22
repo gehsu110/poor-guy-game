@@ -1,15 +1,24 @@
-// 3D Pikmin-Bloom 風格圖示 (Higgsfield 生成)
-// TODO: 確認後下載到 src/assets/icons/ 並改為本地 import
+// 3D Pikmin-Bloom 風格圖示（透明背景，本地 PNG）
+import tabToday   from '../assets/icons/tab/tab-today.png'
+import tabMap     from '../assets/icons/tab/tab-map.png'
+import tabQuest   from '../assets/icons/tab/tab-quest.png'
+import tabSupply  from '../assets/icons/tab/tab-supply.png'
+import tabGuild   from '../assets/icons/tab/tab-guild.png'
+import coinGold   from '../assets/icons/currency/coin-gold.png'
+import coinPurple from '../assets/icons/currency/coin-purple.png'
+import ticketNormal from '../assets/icons/currency/ticket-normal.png'
+import ticketGold from '../assets/icons/currency/ticket-gold.png'
+
 const IMAGE_ICONS = {
-  'tab-today':    'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_123812_17165c82-7ccd-44d3-a1c6-f8232555221c.jpeg',
-  'tab-map':      'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_123814_9bfe8b29-15fc-4dfb-aa70-62ed9e48827c.jpeg',
-  'tab-quest':    'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_121107_5d1debb4-2849-48f6-95e6-7749ba838bec.png',
-  'tab-supply':   'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_123816_7de8cc9c-0fc3-49a2-b01c-2dc5ddc191b0.jpeg',
-  'tab-guild':    'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_124036_ea3a4703-a477-404c-a3cd-37f38f35f5c0.png',
-  'coin-gold':    'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_123918_e2e88447-8993-4537-a3a9-3e634b76ade9.jpeg',
-  'coin-purple':  'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_123921_458dd6cd-4f07-4a5c-a74c-82b535057670.png',
-  'ticket-normal':'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_123924_6e1a5658-22d3-460c-9723-615b028bf6dd.png',
-  'ticket-gold':  'https://d8j0ntlcm91z4.cloudfront.net/user_3FPA182DAJfdZN8nc5LUVbmXafz/hf_20260622_124037_319f8d9f-7956-4cf0-9735-09d19b8f837c.png',
+  'tab-today':    tabToday,
+  'tab-map':      tabMap,
+  'tab-quest':    tabQuest,
+  'tab-supply':   tabSupply,
+  'tab-guild':    tabGuild,
+  'coin-gold':    coinGold,
+  'coin-purple':  coinPurple,
+  'ticket-normal':ticketNormal,
+  'ticket-gold':  ticketGold,
 }
 
 const PATHS = {
