@@ -1254,25 +1254,20 @@ video.academy-screen-character {
   background: #ff7fa3;
 }
 
-/* ── 浮動 Tab Bar ── */
+/* ── 浮動 Tab Bar（無背景框，圖示直接懸空） ── */
 .academy-dock {
   position: absolute;
-  right: 12px;
-  bottom: max(14px, env(safe-area-inset-bottom));
-  left: 12px;
+  right: 0;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: 0;
   z-index: 40;
   display: flex;
   height: 72px;
-  border-radius: 30px;
-  border: 1px solid rgba(255,255,255,0.9);
-  background: rgba(255,255,255,0.82);
-  padding: 0 6px;
-  box-shadow:
-    0 10px 36px rgba(86,74,130,0.18),
-    0 2px 8px rgba(86,74,130,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 0 8px;
 }
 
 .academy-dock-item {
@@ -1285,10 +1280,16 @@ video.academy-screen-character {
   gap: 3px;
   border-radius: 22px;
   padding: 6px 0;
-  color: #9d94b5;
+  color: rgba(255,255,255,0.7);
   font-size: 10px;
   font-weight: 900;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.32);
   transition: color 0.18s ease;
+}
+
+.academy-dock-item.is-active {
+  color: white;
+  text-shadow: 0 1px 6px rgba(139,124,255,0.5);
 }
 
 .academy-dock-item span {
@@ -1300,15 +1301,14 @@ video.academy-screen-character {
   background: none;
   border: none;
   box-shadow: none;
-  transition: transform 0.18s ease;
-}
-
-.academy-dock-item.is-active {
-  color: #7b63d8;
+  transition: transform 0.18s ease, background 0.18s ease;
 }
 
 .academy-dock-item.is-active span {
   transform: scale(1.08);
+  background: rgba(255,255,255,0.72);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(139,124,255,0.22);
 }
 
 /* active 底部指示條 */
