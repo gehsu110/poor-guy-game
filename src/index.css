@@ -1029,12 +1029,11 @@ video.academy-home-hero__character {
   z-index: 20;          /* 高於英雄卡片容器(z-10)，角色在最前面 */
   left: 50%;
   transform: translateX(-50%);
-  /* 用 width: vw 固定寬度，height: auto 維持比例 → 完全不會超出螢幕邊界 */
-  bottom: 270px;        /* 從底部定位：角色腳踝貼住英雄卡片上方 */
-  width: 52vw;          /* 375px 螢幕 ≈ 195px，角色佔畫面約一半寬 */
-  max-width: 230px;     /* 大螢幕上限 */
-  min-width: 150px;     /* 小螢幕下限 */
-  height: auto;         /* 依寬度等比縮放，不需要 object-fit */
+  /* width 固定為 vw，height: auto 維持比例 → 不依賴 object-fit，不會觸邊 */
+  top: 80px;
+  width: 54vw;              /* 375px 螢幕 ≈ 202px，同前版比例 */
+  max-width: 210px;         /* 大螢幕上限 */
+  height: auto;             /* 依寬度等比縮放 */
   filter: drop-shadow(0 18px 18px rgba(78, 61, 122, 0.22));
   pointer-events: none; /* 讓卡片按鈕可點擊（角色覆蓋範圍不阻擋） */
 }
