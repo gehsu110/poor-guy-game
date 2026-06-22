@@ -48,10 +48,10 @@ function HeroShowcase({ profile, onProfileClick, hasVideo }) {
           <div className="academy-home-player-info__title">Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</div>
         </div>
         <div className="academy-home-player-info__currency">
-          <span className="academy-pill academy-pill--gold"><GameIcon name="yellow-star" />{profile?.stars?.yellow ?? 0}</span>
-          <span className="academy-pill academy-pill--purple"><GameIcon name="purple-star" />{profile?.stars?.purple ?? 0}</span>
-          <span className="academy-pill academy-pill--pink"><GameIcon name="normal-ticket" />{profile?.tickets?.normal ?? 0}</span>
-          <span className="academy-pill academy-pill--gold"><GameIcon name="gold-ticket" />{profile?.tickets?.gold ?? 0}</span>
+          <span className="academy-pill academy-pill--gold"><GameIcon name="coin-gold" />{profile?.stars?.yellow ?? 0}</span>
+          <span className="academy-pill academy-pill--purple"><GameIcon name="coin-purple" />{profile?.stars?.purple ?? 0}</span>
+          <span className="academy-pill academy-pill--pink"><GameIcon name="ticket-normal" />{profile?.tickets?.normal ?? 0}</span>
+          <span className="academy-pill academy-pill--gold"><GameIcon name="ticket-gold" />{profile?.tickets?.gold ?? 0}</span>
         </div>
       </div>
     </section>
@@ -153,11 +153,11 @@ export default function TownScreen() {
 
 export function BottomNav({ current, navigate }) {
   const tabs = [
-    { key: 'town', label: '今日', icon: 'battle' },
-    { key: 'map', label: '地圖', icon: 'map' },
-    { key: 'missions', label: '任務', icon: 'mission' },
-    { key: 'shop', label: '補給', icon: 'shop' },
-    { key: 'quest', label: '公會', icon: 'guild' },
+    { key: 'town', label: '今日', icon: 'tab-today' },
+    { key: 'map', label: '地圖', icon: 'tab-map' },
+    { key: 'missions', label: '任務', icon: 'tab-quest' },
+    { key: 'shop', label: '補給', icon: 'tab-supply' },
+    { key: 'quest', label: '公會', icon: 'tab-guild' },
   ]
 
   return (

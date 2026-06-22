@@ -2178,6 +2178,23 @@ video.academy-screen-character {
   color: #7b63d8;
 }
 
+/* 3D Pikmin-Bloom 風格圖示（img 版本） */
+.game-icon--img {
+  overflow: hidden;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+}
+
+.academy-dock-item .game-icon--img {
+  border-radius: 10px;
+  mix-blend-mode: multiply;
+}
+
+.academy-pill .game-icon--img {
+  mix-blend-mode: multiply;
+  border-radius: 4px;
+}
+
 .game-icon--yellow-star { color: #d99a18; }
 .game-icon--purple-star { color: #765bd9; }
 .game-icon--normal-ticket { color: #d9517b; }

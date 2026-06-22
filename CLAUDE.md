@@ -129,9 +129,43 @@ def normalize_frames(raw_dir, out_dir):
 
 ---
 
+## 圖示系統
+
+**風格**：Nintendo Pikmin Bloom 3D 圓潤軟渲染，白底，pure white background
+
+**Master prompt 模板**：
+```
+"[物件描述], cute 3D rendered game icon, soft rounded plump shape, gentle drop shadow, pure white background, bright friendly colors, Nintendo Pikmin Bloom style, polished mobile game UI asset, centered, single object only, [顏色] color scheme, no text, no outline"
+```
+
+**Model**：`nano_banana_pro`，aspect_ratio: `1:1`
+
+**GameIcon 組件**：`src/components/GameIcon.jsx`
+- SVG 圖示用於記帳類別（food/transport 等）
+- `IMAGE_ICONS` 物件存放 3D 圖示 CDN URL，自動渲染為 `<img>`
+- CSS `.game-icon--img` 加 `mix-blend-mode: multiply` 讓白底在彩色背景消失
+
+**圖示對照**：
+| icon name     | 用途          | Higgsfield job ID |
+|---------------|---------------|-------------------|
+| tab-today     | 今日 tab      | 17165c82          |
+| tab-map       | 地圖 tab      | 9bfe8b29          |
+| tab-quest     | 任務 tab (劍) | 5d1debb4          |
+| tab-supply    | 補給 tab (箱) | 7de8cc9c          |
+| tab-guild     | 公會 tab (盾) | ea3a4703          |
+| coin-gold     | 黃星幣        | e2e88447          |
+| coin-purple   | 紫星幣        | 458dd6cd          |
+| ticket-normal | 普通扭蛋票    | 6e1a5658          |
+| ticket-gold   | 金扭蛋票      | 319f8d9f          |
+
+**下一步（確認後）**：下載到 `src/assets/icons/`，改 GameIcon.jsx 為本地 import。
+
+---
+
 ## 待辦
 
 - [ ] suit（都市精英）：需重新生成 chibi 比例影片，現版本是成人動漫比例
 - [ ] academy 男生幀：尚未生成，`boyFrames: null`
 - [ ] saving_hero / mint_coat / moonlight：角色設計＋影片全部待做
 - [ ] 服裝解鎖測試完畢後，將 pink_robe / night_cape / suit 的 `owned` 改回 `false`
+- [ ] 圖示確認後：下載到 src/assets/icons/，改為本地 import（避免 CDN URL 過期）
