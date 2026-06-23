@@ -1,20 +1,11 @@
-// 3D Pikmin-Bloom 風格圖示（透明背景，本地 PNG）
-import tabToday   from '../assets/icons/tab/tab-today.png'
-import tabMap     from '../assets/icons/tab/tab-map.png'
-import tabQuest   from '../assets/icons/tab/tab-quest.png'
-import tabSupply  from '../assets/icons/tab/tab-supply.png'
-import tabGuild   from '../assets/icons/tab/tab-guild.png'
+// Tab 圖示：手繪 gameicons.net 風格 SVG（fill="currentColor"，CSS 控色）
+// 貨幣圖示：3D Pikmin PNG（保留，22px 夠小）
 import coinGold   from '../assets/icons/currency/coin-gold.png'
 import coinPurple from '../assets/icons/currency/coin-purple.png'
 import ticketNormal from '../assets/icons/currency/ticket-normal.png'
 import ticketGold from '../assets/icons/currency/ticket-gold.png'
 
 const IMAGE_ICONS = {
-  'tab-today':    tabToday,
-  'tab-map':      tabMap,
-  'tab-quest':    tabQuest,
-  'tab-supply':   tabSupply,
-  'tab-guild':    tabGuild,
   'coin-gold':    coinGold,
   'coin-purple':  coinPurple,
   'ticket-normal':ticketNormal,
@@ -22,6 +13,42 @@ const IMAGE_ICONS = {
 }
 
 const PATHS = {
+  // ── Tab Bar（gameicons.net 平面風格，fill="currentColor"）─────────────
+  'tab-today': (
+    // 8-pointed star / sun
+    <path fill="currentColor" d="M32,4 L36,22 L52,12 L42,28 L60,32 L42,36 L52,52 L36,42 L32,60 L28,42 L12,52 L22,36 L4,32 L22,28 L12,12 L28,22 Z"/>
+  ),
+
+  'tab-map': (
+    // Location pin with circular cutout
+    <path fill="currentColor" fillRule="evenodd" d="M32,4 C20,4 8,14 8,26 C8,42 32,62 32,62 C32,62 56,42 56,26 C56,14 44,4 32,4 Z M22,26 A10,10 0,0,1 42,26 A10,10 0,0,1 22,26 Z"/>
+  ),
+
+  'tab-quest': (
+    // Classic upright sword
+    <g fill="currentColor">
+      <rect x="29" y="4" width="6" height="34" rx="3"/>
+      <rect x="12" y="34" width="40" height="8" rx="4"/>
+      <rect x="29.5" y="42" width="5" height="16" rx="2.5"/>
+      <circle cx="32" cy="60" r="4"/>
+    </g>
+  ),
+
+  'tab-supply': (
+    // Treasure chest with keyhole
+    <path fill="currentColor" fillRule="evenodd" d="
+      M47,60 C52,60 56,57 56,52 L56,28 L8,28 L8,52 C8,57 12,60 17,60 Z
+      M17,10 C12,10 8,13 8,18 L8,28 L56,28 L56,18 C56,13 52,10 47,10 Z
+      M27,23 A5,5 0,0,1 37,23 A5,5 0,0,1 27,23 Z
+    "/>
+  ),
+
+  'tab-guild': (
+    // Shield
+    <path fill="currentColor" d="M32,4 L56,16 L56,40 C56,52 32,62 32,62 C32,62 8,52 8,40 L8,16 Z"/>
+  ),
+
+  // ── Currency / tickets（SVG fallback，正常用 IMAGE_ICONS）────────────
   'yellow-star': (
     <>
       <path className="game-icon__plate" d="M32 6l22 12v28L32 58 10 46V18L32 6z" />
@@ -50,6 +77,8 @@ const PATHS = {
       <path className="game-icon__accent" d="M28 21l4.2 8.5 9.4 1.4-6.8 6.6 1.6 9.4L28 42.4l-8.4 4.5 1.6-9.4-6.8-6.6 9.4-1.4L28 21z" />
     </>
   ),
+
+  // ── Screen Icons ──────────────────────────────────────────────────────
   battle: (
     <>
       <path className="game-icon__plate" d="M32 7l20 9v16c0 13.4-7.8 21.5-20 26-12.2-4.5-20-12.6-20-26V16l20-9z" />
@@ -101,6 +130,8 @@ const PATHS = {
       <circle className="game-icon__dot" cx="32" cy="32" r="4" />
     </>
   ),
+
+  // ── Category Icons ────────────────────────────────────────────────────
   food: (
     <>
       <path className="game-icon__plate" d="M12 10h40v44H12z" />
@@ -159,17 +190,12 @@ const PATHS = {
 
 const ALIASES = {
   star: 'yellow-star',
-  today: 'battle',
   purple: 'purple-star',
   ticket: 'normal-ticket',
-  'gold-ticket': 'gold-ticket',
   goldTicket: 'gold-ticket',
   home: 'guild',
   bag: 'shop',
   boss: 'battle',
-  // 3D 圖示別名
-  'yellow-star-3d': 'coin-gold',
-  'purple-star-3d': 'coin-purple',
 }
 
 export default function GameIcon({ name, className = '', title }) {
@@ -188,7 +214,12 @@ export default function GameIcon({ name, className = '', title }) {
   }
 
   return (
-    <svg className={`game-icon game-icon--${resolved} ${className}`} viewBox="0 0 64 64" role={title ? 'img' : 'presentation'} aria-hidden={title ? undefined : true}>
+    <svg
+      className={`game-icon game-icon--${resolved} ${className}`}
+      viewBox="0 0 64 64"
+      role={title ? 'img' : 'presentation'}
+      aria-hidden={title ? undefined : true}
+    >
       {title && <title>{title}</title>}
       {PATHS[resolved] ?? PATHS.unknown}
     </svg>
