@@ -16,8 +16,8 @@ export default defineConfig({
         name: '窮鬼勇者',
         short_name: '窮鬼勇者',
         description: '記帳打怪，守住你的預算。',
-        theme_color: '#C8A8E9',
-        background_color: '#E8F4FD',
+        theme_color: '#7161B8',
+        background_color: '#FFF8EC',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
@@ -27,7 +27,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+        globPatterns: ['**/*.{js,css,html,ico,png,webp,svg,woff2}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

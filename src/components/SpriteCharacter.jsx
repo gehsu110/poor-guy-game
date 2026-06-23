@@ -71,7 +71,7 @@ export default function SpriteCharacter({
   // 眨眼期間改用 blinkFrames 系列
   const visibleFrames = isBlinking && blinkFrames.length > 0 ? blinkFrames : null
   const src = visibleFrames
-    ? frames[visibleFrames[Math.floor((Date.now() / (1000 / fps)) % visibleFrames.length)]]
+    ? frames[visibleFrames[frameIdx % visibleFrames.length]]
     : pingPongFrames[frameIdx]
 
   return (

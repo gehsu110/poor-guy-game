@@ -12,13 +12,13 @@ function TopHUD({ todayBudget, spent }) {
 
   return (
     <div className="academy-hud">
-      <div className="mb-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
+      <div className="academy-hud__labels mb-1 flex justify-between text-[10px] font-black">
         <span>今日預算</span>
-        <span>剩餘 <b className={remaining < 0 ? 'text-[#FF6D98]' : 'text-[#24B7B0]'}>NT${formatMoney(Math.max(0, remaining))}</b></span>
+        <span>剩餘 <b className={remaining < 0 ? 'is-danger' : 'is-safe'}>NT${formatMoney(Math.max(0, remaining))}</b></span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE7F7]">
+      <div className="academy-budget-track h-2.5 overflow-hidden rounded-full">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-[#52DED4] via-[#FFD166] to-[#FF7FA3]"
+          className={`academy-budget-fill h-full rounded-full ${remaining < 0 ? 'is-danger' : ''}`}
           animate={{ width: `${pct * 100}%` }}
           transition={{ duration: 0.45 }}
         />
@@ -69,8 +69,8 @@ function AttackEntry({ spent, budget, onClick }) {
       animate={{ y: 0, opacity: 1 }}
     >
       <div className="flex items-center justify-between text-xs font-black">
-        <span className="text-[#26324A]">今日消費 NT${formatMoney(spent)}</span>
-        <span className={remaining < 0 ? 'text-[#FF6D98]' : 'text-[#24B7B0]'}>
+        <span className="academy-value-primary">今日消費 NT${formatMoney(spent)}</span>
+        <span className={remaining < 0 ? 'is-danger' : 'is-safe'}>
           {remaining < 0 ? `超支 NT$${formatMoney(-remaining)}` : `剩餘 NT$${formatMoney(remaining)}`}
         </span>
       </div>
@@ -82,7 +82,7 @@ function AttackEntry({ spent, budget, onClick }) {
           </div>
         ))}
       </div>
-      <div className="mt-3 rounded-2xl bg-gradient-to-r from-[#F5C518] to-[#FF9A3C] px-4 py-3 text-center text-sm font-black text-[#26324a] shadow-lg">
+      <div className="academy-primary-cta mt-3 px-4 py-3 text-center text-sm font-black">
         開始記帳攻擊
       </div>
     </motion.button>

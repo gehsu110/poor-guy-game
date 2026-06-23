@@ -1,16 +1,28 @@
-# React + Vite
+# 窮鬼勇者
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+直式手機優先的記帳冒險遊戲。記帳會轉換成攻擊與每日怪物進度。
 
-Currently, two official plugins are available:
+## 本機開發
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+## GitHub → Cloudflare Pages
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Production branch：`main`
+- Build command：`npm run build`
+- Build output：`build`
+- Node.js：建議 22
 
-## Expanding the ESLint configuration
+`public/_redirects` 提供 SPA fallback；`public/_headers` 負責安全標頭及帶 hash 靜態資產快取。PWA 使用 auto-update，部署新版後會清除過期快取並接管現有頁面。
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+每次 push 前執行：
+
+```bash
+npm run lint
+npm run build
+```
+
+視覺規格位於 [`docs/VISUAL_SYSTEM.md`](docs/VISUAL_SYSTEM.md)。

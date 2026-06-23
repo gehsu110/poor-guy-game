@@ -1,0 +1,149 @@
+:root {
+  --color-brand-50: #f3f0fb;
+  --color-brand-100: #e5def5;
+  --color-brand-300: #b6a9df;
+  --color-brand-500: #7161b8;
+  --color-brand-700: #433a78;
+
+  --color-reward-100: #fff1c9;
+  --color-reward-500: #e7ad36;
+  --color-reward-700: #9a681b;
+  --color-safe-100: #ddf5ef;
+  --color-safe-500: #2faf9f;
+  --color-danger-100: #fde7e8;
+  --color-danger-500: #d96573;
+
+  --color-ink-900: #27304a;
+  --color-ink-500: #77738d;
+  --color-surface-base: #fff8ec;
+  --color-surface-panel: rgba(255, 252, 245, 0.92);
+  --color-surface-line: rgba(91, 76, 126, 0.14);
+
+  --radius-panel: 24px;
+  --radius-control: 14px;
+  --shadow-panel: 0 14px 32px rgba(55, 48, 86, 0.14);
+  --shadow-float: 0 8px 18px rgba(55, 48, 86, 0.12);
+}
+
+/* v1 vertical-slice overrides: keep legacy selectors while tokens replace drift. */
+.academy-hud,
+.academy-home-hero,
+.academy-attack-panel {
+  border-color: var(--color-surface-line);
+  background: var(--color-surface-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.academy-bg-soft {
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.04) 0%, rgba(255, 248, 236, 0.04) 44%, rgba(39, 48, 74, 0.12) 100%),
+    radial-gradient(circle at 50% 43%, rgba(255,255,255,0.02), rgba(255,248,236,0.14) 72%);
+}
+
+.academy-hud__labels { color: var(--color-ink-500); }
+.academy-value-primary { color: var(--color-ink-900); }
+.is-safe { color: var(--color-safe-500); }
+.is-danger { color: var(--color-danger-500); }
+
+.academy-budget-track { background: #ebe7ef; }
+.academy-budget-fill {
+  background: linear-gradient(90deg, var(--color-safe-500), #65c8b5);
+}
+.academy-budget-fill.is-danger {
+  background: linear-gradient(90deg, var(--color-reward-500), var(--color-danger-500));
+}
+
+.academy-primary-cta {
+  border-radius: var(--radius-control);
+  color: #38290d;
+  background: linear-gradient(135deg, #f2c75f, var(--color-reward-500));
+  box-shadow: 0 9px 20px rgba(154, 104, 27, 0.22), inset 0 1px rgba(255,255,255,0.5);
+}
+
+.academy-step {
+  color: var(--color-ink-500);
+  background: var(--color-brand-50);
+  border-color: var(--color-brand-100);
+}
+.academy-step span { background: var(--color-brand-300); }
+.academy-step b { color: var(--color-ink-900); }
+.academy-step--attack {
+  background: var(--color-reward-100);
+  border-color: rgba(231, 173, 54, 0.42);
+}
+.academy-step--attack span {
+  color: #38290d;
+  background: var(--color-reward-500);
+}
+
+.academy-dock {
+  right: 10px;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: 10px;
+  height: 68px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-surface-line);
+  border-radius: 24px;
+  background: rgba(255, 250, 240, 0.96);
+  box-shadow: 0 -8px 26px rgba(55, 48, 86, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.academy-dock-item {
+  color: var(--color-ink-500);
+  text-shadow: none;
+}
+.academy-dock-item.is-active {
+  color: var(--color-brand-700);
+  text-shadow: none;
+}
+
+.academy-dock-item span,
+.academy-dock-item.is-active span {
+  width: 40px;
+  height: 40px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.academy-dock-item.is-active > span {
+  background: var(--color-brand-100);
+  box-shadow: inset 0 0 0 1px rgba(113, 97, 184, 0.16);
+}
+
+.academy-dock-item.is-active::after { background: var(--color-brand-500); }
+.academy-dock-item .game-icon,
+.academy-dock-item:not(.is-active) .game-icon,
+.academy-dock-item.is-active .game-icon {
+  width: 36px;
+  height: 36px;
+  color: currentColor;
+  opacity: 1;
+  filter: none;
+}
+
+.academy-dock-item:not(.is-active) .game-icon--tab-today,
+.academy-dock-item:not(.is-active) .game-icon--tab-map,
+.academy-dock-item:not(.is-active) .game-icon--tab-quest,
+.academy-dock-item:not(.is-active) .game-icon--tab-supply,
+.academy-dock-item:not(.is-active) .game-icon--tab-guild { color: currentColor; }
+
+.layered-character {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.layered-character__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
