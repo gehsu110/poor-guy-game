@@ -7,6 +7,8 @@ import { BottomNav } from './TownScreen'
 import Avatar from '../components/Avatar'
 import { getOutfitAssets } from '../outfitAssets'
 import profileBg from '../assets/academy-art/profile-bg.webp'
+import LayeredCharacter from '../components/LayeredCharacter'
+import { CHARACTER_ITEMS } from '../characterItems'
 
 const WARDROBE = {
   set: [
@@ -87,6 +89,11 @@ const WARDROBE = {
     { id: 'moon',      name: '月光頭像框', desc: '限定感外框',     owned: true },
     { id: 'crystal',   name: '冰晶頭像框', desc: '紫星直購預覽',   owned: false },
   ],
+  reward: [
+    { ...CHARACTER_ITEMS.ledger_book, owned: true, testLabel: '30 筆記帳任務' },
+    { ...CHARACTER_ITEMS.budget_wand, owned: true, testLabel: '守預算 7 天' },
+    { ...CHARACTER_ITEMS.saving_crown, owned: true, testLabel: '月度 S 評級' },
+  ],
 }
 
 const WARDROBE_CATS = [
@@ -94,6 +101,7 @@ const WARDROBE_CATS = [
   { key: 'outfit', label: '服裝' },
   { key: 'accessory', label: '頭飾' },
   { key: 'frame', label: '頭像框' },
+  { key: 'reward', label: '獎勵' },
 ]
 
 const DEFAULT_EQUIPPED = { outfit: 'academy', accessory: 'star_pin', frame: 'soft_gold' }
@@ -107,6 +115,12 @@ function OutfitPreview({ gender, outfitId, className }) {
   return <Avatar gender={gender} variant="full" outfit={outfitId} className={className} />
 }
 
+function ModularPreview({ gender, outfitId, equipped, className }) {
+  const { image } = getOutfitAssets(outfitId, gender)
+  if (!image) return <OutfitPreview gender={gender} outfitId={outfitId} className={className} />
+  return <LayeredCharacter gender={gender} equipped={equipped} baseAsset={image} className={className} />
+}
+
 function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEquipSet, onEquipCosmetic }) {
   const [cat, setCat] = useState('set')
 
@@ -118,15 +132,18 @@ function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEqu
           <span className="academy-status">{activeSet?.name ?? '自訂搭配'}</span>
         </div>
         <div className="flex items-center gap-3">
-          <OutfitPreview
+          <ModularPreview
             gender={avatarGender}
             outfitId={equipped.outfit ?? 'academy'}
+            equipped={equipped}
             className="academy-wardrobe-hero"
           />
           <div className="min-w-0 flex-1 text-xs font-bold leading-6 text-[#8E87A8]">
             <div>服裝：{WARDROBE.outfit.find(i => i.id === (equipped.outfit ?? 'academy'))?.name}</div>
             <div>頭飾：{WARDROBE.accessory.find(i => i.id === (equipped.accessory ?? 'star_pin'))?.name}</div>
             <div>頭像框：{WARDROBE.frame.find(i => i.id === (equipped.frame ?? 'soft_gold'))?.name}</div>
+            <div>左手：{CHARACTER_ITEMS[equipped.handLeft]?.name ?? '無'}</div>
+            <div>右手：{CHARACTER_ITEMS[equipped.handRight]?.name ?? '無'}</div>
           </div>
         </div>
       </div>
@@ -207,6 +224,26 @@ function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEqu
                   <span className={`academy-wardrobe-swatch academy-wardrobe-swatch--${item.id}`} />
                   <b>{item.name}</b>
                   <small>{owned ? item.desc : '未解鎖'}</small>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {cat === 'reward' && (
+          <div className="grid grid-cols-2 gap-2">
+            {WARDROBE.reward.map(item => {
+              const active = equipped[item.slot] === item.id
+              const owned = item.owned || collectionIds.has(item.id)
+              return (
+                <button
+                  key={item.id}
+                  className={`academy-reward-item ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
+                  onClick={() => owned && onEquipCosmetic(item.slot, active ? 'none' : item.id)}
+                >
+                  <img src={item.girlAsset} alt="" draggable="false" />
+                  <b>{item.name}</b>
+                  <small>{active ? '點擊卸下' : item.testLabel}</small>
                 </button>
               )
             })}

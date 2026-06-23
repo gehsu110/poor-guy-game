@@ -25,15 +25,15 @@ export const CHARACTER_ITEMS = Object.freeze({
   },
   budget_wand: {
     id: 'budget_wand', slot: 'handRight', name: '預算星杖', rarity: 'rare',
-    source: { type: 'mission', missionId: 'keep_budget_7_days' }, girlAsset: null, boyAsset: null,
+    source: { type: 'mission', missionId: 'keep_budget_7_days' }, girlAsset: budgetWand, boyAsset: null,
   },
   ledger_book: {
     id: 'ledger_book', slot: 'handLeft', name: '會發光的帳本', rarity: 'rare',
-    source: { type: 'mission', missionId: 'record_30_entries' }, girlAsset: null, boyAsset: null,
+    source: { type: 'mission', missionId: 'record_30_entries' }, girlAsset: ledgerBook, boyAsset: null,
   },
   saving_crown: {
     id: 'saving_crown', slot: 'headwear', name: '守財小王冠', rarity: 'epic',
-    source: { type: 'achievement', achievementId: 'monthly_s_rank' }, girlAsset: null, boyAsset: null,
+    source: { type: 'achievement', achievementId: 'monthly_s_rank' }, girlAsset: savingCrown, boyAsset: null,
   },
 })
 
@@ -54,3 +54,6 @@ export function getEquippedLayers(equipped, gender = 'girl') {
     return asset ? [{ slot, item, asset }] : []
   })
 }
+import savingCrown from './assets/character-items/saving-crown.svg'
+import ledgerBook from './assets/character-items/ledger-book.svg'
+import budgetWand from './assets/character-items/budget-wand.svg'

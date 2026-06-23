@@ -5,6 +5,8 @@ import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
+import LayeredCharacter from '../components/LayeredCharacter'
+import { normalizeEquipment } from '../characterItems'
 
 function TopHUD({ todayBudget, spent }) {
   const remaining = todayBudget - spent
@@ -96,6 +98,9 @@ export default function TownScreen() {
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
   const { bg, frames, blink, image, video } = getOutfitAssets(outfitId, gender)
+  const modularEquipment = normalizeEquipment(profile?.equipped)
+  const hasModularReward = ['headwear', 'handLeft', 'handRight', 'back', 'aura', 'front']
+    .some(slot => modularEquipment[slot] && modularEquipment[slot] !== 'none' && modularEquipment[slot] !== 'star_pin')
 
   return (
     <div className="academy-screen">
@@ -104,7 +109,14 @@ export default function TownScreen() {
       <div className="academy-bg-soft" />
 
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
-      {video ? (
+      {hasModularReward && image ? (
+        <LayeredCharacter
+          gender={gender}
+          equipped={modularEquipment}
+          baseAsset={image}
+          className="academy-screen-character academy-screen-character--layered academy-screen-character--tap"
+        />
+      ) : video ? (
         <ChromaKeyCanvas
           src={video}
           keyColor={[0, 255, 0]}
