@@ -82,7 +82,7 @@ function AttackEntry({ spent, budget, onClick }) {
           </div>
         ))}
       </div>
-      <div className="mt-3 rounded-2xl bg-gradient-to-r from-[#8B7CFF] to-[#FF7FA3] px-4 py-3 text-center text-sm font-black text-white shadow-lg">
+      <div className="mt-3 rounded-2xl bg-gradient-to-r from-[#F5C518] to-[#FF9A3C] px-4 py-3 text-center text-sm font-black text-[#26324a] shadow-lg">
         開始記帳攻擊
       </div>
     </motion.button>

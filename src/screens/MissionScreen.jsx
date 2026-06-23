@@ -195,7 +195,7 @@ export default function MissionScreen() {
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#ECE7F5]">
                   <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-[#8B7CFF] to-[#52DED4]"
+                    className="h-full rounded-full bg-gradient-to-r from-[#F5C518] to-[#52DED4]"
                     animate={{ width: `${pct * 100}%` }}
                   />
                 </div>
@@ -233,7 +233,7 @@ export default function MissionScreen() {
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#ECE7F5]">
                   <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-[#8B7CFF] to-[#52DED4]"
+                    className="h-full rounded-full bg-gradient-to-r from-[#F5C518] to-[#52DED4]"
                     animate={{ width: `${pct * 100}%` }}
                   />
                 </div>
