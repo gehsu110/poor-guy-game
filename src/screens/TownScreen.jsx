@@ -101,6 +101,9 @@ export default function TownScreen() {
   const modularEquipment = normalizeEquipment(profile?.equipped)
   const hasModularReward = ['headwear', 'handLeft', 'handRight', 'back', 'aura', 'front']
     .some(slot => modularEquipment[slot] && modularEquipment[slot] !== 'none' && modularEquipment[slot] !== 'star_pin')
+  // 現有 idle frames 是完整角色烘焙圖，沒有骨架與手掌遮罩。
+  // 動畫狀態不可直接疊固定手持物，否則會漂移與穿模；待分層骨架完成後再開啟。
+  const canRenderModularLayers = hasModularReward && image && !frames?.length && !video
 
   return (
     <div className="academy-screen">
@@ -109,7 +112,7 @@ export default function TownScreen() {
       <div className="academy-bg-soft" />
 
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
-      {hasModularReward && image ? (
+      {canRenderModularLayers ? (
         <LayeredCharacter
           gender={gender}
           equipped={modularEquipment}

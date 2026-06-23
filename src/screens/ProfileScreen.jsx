@@ -146,6 +146,11 @@ function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEqu
             <div>右手：{CHARACTER_ITEMS[equipped.handRight]?.name ?? '無'}</div>
           </div>
         </div>
+        {avatarGender === 'girl' && (
+          <div className="academy-layered-preview-note">
+            獎勵物件目前為衣櫃定位預覽；首頁動畫將在角色骨架分層完成後啟用。
+          </div>
+        )}
       </div>
 
       <div className="academy-card">
