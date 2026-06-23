@@ -1,4 +1,5 @@
 import { getEquippedLayers } from '../characterItems'
+import SpriteCharacter from './SpriteCharacter'
 
 /**
  * 分層紙娃娃渲染器。
@@ -8,10 +9,25 @@ export default function LayeredCharacter({
   gender = 'girl',
   equipped,
   baseAsset,
+  frames = [],
+  fps = 4,
   className = '',
   onClick,
 }) {
   const layers = getEquippedLayers(equipped, gender)
+  const behind = layers.filter(({ slot }) => ['aura', 'back'].includes(slot))
+  const inFront = layers.filter(({ slot }) => !['aura', 'back'].includes(slot))
+
+  const renderLayer = ({ slot, item, asset }) => (
+    <img
+      key={`${slot}:${item.id}`}
+      className="layered-character__layer"
+      data-character-slot={slot}
+      src={asset}
+      alt=""
+      draggable="false"
+    />
+  )
 
   return (
     <button
@@ -20,17 +36,13 @@ export default function LayeredCharacter({
       onClick={onClick}
       aria-label="角色造型"
     >
-      {baseAsset && <img className="layered-character__layer" src={baseAsset} alt="" draggable="false" />}
-      {layers.map(({ slot, item, asset }) => (
-        <img
-          key={`${slot}:${item.id}`}
-          className="layered-character__layer"
-          data-character-slot={slot}
-          src={asset}
-          alt=""
-          draggable="false"
-        />
-      ))}
+      {behind.map(renderLayer)}
+      {frames.length > 0 ? (
+        <SpriteCharacter frames={frames} fps={fps} className="layered-character__layer" />
+      ) : baseAsset ? (
+        <img className="layered-character__layer" src={baseAsset} alt="" draggable="false" />
+      ) : null}
+      {inFront.map(renderLayer)}
     </button>
   )
 }

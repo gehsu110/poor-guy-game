@@ -112,7 +112,7 @@
   box-shadow: inset 0 0 0 1px rgba(113, 97, 184, 0.16);
 }
 
-.academy-dock-item.is-active::after { background: var(--color-brand-500); }
+.academy-dock-item.is-active::after { content: none; }
 .academy-dock-item .game-icon,
 .academy-dock-item:not(.is-active) .game-icon,
 .academy-dock-item.is-active .game-icon {

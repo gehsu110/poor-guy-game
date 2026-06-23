@@ -114,6 +114,8 @@ export default function TownScreen() {
           gender={gender}
           equipped={modularEquipment}
           baseAsset={image}
+          frames={frames ?? []}
+          fps={4}
           className="academy-screen-character academy-screen-character--layered academy-screen-character--tap"
         />
       ) : video ? (

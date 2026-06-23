@@ -15,37 +15,36 @@ const IMAGE_ICONS = {
 const PATHS = {
   // ── Tab Bar（gameicons.net 平面風格，fill="currentColor"）─────────────
   'tab-today': (
-    // 8-pointed star / sun
-    <path fill="currentColor" d="M32,4 L36,22 L52,12 L42,28 L60,32 L42,36 L52,52 L36,42 L32,60 L28,42 L12,52 L22,36 L4,32 L22,28 L12,12 L28,22 Z"/>
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 12h32a4 4 0 014 4v38H12V16a4 4 0 014-4zM22 8v9M42 8v9M12 24h40M20 34h10M20 44h24"/>
+      <path d="M40 30l2 4 4 .6-3 3 .8 4.2-3.8-2-3.8 2 .8-4.2-3-3 4-.6z" fill="currentColor" stroke="none"/>
+    </g>
   ),
 
   'tab-map': (
-    // Location pin with circular cutout
-    <path fill="currentColor" fillRule="evenodd" d="M32,4 C20,4 8,14 8,26 C8,42 32,62 32,62 C32,62 56,42 56,26 C56,14 44,4 32,4 Z M22,26 A10,10 0,0,1 42,26 A10,10 0,0,1 22,26 Z"/>
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 16l14-6 18 6 14-6v39l-14 6-18-6-14 6zM23 10v39M41 16v39M16 39c7-9 13-10 20-4 5 4 9 1 13-7"/>
+      <circle cx="16" cy="39" r="2.5" fill="currentColor" stroke="none"/><circle cx="49" cy="28" r="2.5" fill="currentColor" stroke="none"/>
+    </g>
   ),
 
   'tab-quest': (
-    // Classic upright sword
-    <g fill="currentColor">
-      <rect x="29" y="4" width="6" height="34" rx="3"/>
-      <rect x="12" y="34" width="40" height="8" rx="4"/>
-      <rect x="29.5" y="42" width="5" height="16" rx="2.5"/>
-      <circle cx="32" cy="60" r="4"/>
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 10h28a5 5 0 015 5v39H13V15a5 5 0 015-5zM22 10V6h20v4M21 24l5 5 10-11M21 38h22M21 47h15"/>
     </g>
   ),
 
   'tab-supply': (
-    // Treasure chest with keyhole
-    <path fill="currentColor" fillRule="evenodd" d="
-      M47,60 C52,60 56,57 56,52 L56,28 L8,28 L8,52 C8,57 12,60 17,60 Z
-      M17,10 C12,10 8,13 8,18 L8,28 L56,28 L56,18 C56,13 52,10 47,10 Z
-      M27,23 A5,5 0,0,1 37,23 A5,5 0,0,1 27,23 Z
-    "/>
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 25h44v29H10zM14 25v-8a7 7 0 017-7h22a7 7 0 017 7v8M10 36h44M27 31h10v12H27z"/>
+      <circle cx="32" cy="37" r="2" fill="currentColor" stroke="none"/>
+    </g>
   ),
 
   'tab-guild': (
-    // Shield
-    <path fill="currentColor" d="M32,4 L56,16 L56,40 C56,52 32,62 32,62 C32,62 8,52 8,40 L8,16 Z"/>
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M32 7l22 10v16c0 13-8 20-22 25C18 53 10 46 10 33V17zM20 31l12-10 12 10v15H20zM27 46V35h10v11"/>
+    </g>
   ),
 
   // ── Currency / tickets（SVG fallback，正常用 IMAGE_ICONS）────────────
