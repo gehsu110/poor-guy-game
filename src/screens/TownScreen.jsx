@@ -5,8 +5,9 @@ import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
-import LayeredCharacter from '../components/LayeredCharacter'
-import { normalizeEquipment } from '../characterItems'
+import summerRing from '../assets/academy-art/summer-set/swim-ring.webp'
+import summerBall from '../assets/academy-art/summer-set/beach-ball.webp'
+import summerBag from '../assets/academy-art/summer-set/shell-bag.webp'
 
 function TopHUD({ todayBudget, spent }) {
   const remaining = todayBudget - spent
@@ -97,31 +98,25 @@ export default function TownScreen() {
   const budget   = profile?.dailyBudget ?? 1000
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
-  const { bg, frames, blink, image, video } = getOutfitAssets(outfitId, gender)
-  const modularEquipment = normalizeEquipment(profile?.equipped)
-  const hasModularReward = ['headwear', 'handLeft', 'handRight', 'back', 'aura', 'front']
-    .some(slot => modularEquipment[slot] && modularEquipment[slot] !== 'none' && modularEquipment[slot] !== 'star_pin')
-  // 現有 idle frames 是完整角色烘焙圖，沒有骨架與手掌遮罩。
-  // 動畫狀態不可直接疊固定手持物，否則會漂移與穿模；待分層骨架完成後再開啟。
-  const canRenderModularLayers = hasModularReward && image && !frames?.length && !video
-
+  const { bg, frames, blink, image, video, bgTheme } = getOutfitAssets(outfitId, gender)
   return (
-    <div className="academy-screen">
+    <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`}>
       {/* 全螢幕背景 */}
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
+      {bgTheme === 'summer' && (
+        <div className="summer-scene" aria-hidden="true">
+          <span className="summer-cloud summer-cloud--one" />
+          <span className="summer-cloud summer-cloud--two" />
+          <span className="summer-sun-glow" />
+          <i className="summer-spark summer-spark--one" />
+          <i className="summer-spark summer-spark--two" />
+          <i className="summer-spark summer-spark--three" />
+        </div>
+      )}
 
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
-      {canRenderModularLayers ? (
-        <LayeredCharacter
-          gender={gender}
-          equipped={modularEquipment}
-          baseAsset={image}
-          frames={frames ?? []}
-          fps={4}
-          className="academy-screen-character academy-screen-character--layered academy-screen-character--tap"
-        />
-      ) : video ? (
+      {video ? (
         <ChromaKeyCanvas
           src={video}
           keyColor={[0, 255, 0]}
@@ -143,8 +138,8 @@ export default function TownScreen() {
           alt=""
           draggable="false"
           className="academy-screen-character academy-screen-character--tap"
-          initial={{ opacity: 0, y: 24, scale: 0.92 }}
-          animate={{ opacity: 1, y: [0, -10, 0], scale: 1 }}
+          initial={{ opacity: 0, x: '-50%', y: 24, scale: 0.92 }}
+          animate={{ opacity: 1, x: '-50%', y: [0, -10, 0], scale: 1 }}
           transition={{
             opacity: { duration: 0.5 },
             scale:   { duration: 0.5 },
@@ -152,6 +147,13 @@ export default function TownScreen() {
           }}
         />
       ) : null}
+      {bgTheme === 'summer' && (
+        <div className="summer-outfit-props" aria-hidden="true">
+          <motion.img src={summerRing} alt="" draggable="false" className="summer-prop summer-prop--ring" animate={{ y: [0, -7, 0], rotate: [-3, 2, -3] }} transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }} />
+          <motion.img src={summerBall} alt="" draggable="false" className="summer-prop summer-prop--ball" animate={{ y: [0, -10, 0], rotate: [0, 8, 0] }} transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }} />
+          <motion.img src={summerBag} alt="" draggable="false" className="summer-prop summer-prop--bag" animate={{ y: [0, -5, 0], rotate: [2, -2, 2] }} transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }} />
+        </div>
+      )}
 
       {/* UI 層（z-10，疊在角色上） */}
       <div className="relative z-10 px-4 pt-4">

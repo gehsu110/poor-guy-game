@@ -18,6 +18,8 @@ import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png
 
 // ── 背景 imports ────────────────────────────────────────────────
 import homeBg from './assets/academy-art/home-bg.webp'
+import summerBeachBg from './assets/academy-art/summer-set/beach-bg.webp'
+import girlSummerIdle from './assets/academy-art/summer-set/girl-summer-idle.webp'
 
 // ── 幀動畫 imports（從影片抽幀 + 黑底去背，4fps × 12幀 = 3s loop）──
 
@@ -214,6 +216,18 @@ export const OUTFIT_CONFIG = {
     bg:        homeBg,
     bgTheme:   'moonlight',
   },
+  summer_beach: {
+    name: '星潮海灘套裝',
+    desc: '夏日海灘主題限定',
+    girlImage: girlSummerIdle,
+    boyImage: null,
+    girlFrames: null,
+    boyFrames: null,
+    girlVideo: null,
+    boyVideo: null,
+    bg: summerBeachBg,
+    bgTheme: 'summer',
+  },
 }
 
 /**
@@ -234,5 +248,5 @@ export function getOutfitAssets(outfitId, gender = 'girl') {
   const video = gender === 'boy'
     ? (c.boyVideo  ?? c.girlVideo)
     : (c.girlVideo ?? c.boyVideo)
-  return { frames, blink, image, video, bg: c.bg }
+  return { frames, blink, image, video, bg: c.bg, bgTheme: c.bgTheme }
 }

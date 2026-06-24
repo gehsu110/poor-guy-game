@@ -50,6 +50,15 @@ const WARDROBE = {
       owned: true,   // 暫時解鎖測試用
     },
     {
+      id: 'summer_beach_set',
+      name: '星潮海灘套裝',
+      desc: '泳裝、貝殼髮飾與海灘主題場景',
+      outfit: 'summer_beach',
+      accessory: 'none',
+      frame: 'crystal',
+      owned: true,
+    },
+    {
       id: 'mint_supply_set',
       name: '薄荷補給套裝',
       desc: '黃星直購造型',
@@ -74,6 +83,7 @@ const WARDROBE = {
     { id: 'pink_robe',  name: '粉晶禮服',   desc: '可愛柔粉風',   owned: true },  // 暫時解鎖
     { id: 'night_cape', name: '星夜斗篷',   desc: '扭蛋稀有服裝', owned: true },  // 暫時解鎖
     { id: 'suit',       name: '都市精英套裝',desc: '職場感套裝',   owned: true },  // 暫時解鎖
+    { id: 'summer_beach', name: '星潮海灘裝', desc: '貝殼水手夏日造型', owned: true },
     { id: 'mint_coat',  name: '薄荷外套',   desc: '清爽補給色',   owned: false },
     { id: 'moonlight',  name: '月光限定服', desc: '限定池套裝',   owned: false },
   ],
