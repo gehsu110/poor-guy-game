@@ -5,9 +5,6 @@ import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
-import summerRing from '../assets/academy-art/summer-set/swim-ring.webp'
-import summerBall from '../assets/academy-art/summer-set/beach-ball.webp'
-import summerBag from '../assets/academy-art/summer-set/shell-bag.webp'
 
 function TopHUD({ todayBudget, spent }) {
   const remaining = todayBudget - spent
@@ -147,14 +144,6 @@ export default function TownScreen() {
           }}
         />
       ) : null}
-      {bgTheme === 'summer' && (
-        <div className="summer-outfit-props" aria-hidden="true">
-          <motion.img src={summerRing} alt="" draggable="false" className="summer-prop summer-prop--ring" animate={{ y: [0, -7, 0], rotate: [-3, 2, -3] }} transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }} />
-          <motion.img src={summerBall} alt="" draggable="false" className="summer-prop summer-prop--ball" animate={{ y: [0, -10, 0], rotate: [0, 8, 0] }} transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }} />
-          <motion.img src={summerBag} alt="" draggable="false" className="summer-prop summer-prop--bag" animate={{ y: [0, -5, 0], rotate: [2, -2, 2] }} transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }} />
-        </div>
-      )}
-
       {/* UI 層（z-10，疊在角色上） */}
       <div className="relative z-10 px-4 pt-4">
         <TopHUD todayBudget={budget} spent={totalSpent} />
