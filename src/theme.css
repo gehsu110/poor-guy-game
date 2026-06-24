@@ -259,7 +259,8 @@
 }
 
 .academy-screen--summer .academy-screen-character {
-  top: 66px;
+  /* 讓腳底落在沙灘上，並留出上方天空，轉圈時也不會貼著 HUD。 */
+  top: 104px;
   width: 66vw;
   max-width: 260px;
 }
