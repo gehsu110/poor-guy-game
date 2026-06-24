@@ -6,54 +6,33 @@ import GameIcon from '../components/GameIcon'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
 
-function TopHUD({ todayBudget, spent }) {
-  const remaining = todayBudget - spent
-  const pct = todayBudget > 0 ? Math.min(spent / todayBudget, 1) : 0
-
+function IdentityHUD({ profile, onProfileClick }) {
+  const title = profile ? getTitle(profile.level) : null
+  const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
+  const playerName = profile?.playerName?.trim() || '窮鬼勇者'
   return (
-    <div className="academy-hud">
-      <div className="academy-hud__labels mb-1 flex justify-between text-[10px] font-black">
-        <span>今日預算</span>
-        <span>剩餘 <b className={remaining < 0 ? 'is-danger' : 'is-safe'}>NT${formatMoney(Math.max(0, remaining))}</b></span>
-      </div>
-      <div className="academy-budget-track h-2.5 overflow-hidden rounded-full">
-        <motion.div
-          className={`academy-budget-fill h-full rounded-full ${remaining < 0 ? 'is-danger' : ''}`}
-          animate={{ width: `${pct * 100}%` }}
-          transition={{ duration: 0.45 }}
-        />
+    <div className="academy-identity-hud">
+      <button className="academy-identity-chip" onClick={onProfileClick} aria-label="前往成長頁">
+        <span className="academy-identity-chip__copy">
+          <strong>{playerName}</strong>
+          <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
+        </span>
+        <GameIcon name="shop" />
+      </button>
+      <div className="academy-currency-rail" aria-label="收藏貨幣">
+        <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></span>
+        <span className="academy-mini-currency academy-mini-currency--purple"><GameIcon name="coin-purple" /><b>{profile?.stars?.purple ?? 0}</b></span>
+        <span className="academy-mini-currency academy-mini-currency--pink"><GameIcon name="ticket-normal" /><b>{profile?.tickets?.normal ?? 0}</b></span>
+        <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="ticket-gold" /><b>{profile?.tickets?.gold ?? 0}</b></span>
       </div>
     </div>
   )
 }
 
-// 角色資訊卡（不含角色圖，角色已移到 screen 層）
-function HeroShowcase({ profile, onProfileClick, hasVideo }) {
-  const title         = profile ? getTitle(profile.level) : null
-  const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
-  const playerName    = profile?.playerName?.trim() || '窮鬼勇者'
-
+function HeroShowcase({ hasVideo }) {
   return (
     <section className={`academy-home-hero${hasVideo ? ' has-video' : ''}`}>
       <div className="academy-home-hero__shine" />
-
-      <button className="academy-home-hero__style-button" onClick={onProfileClick} aria-label="前往成長頁">
-        <GameIcon name="shop" />
-        <span>成長</span>
-      </button>
-
-      <div className="academy-home-player-info">
-        <div className="academy-home-player-info__left">
-          <div className="academy-home-player-info__name">{playerName}</div>
-          <div className="academy-home-player-info__title">Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</div>
-        </div>
-        <div className="academy-home-player-info__currency">
-          <span className="academy-pill academy-pill--gold"><GameIcon name="coin-gold" />{profile?.stars?.yellow ?? 0}</span>
-          <span className="academy-pill academy-pill--purple"><GameIcon name="coin-purple" />{profile?.stars?.purple ?? 0}</span>
-          <span className="academy-pill academy-pill--pink"><GameIcon name="ticket-normal" />{profile?.tickets?.normal ?? 0}</span>
-          <span className="academy-pill academy-pill--gold"><GameIcon name="ticket-gold" />{profile?.tickets?.gold ?? 0}</span>
-        </div>
-      </div>
     </section>
   )
 }
@@ -68,22 +47,19 @@ function AttackEntry({ spent, budget, onClick }) {
       initial={{ y: 18, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
     >
-      <div className="flex items-center justify-between text-xs font-black">
-        <span className="academy-value-primary">今日消費 NT${formatMoney(spent)}</span>
-        <span className={remaining < 0 ? 'is-danger' : 'is-safe'}>
-          {remaining < 0 ? `超支 NT$${formatMoney(-remaining)}` : `剩餘 NT$${formatMoney(remaining)}`}
-        </span>
+      <div className="academy-attack-summary">
+        <div>
+          <small>今日消費</small>
+          <strong>NT${formatMoney(spent)}</strong>
+        </div>
+        <div className={remaining < 0 ? 'is-danger' : 'is-safe'}>
+          <small>{remaining < 0 ? '今日已超支' : '今日可用預算'}</small>
+          <strong>NT${formatMoney(Math.abs(remaining))}</strong>
+        </div>
       </div>
-      <div className="mt-3 grid grid-cols-4 gap-2">
-        {['分類', '備註', '金額', '攻擊'].map((step, i) => (
-          <div key={step} className={`academy-step ${i === 3 ? 'academy-step--attack' : ''}`}>
-            <span>{i + 1}</span>
-            <b>{step}</b>
-          </div>
-        ))}
-      </div>
-      <div className="academy-primary-cta mt-3 px-4 py-3 text-center text-sm font-black">
-        開始記帳攻擊
+      <div className="academy-attack-hint">記下一筆消費，轉化為今日攻擊力</div>
+      <div className="academy-primary-cta mt-2 px-4 py-3 text-center text-sm font-black">
+        立即記帳
       </div>
     </motion.button>
   )
@@ -109,6 +85,16 @@ export default function TownScreen() {
           <i className="summer-spark summer-spark--one" />
           <i className="summer-spark summer-spark--two" />
           <i className="summer-spark summer-spark--three" />
+        </div>
+      )}
+      {bgTheme === 'sakura' && (
+        <div className="sakura-scene" aria-hidden="true">
+          <span className="sakura-moon-glow" />
+          <span className="sakura-ground-shadow" />
+          <i className="sakura-petal sakura-petal--one" />
+          <i className="sakura-petal sakura-petal--two" />
+          <i className="sakura-petal sakura-petal--three" />
+          <i className="sakura-petal sakura-petal--four" />
         </div>
       )}
 
@@ -146,11 +132,11 @@ export default function TownScreen() {
       ) : null}
       {/* UI 層（z-10，疊在角色上） */}
       <div className="relative z-10 px-4 pt-4">
-        <TopHUD todayBudget={budget} spent={totalSpent} />
+        <IdentityHUD profile={profile} onProfileClick={() => navigate('profile')} />
       </div>
 
       <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <HeroShowcase profile={profile} onProfileClick={() => navigate('profile')} />
+        <HeroShowcase />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 

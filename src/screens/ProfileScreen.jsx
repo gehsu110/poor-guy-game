@@ -59,6 +59,15 @@ const WARDROBE = {
       owned: true,
     },
     {
+      id: 'sakura_festival_set',
+      name: '櫻燈祭典套裝',
+      desc: '短髮盤辮、櫻扇、金魚袋與月下神社',
+      outfit: 'sakura_festival',
+      accessory: 'none',
+      frame: 'moon',
+      owned: true,
+    },
+    {
       id: 'mint_supply_set',
       name: '薄荷補給套裝',
       desc: '黃星直購造型',
@@ -84,6 +93,7 @@ const WARDROBE = {
     { id: 'night_cape', name: '星夜斗篷',   desc: '扭蛋稀有服裝', owned: true },  // 暫時解鎖
     { id: 'suit',       name: '都市精英套裝',desc: '職場感套裝',   owned: true },  // 暫時解鎖
     { id: 'summer_beach', name: '星潮海灘裝', desc: '貝殼水手夏日造型', owned: true },
+    { id: 'sakura_festival', name: '櫻燈祭典裝', desc: '月下和風祭典造型', owned: true },
     { id: 'mint_coat',  name: '薄荷外套',   desc: '清爽補給色',   owned: false },
     { id: 'moonlight',  name: '月光限定服', desc: '限定池套裝',   owned: false },
   ],
