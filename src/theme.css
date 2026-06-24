@@ -253,10 +253,14 @@
 }
 
 .academy-screen--summer .academy-home-hero {
-  background:
-    radial-gradient(circle at 50% 36%, rgba(255,255,255,.44), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,252,238,.48));
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  isolation: auto;
 }
+
+.academy-screen--summer .academy-home-hero::before,
+.academy-screen--summer .academy-home-hero__shine { display: none; }
 
 .academy-screen--summer .academy-screen-character {
   /* 讓腳底落在沙灘上，並留出上方天空，轉圈時也不會貼著 HUD。 */
