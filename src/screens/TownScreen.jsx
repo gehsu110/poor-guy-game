@@ -12,18 +12,23 @@ function IdentityHUD({ profile, onProfileClick }) {
   const playerName = profile?.playerName?.trim() || '窮鬼勇者'
   return (
     <div className="academy-identity-hud">
-      <button className="academy-identity-chip" onClick={onProfileClick} aria-label="前往成長頁">
-        <span className="academy-identity-chip__copy">
-          <strong>{playerName}</strong>
-          <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
-        </span>
-        <GameIcon name="shop" />
-      </button>
-      <div className="academy-currency-rail" aria-label="收藏貨幣">
-        <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></span>
-        <span className="academy-mini-currency academy-mini-currency--purple"><GameIcon name="coin-purple" /><b>{profile?.stars?.purple ?? 0}</b></span>
-        <span className="academy-mini-currency academy-mini-currency--pink"><GameIcon name="ticket-normal" /><b>{profile?.tickets?.normal ?? 0}</b></span>
-        <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="ticket-gold" /><b>{profile?.tickets?.gold ?? 0}</b></span>
+      <div className="academy-status-board">
+        <button className="academy-identity-chip" onClick={onProfileClick} aria-label="前往成長頁">
+          <span className="academy-identity-chip__copy">
+            <strong>{playerName}</strong>
+            <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
+          </span>
+          <span className="academy-growth-gate">
+            <GameIcon name="shop" />
+            <b>成長</b>
+          </span>
+        </button>
+        <div className="academy-currency-rail" aria-label="收藏貨幣">
+          <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></span>
+          <span className="academy-mini-currency academy-mini-currency--purple"><GameIcon name="coin-purple" /><b>{profile?.stars?.purple ?? 0}</b></span>
+          <span className="academy-mini-currency academy-mini-currency--pink"><GameIcon name="ticket-normal" /><b>{profile?.tickets?.normal ?? 0}</b></span>
+          <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="ticket-gold" /><b>{profile?.tickets?.gold ?? 0}</b></span>
+        </div>
       </div>
     </div>
   )
@@ -39,6 +44,7 @@ function HeroShowcase({ hasVideo }) {
 
 function AttackEntry({ spent, budget, onClick }) {
   const remaining = budget - spent
+  const attackPower = Math.max(0, Math.round(spent / 10))
   return (
     <motion.button
       className="academy-attack-panel"
@@ -51,6 +57,10 @@ function AttackEntry({ spent, budget, onClick }) {
         <div>
           <small>今日消費</small>
           <strong>NT${formatMoney(spent)}</strong>
+        </div>
+        <div className="academy-attack-summary__power">
+          <small>今日攻擊力</small>
+          <strong>+{attackPower}</strong>
         </div>
         <div className={remaining < 0 ? 'is-danger' : 'is-safe'}>
           <small>{remaining < 0 ? '今日已超支' : '今日可用預算'}</small>

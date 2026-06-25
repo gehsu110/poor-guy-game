@@ -19,6 +19,7 @@ export default function ChromaKeyCanvas({
   onClick,
 }) {
   const canvasRef = useRef(null)
+  const keyColorValue = keyColor.join(',')
 
   useEffect(() => {
     if (!src) return
@@ -37,7 +38,7 @@ export default function ChromaKeyCanvas({
 
     let rafId
     let inited = false
-    const [kr, kg, kb] = keyColor
+    const [kr, kg, kb] = keyColorValue.split(',').map(Number)
     const t2 = threshold * threshold  // 用距離平方，避免 sqrt
 
     function processFrame() {
@@ -86,7 +87,7 @@ export default function ChromaKeyCanvas({
       video.pause()
       video.src = ''
     }
-  }, [src, threshold])  // keyColor 不入 dep，避免重建（通常固定）
+  }, [src, threshold, keyColorValue])
 
   return (
     <canvas
