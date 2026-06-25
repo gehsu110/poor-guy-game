@@ -30,6 +30,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB 上限（角色動畫 webp 較大）
         globPatterns: ['**/*.{js,css,html,ico,png,webp,svg,woff2}'],
         runtimeCaching: [
           {
