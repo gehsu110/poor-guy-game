@@ -444,15 +444,15 @@
 .academy-screen--sakura .academy-home-hero__shine { display: none; }
 
 .academy-screen--sakura .academy-bg {
-  transform: scale(1.34);
-  transform-origin: center 66%;
-  object-position: center 70%;
+  transform: scale(1.78);
+  transform-origin: center 74%;
+  object-position: center 78%;
 }
 
 .academy-screen--sakura .academy-screen-character {
-  top: 194px;
-  width: 52vw;
-  max-width: 214px;
+  top: 222px;
+  width: 45vw;
+  max-width: 184px;
 }
 
 .academy-screen--sakura .academy-hud,
@@ -529,10 +529,10 @@
 }
 .sakura-ground-shadow {
   position: absolute;
-  top: 438px;
+  top: 510px;
   left: 50%;
-  width: 116px;
-  height: 18px;
+  width: 92px;
+  height: 14px;
   translate: -50% 0;
   border-radius: 50%;
   background: radial-gradient(ellipse, rgba(24,15,45,.38), rgba(24,15,45,.08) 58%, transparent 72%);
