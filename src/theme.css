@@ -519,6 +519,11 @@
 
 .academy-screen--sakura .academy-home-content {
   padding-top: 0;
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+}
+
+.academy-screen--sakura .academy-attack-panel {
+  margin-bottom: 18px;
 }
 
 .sakura-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
@@ -549,4 +554,24 @@
 .sakura-petal--four { left: 84%; animation-delay: -6s; animation-duration: 10s; }
 @keyframes sakura-fall {
   to { translate: 54px 520px; rotate: 420deg; opacity: .1; }
+}
+
+@media (max-width: 430px) {
+  .academy-screen--sakura .academy-home-content {
+    padding-bottom: calc(7.75rem + env(safe-area-inset-bottom));
+  }
+
+  .academy-screen--sakura .academy-attack-panel {
+    margin-bottom: 22px;
+  }
+}
+
+@media (max-width: 390px) {
+  .academy-screen--sakura .academy-home-content {
+    padding-bottom: calc(8.25rem + env(safe-area-inset-bottom));
+  }
+
+  .academy-screen--sakura .academy-attack-panel {
+    margin-bottom: 26px;
+  }
 }
