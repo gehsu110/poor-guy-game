@@ -107,16 +107,6 @@ export default function TownScreen() {
           <i className="sakura-petal sakura-petal--four" />
         </div>
       )}
-      {bgTheme === 'moonlight' && (
-        <div className="moonlight-scene" aria-hidden="true">
-          <span className="moonlight-glow" />
-          <span className="moonlight-water-ripple" />
-          <i className="moonlight-firefly moonlight-firefly--one" />
-          <i className="moonlight-firefly moonlight-firefly--two" />
-          <i className="moonlight-firefly moonlight-firefly--three" />
-        </div>
-      )}
-
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
       {video ? (
         <ChromaKeyCanvas
@@ -141,11 +131,11 @@ export default function TownScreen() {
           draggable="false"
           className="academy-screen-character academy-screen-character--tap"
           initial={{ opacity: 0, x: '-50%', y: 24, scale: 0.92 }}
-          animate={{ opacity: 1, x: '-50%', y: [0, -10, 0], scale: 1 }}
+          animate={{ opacity: 1, x: '-50%', y: 0, scale: 1 }}
           transition={{
             opacity: { duration: 0.5 },
             scale:   { duration: 0.5 },
-            y: { duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
+            y: { duration: 0.5, ease: 'easeOut' },
           }}
         />
       ) : null}

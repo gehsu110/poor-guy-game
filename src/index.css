@@ -837,8 +837,7 @@ body {
   box-shadow: 0 16px 30px rgba(255,127,163,0.14), inset 0 0 0 4px rgba(255,229,238,0.72);
 }
 
-.academy-avatar-frame--moon,
-.academy-avatar-frame--frame_moon {
+.academy-avatar-frame--moon {
   border: 3px solid rgba(139,124,255,0.78);
   box-shadow: 0 16px 30px rgba(139,124,255,0.16), inset 0 0 0 4px rgba(241,236,255,0.78);
 }
@@ -866,12 +865,6 @@ body {
 
 .academy-avatar-outfit--pink_robe {
   background: radial-gradient(circle at 50% 36%, #ffffff 0%, #ffe5ee 46%, #ffb3c6 100%);
-}
-
-.academy-avatar-outfit--moonlight {
-  background:
-    radial-gradient(circle at 78% 24%, rgba(255,247,183,0.92) 0 10%, transparent 11%),
-    radial-gradient(circle at 50% 36%, #ffffff 0%, #f1ecff 42%, #8b7cff 100%);
 }
 
 .academy-avatar-accessory--star_pin::after,
@@ -1966,11 +1959,6 @@ video.academy-screen-character {
 .academy-wardrobe-swatch--pink_magic_set,
 .academy-wardrobe-swatch--ribbon {
   background: linear-gradient(135deg, #ff7fa3, #ffe5ee);
-}
-
-.academy-wardrobe-swatch--moonlight,
-.academy-wardrobe-swatch--moonlight_set {
-  background: linear-gradient(135deg, #fff7b7, #8b7cff);
 }
 
 .academy-wardrobe-swatch--none {

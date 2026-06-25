@@ -17,10 +17,8 @@ const GACHA_POOL = [
   { id: 'title_legend', type: 'title', name: '理財賢者', rarity: 'SSR', color: '#FFE4A0', iconKey: 'star' },
   { id: 'frame_stars', type: 'frame', name: '星砂邊框', rarity: 'R', color: '#FFE4A0', iconKey: 'ticket' },
   { id: 'frame_ribbon', type: 'frame', name: '緞帶邊框', rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
-  { id: 'frame_moon', type: 'frame', name: '月光邊框', rarity: 'SSR', color: '#C8A8E9', iconKey: 'goldTicket' },
   { id: 'night_cape', type: 'outfit', name: '星夜斗篷', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
   { id: 'night_cape_set', type: 'set', name: '星夜斗篷套裝', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
-  { id: 'moonlight_set', type: 'set', name: '月光限定套裝', rarity: 'SSR', color: '#FFE4A0', iconKey: 'goldTicket' },
   { id: 'ribbon', type: 'accessory', name: '粉色緞帶', rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'crown', type: 'accessory', name: '勇者小冠', rarity: 'SSR', color: '#FFE4A0', iconKey: 'goldTicket' },
 ]
@@ -34,7 +32,6 @@ const DIRECT_ITEMS = [
   { id: 'pink_robe', type: 'outfit', name: '粉晶禮服', costType: 'purple', cost: 4, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
   { id: 'pink_magic_set', type: 'set', name: '粉晶魔法套裝', costType: 'purple', cost: 6, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
   { id: 'star_pin', type: 'accessory', name: '星星髮夾', costType: 'yellow', cost: 3, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
-  { id: 'fx_moon', type: 'effect', name: '月光術式', costType: 'purple', cost: 2, rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
   { id: 'title_budget', type: 'title', name: '預算守門人', costType: 'purple', cost: 3, rarity: 'SR', color: '#A8D8EA', iconKey: 'coin' },
 ]
 
@@ -325,7 +322,6 @@ export default function ShopScreen() {
       mint_supply_set: { outfit: 'mint_coat', accessory: 'star_pin', frame: 'crystal' },
       pink_magic_set: { outfit: 'pink_robe', accessory: 'ribbon', frame: 'frame_ribbon' },
       night_cape_set: { outfit: 'night_cape', accessory: 'crown', frame: 'moon' },
-      moonlight_set: { outfit: 'moonlight', accessory: 'crown', frame: 'frame_moon' },
     }
     const data = item.type === 'set'
       ? { equipped: { ...equipped, ...SET_EQUIP[item.id], set: item.id } }

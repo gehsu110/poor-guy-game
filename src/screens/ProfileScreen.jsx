@@ -76,15 +76,6 @@ const WARDROBE = {
       frame: 'crystal',
       owned: false,
     },
-    {
-      id: 'moonlight_set',
-      name: '月光限定套裝',
-      desc: '金色池限定',
-      outfit: 'moonlight',
-      accessory: 'crown',
-      frame: 'frame_moon',
-      owned: true,
-    },
   ],
   outfit: [
     { id: 'academy',    name: '星術學院服', desc: '預設主角服裝', owned: true },
@@ -95,7 +86,6 @@ const WARDROBE = {
     { id: 'summer_beach', name: '星潮海灘裝', desc: '貝殼水手夏日造型', owned: true },
     { id: 'sakura_festival', name: '櫻燈祭典裝', desc: '月下和風祭典造型', owned: true },
     { id: 'mint_coat',  name: '薄荷外套',   desc: '清爽補給色',   owned: false },
-    { id: 'moonlight',  name: '月光限定服', desc: '限定池套裝',   owned: true },
   ],
   accessory: [
     { id: 'none',     name: '不戴頭飾',   desc: '乾淨頭像',       owned: true },
@@ -106,7 +96,7 @@ const WARDROBE = {
   frame: [
     { id: 'soft_gold', name: '柔金頭像框', desc: '預設邊框',       owned: true },
     { id: 'ribbon',    name: '緞帶頭像框', desc: '粉色收藏框',     owned: true },
-    { id: 'moon',      name: '月光頭像框', desc: '限定感外框',     owned: true },
+    { id: 'moon',      name: '夜櫻頭像框', desc: '祭典感外框',     owned: true },
     { id: 'crystal',   name: '冰晶頭像框', desc: '紫星直購預覽',   owned: false },
   ],
   reward: [
