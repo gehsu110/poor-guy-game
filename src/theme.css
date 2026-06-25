@@ -562,6 +562,121 @@
   to { translate: 54px 520px; rotate: 420deg; opacity: .1; }
 }
 
+/* ── Moonlight Scene ───────────────────────────────────────────── */
+.academy-screen--moonlight .academy-bg-soft {
+  background: linear-gradient(180deg, rgba(8,15,50,.06), rgba(12,18,65,.18) 62%, rgba(8,12,45,.42));
+}
+
+.academy-screen--moonlight .academy-home-hero {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  isolation: auto;
+}
+
+.academy-screen--moonlight .academy-home-hero::before,
+.academy-screen--moonlight .academy-home-hero__shine { display: none; }
+
+.academy-screen--moonlight .academy-bg {
+  transform: scale(1.08);
+  transform-origin: center 60%;
+  object-position: center 55%;
+}
+
+.academy-screen--moonlight .academy-screen-character {
+  top: 220px;
+  width: 60vw;
+  max-width: 240px;
+}
+
+.academy-screen--moonlight .academy-hud,
+.academy-screen--moonlight .academy-attack-panel {
+  border-color: rgba(140,165,230,.22);
+  background: rgba(240,245,255,.88);
+}
+
+.academy-screen--moonlight .academy-status-board {
+  background: rgba(15,20,60,.72);
+  box-shadow: 0 12px 30px rgba(8,12,45,.32), inset 0 1px rgba(255,255,255,.12);
+}
+
+.academy-screen--moonlight .academy-identity-chip__copy strong {
+  color: #e8f0ff;
+  text-shadow: 0 2px 10px rgba(8,12,45,.42);
+}
+
+.academy-screen--moonlight .academy-identity-chip__copy small {
+  color: rgba(200,220,255,.72);
+}
+
+.academy-screen--moonlight .academy-growth-gate {
+  color: #c8e0ff;
+  background: rgba(140,180,255,.12);
+  box-shadow: inset 0 0 0 1px rgba(140,180,255,.22), 0 0 16px rgba(100,150,255,.10);
+}
+
+.academy-screen--moonlight .academy-mini-currency {
+  color: #c8e0ff;
+  background: rgba(140,180,255,.12);
+  box-shadow: inset 0 0 0 1px rgba(140,180,255,.18);
+}
+
+.academy-screen--moonlight .academy-mini-currency b { color: #e8f0ff; }
+
+.academy-screen--moonlight .academy-primary-cta {
+  color: #f0f4ff;
+  background: linear-gradient(135deg, #3a4f9e, #6e5ab0 58%, #8a6fcf);
+}
+
+.academy-screen--moonlight .academy-attack-summary > div {
+  background: rgba(230,238,255,.38);
+  box-shadow: inset 0 0 0 1px rgba(100,130,220,.10);
+}
+
+.academy-screen--moonlight .academy-home-content {
+  padding-top: 0;
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+}
+
+.academy-screen--moonlight .academy-attack-panel { margin-bottom: 8px; }
+
+/* 月光場景粒子 */
+.moonlight-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+
+.moonlight-glow {
+  position: absolute; top: 4%; left: 50%; width: 200px; height: 200px; translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,220,255,.14), transparent 68%);
+  animation: moonlight-breathe 6s ease-in-out infinite;
+}
+@keyframes moonlight-breathe { 50% { opacity: .5; transform: scale(1.10); } }
+
+.moonlight-water-ripple {
+  position: absolute; bottom: 24%; left: 50%; width: 160px; height: 12px; translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(180,210,255,.22), transparent 70%);
+  animation: moonlight-ripple 4s ease-in-out infinite;
+}
+@keyframes moonlight-ripple {
+  0%, 100% { opacity: .5; transform: scaleX(1); }
+  50% { opacity: .9; transform: scaleX(1.15); }
+}
+
+.moonlight-firefly {
+  position: absolute; width: 5px; height: 5px; border-radius: 50%;
+  background: #c8ff96; box-shadow: 0 0 8px #a0e860, 0 0 18px rgba(160,232,96,.5);
+  animation: moonlight-firefly-float 5s ease-in-out infinite;
+}
+.moonlight-firefly--one   { bottom: 38%; left: 18%; animation-duration: 5.2s; }
+.moonlight-firefly--two   { bottom: 52%; right: 22%; animation-delay: -2.1s; animation-duration: 6.8s; }
+.moonlight-firefly--three { bottom: 44%; left: 62%; animation-delay: -3.8s; animation-duration: 4.5s; }
+@keyframes moonlight-firefly-float {
+  0%   { translate: 0 0; opacity: .9; }
+  30%  { translate: 8px -14px; opacity: .4; }
+  60%  { translate: -5px -28px; opacity: .85; }
+  100% { translate: 3px -42px; opacity: 0; }
+}
+
 @media (max-width: 430px) {
   .academy-screen--sakura .academy-home-content {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));

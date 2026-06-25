@@ -24,6 +24,10 @@ import girlSummerTeal from './assets/academy-art/summer-set/girl-summer-teal.png
 import sakuraFestivalBg from './assets/academy-art/sakura-set/sakura-bg-close.webp'
 import girlSakuraFestival from './assets/academy-art/sakura-set/girl-sakura-festival.webp'
 
+// ── 月光套裝 ─────────────────────────────────────────────────────
+import moonlightBg from './assets/academy-art/moonlight-set/moonlight-bg.png'
+import girlMoonlightIdle from './assets/academy-art/moonlight-set/girl-moonlight-idle.webp'
+
 // ── 幀動畫 imports（從影片抽幀 + 黑底去背，4fps × 12幀 = 3s loop）──
 
 // 女生學院服
@@ -212,11 +216,11 @@ export const OUTFIT_CONFIG = {
   moonlight: {
     name: '月光限定套裝',
     desc: '金色池限定',
-    girlImage: null,
+    girlImage: girlMoonlightIdle,
     boyImage:  null,
     girlVideo: null,
     boyVideo:  null,
-    bg:        homeBg,
+    bg:        moonlightBg,
     bgTheme:   'moonlight',
   },
   summer_beach: {

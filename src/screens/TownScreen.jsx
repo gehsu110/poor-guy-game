@@ -107,6 +107,15 @@ export default function TownScreen() {
           <i className="sakura-petal sakura-petal--four" />
         </div>
       )}
+      {bgTheme === 'moonlight' && (
+        <div className="moonlight-scene" aria-hidden="true">
+          <span className="moonlight-glow" />
+          <span className="moonlight-water-ripple" />
+          <i className="moonlight-firefly moonlight-firefly--one" />
+          <i className="moonlight-firefly moonlight-firefly--two" />
+          <i className="moonlight-firefly moonlight-firefly--three" />
+        </div>
+      )}
 
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
       {video ? (
