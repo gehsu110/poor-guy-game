@@ -450,9 +450,9 @@
 }
 
 .academy-screen--sakura .academy-screen-character {
-  top: 222px;
-  width: 45vw;
-  max-width: 184px;
+  top: 258px;
+  width: 50vw;
+  max-width: 206px;
 }
 
 .academy-screen--sakura .academy-hud,
@@ -529,10 +529,10 @@
 }
 .sakura-ground-shadow {
   position: absolute;
-  top: 510px;
+  top: 548px;
   left: 50%;
-  width: 92px;
-  height: 14px;
+  width: 104px;
+  height: 16px;
   translate: -50% 0;
   border-radius: 50%;
   background: radial-gradient(ellipse, rgba(24,15,45,.38), rgba(24,15,45,.08) 58%, transparent 72%);

@@ -20,7 +20,7 @@ import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png
 import homeBg from './assets/academy-art/home-bg.webp'
 import summerBeachBg from './assets/academy-art/summer-set/beach-bg.webp'
 import girlSummerIdle from './assets/academy-art/summer-set/girl-summer-idle.webp'
-import sakuraFestivalBg from './assets/academy-art/sakura-set/sakura-bg.webp'
+import sakuraFestivalBg from './assets/academy-art/sakura-set/sakura-bg-close.webp'
 import girlSakuraFestival from './assets/academy-art/sakura-set/girl-sakura-festival.webp'
 
 // ── 幀動畫 imports（從影片抽幀 + 黑底去背，4fps × 12幀 = 3s loop）──
