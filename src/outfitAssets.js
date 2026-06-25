@@ -20,6 +20,7 @@ import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png
 import homeBg from './assets/academy-art/home-bg.webp'
 import summerBeachBg from './assets/academy-art/summer-set/beach-bg.webp'
 import girlSummerIdle from './assets/academy-art/summer-set/girl-summer-idle.webp'
+import girlSummerTeal from './assets/academy-art/summer-set/girl-summer-teal.png'
 import sakuraFestivalBg from './assets/academy-art/sakura-set/sakura-bg-close.webp'
 import girlSakuraFestival from './assets/academy-art/sakura-set/girl-sakura-festival.webp'
 
@@ -222,6 +223,18 @@ export const OUTFIT_CONFIG = {
     name: '星潮海灘套裝',
     desc: '夏日海灘主題限定',
     girlImage: girlSummerIdle,
+    boyImage: null,
+    girlFrames: null,
+    boyFrames: null,
+    girlVideo: null,
+    boyVideo: null,
+    bg: summerBeachBg,
+    bgTheme: 'summer',
+  },
+  summer_teal: {
+    name: '海風浪花套裝',
+    desc: '夏日海風主題限定',
+    girlImage: girlSummerTeal,
     boyImage: null,
     girlFrames: null,
     boyFrames: null,
