@@ -444,21 +444,21 @@
 .academy-screen--sakura .academy-home-hero__shine { display: none; }
 
 .academy-screen--sakura .academy-bg {
-  transform: scale(1.12);
-  transform-origin: center 56%;
-  object-position: center 58%;
+  transform: scale(1.24);
+  transform-origin: center 60%;
+  object-position: center 62%;
 }
 
 .academy-screen--sakura .academy-screen-character {
-  top: 154px;
-  width: 58vw;
-  max-width: 232px;
+  top: 170px;
+  width: 56vw;
+  max-width: 224px;
 }
 
 .academy-screen--sakura .academy-hud,
 .academy-screen--sakura .academy-attack-panel {
   border-color: rgba(232,169,180,.28);
-  background: rgba(255,249,242,.92);
+  background: rgba(255,249,242,.90);
 }
 
 .academy-screen--sakura .academy-status-board {
@@ -474,7 +474,7 @@
   position: absolute;
   right: 18px;
   bottom: -5px;
-  width: 72px;
+  width: 82px;
   height: 10px;
   border-radius: 999px;
   background: radial-gradient(ellipse, rgba(255,197,129,.35), transparent 70%);
@@ -515,6 +515,10 @@
 .academy-screen--sakura .academy-attack-summary > div {
   background: rgba(255,244,236,.46);
   box-shadow: inset 0 0 0 1px rgba(124,83,99,.08);
+}
+
+.academy-screen--sakura .academy-home-content {
+  padding-top: 0.2rem;
 }
 
 .sakura-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
