@@ -47,7 +47,7 @@ export function onAuth(cb) {
 // ─── Profile ─────────────────────────────────────────────────────────────────
 
 const DEFAULT_PROFILE = {
-  playerName: '窮鬼勇者',
+  playerName: '新手勇者',
   level: 1,
   exp: 0,
   expToNext: 100,
@@ -68,6 +68,7 @@ const DEFAULT_PROFILE = {
   consecutiveDays: 0,
   lastActiveDate: null,
   collection: [],
+  nameConfirmed: false,
   onboardingDone: false,
   createdAt: serverTimestamp(),
 }

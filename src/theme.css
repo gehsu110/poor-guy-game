@@ -81,20 +81,20 @@
 .academy-identity-chip__copy { display: flex; min-width: 0; flex-direction: column; }
 .academy-identity-chip__copy strong { overflow: hidden; color: var(--color-ink-900); font-size: 15px; font-weight: 1000; line-height: 1.05; text-overflow: ellipsis; white-space: nowrap; }
 .academy-identity-chip__copy small { overflow: hidden; margin-top: 2px; color: var(--color-ink-500); font-size: 10px; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
-.academy-growth-gate {
+.academy-settings-gate {
   display: inline-flex;
-  min-width: 58px;
+  width: 38px;
+  height: 38px;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  border: 0;
   border-radius: 999px;
-  padding: 5px 8px;
+  padding: 0;
   color: var(--color-brand-700);
   background: rgba(255,255,255,.42);
   box-shadow: inset 0 0 0 1px rgba(113,97,184,.13);
 }
-.academy-growth-gate .game-icon { width: 20px; height: 20px; flex: 0 0 auto; color: currentColor; }
-.academy-growth-gate b { font-size: 9px; font-weight: 950; }
+.academy-settings-gate .game-icon { width: 21px; height: 21px; flex: 0 0 auto; color: currentColor; }
 
 .academy-currency-rail {
   display: grid;
@@ -114,15 +114,16 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+  border: 0;
   border-radius: 999px;
-  padding: 5px 6px;
+  padding: 6px 7px;
   color: var(--color-ink-500);
-  background: rgba(255,255,255,.38);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.32);
-  font-size: 11px;
+  background: rgba(255,255,255,.50);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.42), 0 4px 10px rgba(55,48,86,.06);
+  font-size: 12px;
   font-weight: 1000;
 }
-.academy-mini-currency .game-icon { width: 18px; height: 18px; }
+.academy-mini-currency .game-icon { width: 22px; height: 22px; }
 .academy-mini-currency--gold .game-icon { color: var(--color-reward-500); }
 .academy-mini-currency--purple .game-icon { color: var(--color-brand-500); }
 .academy-mini-currency--pink .game-icon { color: var(--color-danger-500); }
@@ -145,6 +146,34 @@
   color: #38290d;
   background: linear-gradient(135deg, #f2c75f, var(--color-reward-500));
   box-shadow: 0 9px 20px rgba(154, 104, 27, 0.22), inset 0 1px rgba(255,255,255,0.5);
+}
+
+.academy-wardrobe-fab {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 10px;
+  color: var(--color-brand-700);
+  background: rgba(255, 252, 245, .72);
+  box-shadow: inset 0 0 0 1px rgba(113,97,184,.16), 0 8px 18px rgba(55,48,86,.12);
+  backdrop-filter: blur(14px);
+}
+
+.academy-wardrobe-fab .game-icon {
+  width: 20px;
+  height: 20px;
+  color: currentColor;
+}
+
+.academy-wardrobe-fab b {
+  font-size: 11px;
+  font-weight: 1000;
 }
 
 .academy-step {
@@ -391,7 +420,7 @@
     radial-gradient(circle at 88% 0%, rgba(255,237,151,.46), transparent 42%);
 }
 
-.academy-screen--summer .academy-growth-gate,
+.academy-screen--summer .academy-settings-gate,
 .academy-screen--summer .academy-mini-currency {
   background: rgba(255,255,255,.42);
 }
@@ -548,7 +577,7 @@
   color: rgba(255,225,222,.78);
 }
 
-.academy-screen--sakura .academy-growth-gate {
+.academy-screen--sakura .academy-settings-gate {
   color: #fff3db;
   background: rgba(255,221,161,.13);
   box-shadow: inset 0 0 0 1px rgba(255,221,161,.24), 0 0 16px rgba(244,176,105,.12);
@@ -675,7 +704,7 @@
   color: rgba(218,244,240,.78);
 }
 
-.academy-screen--rainy .academy-growth-gate {
+.academy-screen--rainy .academy-settings-gate {
   color: #effffb;
   background: rgba(141,221,211,.13);
   box-shadow: inset 0 0 0 1px rgba(141,221,211,.24), 0 0 16px rgba(104,204,194,.12);

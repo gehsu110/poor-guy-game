@@ -115,6 +115,13 @@ const PATHS = {
       <path className="game-icon__accent" d="M28 48V36h8v12M25 31h14" />
     </>
   ),
+  settings: (
+    <>
+      <path className="game-icon__plate" d="M32 9l5 6 8-1 3 8 7 4-4 7 3 8-7 4-3 8-8-1-5 6-5-6-8 1-3-8-7-4 3-8-4-7 7-4 3-8 8 1 5-6z" />
+      <circle className="game-icon__line" cx="32" cy="32" r="9" />
+      <circle className="game-icon__accent" cx="32" cy="32" r="4" />
+    </>
+  ),
   skull: (
     <>
       <path className="game-icon__plate" d="M32 9c10 0 18 7.5 18 17 0 7.2-4 12.5-9 15v10H23V41c-5-2.5-9-7.8-9-15 0-9.5 8-17 18-17z" />

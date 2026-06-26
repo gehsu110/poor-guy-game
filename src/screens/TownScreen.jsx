@@ -6,38 +6,41 @@ import GameIcon from '../components/GameIcon'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
 
-function IdentityHUD({ profile, onProfileClick }) {
+function IdentityHUD({ profile, onSettingsClick }) {
   const title = profile ? getTitle(profile.level) : null
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
-  const playerName = profile?.playerName?.trim() || '窮鬼勇者'
+  const playerName = profile?.playerName?.trim() || '新手勇者'
   return (
     <div className="academy-identity-hud">
       <div className="academy-status-board">
-        <button className="academy-identity-chip" onClick={onProfileClick} aria-label="前往成長頁">
+        <div className="academy-identity-chip">
           <span className="academy-identity-chip__copy">
             <strong>{playerName}</strong>
             <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
           </span>
-          <span className="academy-growth-gate">
-            <GameIcon name="shop" />
-            <b>成長</b>
-          </span>
-        </button>
-        <div className="academy-currency-rail" aria-label="收藏貨幣">
-          <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></span>
-          <span className="academy-mini-currency academy-mini-currency--purple"><GameIcon name="coin-purple" /><b>{profile?.stars?.purple ?? 0}</b></span>
-          <span className="academy-mini-currency academy-mini-currency--pink"><GameIcon name="ticket-normal" /><b>{profile?.tickets?.normal ?? 0}</b></span>
-          <span className="academy-mini-currency academy-mini-currency--gold"><GameIcon name="ticket-gold" /><b>{profile?.tickets?.gold ?? 0}</b></span>
+          <button className="academy-settings-gate" onClick={onSettingsClick} aria-label="開啟設定">
+            <GameIcon name="settings" />
+          </button>
+        </div>
+        <div className="academy-currency-rail" aria-label="收藏資源">
+          <button className="academy-mini-currency academy-mini-currency--gold" title="黃星：每日與任務獎勵"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></button>
+          <button className="academy-mini-currency academy-mini-currency--purple" title="紫星：稀有兌換素材"><GameIcon name="coin-purple" /><b>{profile?.stars?.purple ?? 0}</b></button>
+          <button className="academy-mini-currency academy-mini-currency--pink" title="一般券：一般補給抽獎"><GameIcon name="ticket-normal" /><b>{profile?.tickets?.normal ?? 0}</b></button>
+          <button className="academy-mini-currency academy-mini-currency--gold" title="金券：限定補給抽獎"><GameIcon name="ticket-gold" /><b>{profile?.tickets?.gold ?? 0}</b></button>
         </div>
       </div>
     </div>
   )
 }
 
-function HeroShowcase({ hasVideo }) {
+function HeroShowcase({ hasVideo, onWardrobeClick }) {
   return (
     <section className={`academy-home-hero${hasVideo ? ' has-video' : ''}`}>
       <div className="academy-home-hero__shine" />
+      <button className="academy-wardrobe-fab" onClick={onWardrobeClick}>
+        <GameIcon name="shop" />
+        <b>換裝</b>
+      </button>
     </section>
   )
 }
@@ -152,11 +155,11 @@ export default function TownScreen() {
       ) : null}
       {/* UI 層（z-10，疊在角色上） */}
       <div className="relative z-10 px-4 pt-4">
-        <IdentityHUD profile={profile} onProfileClick={() => navigate('profile')} />
+        <IdentityHUD profile={profile} onSettingsClick={() => navigate('profile', { tab: 'settings' })} />
       </div>
 
       <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
-        <HeroShowcase />
+        <HeroShowcase onWardrobeClick={() => navigate('profile', { tab: 'wardrobe' })} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 

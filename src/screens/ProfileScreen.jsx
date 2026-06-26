@@ -320,12 +320,12 @@ function TitleList({ currentLevel }) {
 
 export default function ProfileScreen() {
   const { state, dispatch, navigate } = useApp()
-  const { profile, user } = state
-  const [tab, setTab] = useState('stats')
+  const { profile, user, screenParams } = state
+  const [tab, setTab] = useState(screenParams?.tab ?? 'stats')
   const [editBudget, setEditBudget] = useState(false)
   const [budgetInput, setBudgetInput] = useState(String(profile?.dailyBudget ?? 1000))
   const [editName, setEditName] = useState(false)
-  const [nameInput, setNameInput] = useState(profile?.playerName ?? '窮鬼勇者')
+  const [nameInput, setNameInput] = useState(profile?.playerName ?? '新手勇者')
   const [customName, setCustomName] = useState('')
   const [customColor, setCustomColor] = useState('#C8A8E9')
 
@@ -337,7 +337,7 @@ export default function ProfileScreen() {
   const equipped = profile?.equipped ?? {}
   const collectionIds = new Set((profile?.collection ?? []).map(item => item.id))
   const avatarGender = profile?.avatarGender ?? 'girl'
-  const playerName = profile?.playerName?.trim() || '窮鬼勇者'
+  const playerName = profile?.playerName?.trim() || '新手勇者'
   const activeSet = WARDROBE.set.find(set => (
     (equipped.outfit ?? 'academy') === set.outfit &&
     (equipped.accessory ?? 'star_pin') === set.accessory &&
@@ -481,7 +481,7 @@ export default function ProfileScreen() {
 
       <div className="relative z-10 flex items-center gap-2 px-4 pb-2 pt-4">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>
-        <div className="flex-1 text-center text-sm font-black text-[#26324A]">我的成長</div>
+        <div className="flex-1 text-center text-sm font-black text-[#26324A]">冒險者資料</div>
         <div className="w-10" />
       </div>
 

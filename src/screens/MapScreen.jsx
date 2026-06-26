@@ -10,14 +10,21 @@ import monsterSprites from '../assets/academy-art/monster-sprites.png'
 
 // 節點狀態設定
 const NODE_CONFIG = {
-  defeated:  { bg: '#FFF0B8', border: '#D8A22A', icon: 'skull', label: '擊殺' },
-  undefeated:{ bg: '#FFE4A0', border: '#FFD060', icon: 'battle', label: '未滅' },
-  no_record: { bg: '#F0F0F0', border: '#DDD', icon: 'unknown', label: '未記' },
-  today:     { bg: '#C8A8E9', border: '#A87DE0', icon: 'battle', label: '今日' },
-  future:    { bg: '#E8E8E8', border: '#CCC', icon: 'unknown', label: '未來' },
-  boss:      { bg: '#FFB3C6', border: '#FF6B9D', icon: 'boss', label: '首領' },
-  monthboss: { bg: '#C8A8E9', border: '#7B5EA7', icon: 'boss', label: '月底首領' },
+  defeated:  { icon: 'skull', label: '擊殺' },
+  undefeated:{ icon: 'battle', label: '未滅' },
+  no_record: { icon: 'unknown', label: '未記' },
+  today:     { icon: 'battle', label: '今日' },
+  future:    { icon: 'unknown', label: '未來' },
+  boss:      { icon: 'boss', label: '首領' },
+  monthboss: { icon: 'boss', label: '月底首領' },
 }
+
+const MAP_ZONES = [
+  { key: 'academy', title: '第 1 週｜學院入口', sub: '建立記帳節奏，讓路線亮起來', range: [1, 7] },
+  { key: 'market', title: '第 2 週｜魔法市集', sub: '誘惑變多，檢查每天是否守住預算', range: [8, 14] },
+  { key: 'forest', title: '第 3 週｜帳本森林', sub: '花費開始累積，路線會留下戰鬥痕跡', range: [15, 21] },
+  { key: 'boss', title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', range: [22, 31] },
+]
 
 function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
   const cfg = tier === 'monthboss' ? NODE_CONFIG.monthboss
@@ -29,8 +36,7 @@ function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
 
   return (
     <motion.button
-      className={`academy-map-node ${size} ${isToday ? 'is-today' : ''} ${isDim ? 'is-dim' : ''}`}
-      style={{ '--node-bg': cfg.bg, '--node-border': cfg.border }}
+      className={`academy-map-node academy-map-node--${status} ${size} ${isToday ? 'is-today' : ''} ${isDim ? 'is-dim' : ''}`}
       onClick={onClick}
       whileTap={{ scale: 0.88 }}
       animate={isToday ? { scale: [1, 1.1, 1], boxShadow: ['0 0 0 0 rgba(200,168,233,0)', '0 0 0 8px rgba(200,168,233,0.4)', '0 0 0 0 rgba(200,168,233,0)'] } : {}}
@@ -54,6 +60,14 @@ function buildPath(days) {
     rows.push(i % (perRow * 2) === 0 ? row : [...row].reverse())
   }
   return rows
+}
+
+function buildZones(days) {
+  return MAP_ZONES.map(zone => {
+    const [start, end] = zone.range
+    const zoneDays = days.filter(d => d.day >= start && d.day <= end)
+    return { ...zone, days: zoneDays, rows: buildPath(zoneDays) }
+  }).filter(zone => zone.days.length)
 }
 
 export default function MapScreen() {
@@ -112,7 +126,7 @@ export default function MapScreen() {
     return { day: d, date: dateStr, status, tier: monster.tier, monster, spent, record }
   }), [budget, daysInMonth, month, monthExpenses, monthRecords, todayDate, year])
 
-  const rows = buildPath(days)
+  const zones = buildZones(days)
 
   const [selected, setSelected] = useState(null)
 
@@ -154,19 +168,17 @@ export default function MapScreen() {
         </div>
       </div>
 
-      {/* 圖例 */}
       <div className="relative z-10 flex gap-2 px-4 pb-2 overflow-x-auto">
         {[
-          { color: '#A8E6CF', label: '擊殺' },
-          { color: '#FFE4A0', label: '未滅' },
-          { color: '#F0F0F0', label: '未記' },
-          { color: '#C8A8E9', label: '今日' },
-          { color: '#FFB3C6', label: '首領' },
-          { color: '#E8E8E8', label: '未來' },
-        ].map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-1 whitespace-nowrap">
-            <div className="w-3 h-3 rounded-full border border-gray-200" style={{ background: color }} />
-            <span className="text-[10px] text-slate-500">{label}</span>
+          { cls: 'defeated', label: '已擊殺' },
+          { cls: 'today', label: '今日位置' },
+          { cls: 'undefeated', label: '未滅' },
+          { cls: 'no_record', label: '未記' },
+          { cls: 'monthboss', label: '月底 Boss' },
+        ].map(({ cls, label }) => (
+          <div key={label} className="academy-map-legend">
+            <span className={`academy-map-legend__dot academy-map-legend__dot--${cls}`} />
+            <b>{label}</b>
           </div>
         ))}
       </div>
@@ -205,28 +217,40 @@ export default function MapScreen() {
           </div>
         </div>
 
-        <div className="academy-card academy-map-card flex flex-col gap-9 py-6">
+        <div className="academy-month-route">
           {loadingMonth && (
             <div className="absolute inset-x-8 top-3 rounded-full bg-white/82 px-3 py-1 text-center text-[10px] font-black text-[#8E87A8]">
               讀取遠征紀錄中
             </div>
           )}
-          {rows.map((row, ri) => (
-            <div key={ri} className="academy-map-row">
-              {/* 連接線 */}
-              <div className="academy-map-line" />
-              {ri < rows.length - 1 && (
-                <div className={`academy-map-turn ${ri % 2 === 0 ? 'academy-map-turn--right' : 'academy-map-turn--left'}`} />
-              )}
-              {row.map(node => (
-                <MapNode
-                  key={node.day}
-                  {...node}
-                  isToday={node.date === todayDate}
-                  onClick={() => setSelected(node)}
-                />
-              ))}
-            </div>
+          {zones.map(zone => (
+            <section key={zone.key} className={`academy-map-zone academy-map-zone--${zone.key}`}>
+              <div className="academy-map-zone__head">
+                <div>
+                  <strong>{zone.title}</strong>
+                  <small>{zone.sub}</small>
+                </div>
+                {zone.key === 'boss' && <span>月底壓力區</span>}
+              </div>
+              <div className="academy-map-card flex flex-col gap-8 py-5">
+                {zone.rows.map((row, ri) => (
+                  <div key={`${zone.key}-${ri}`} className="academy-map-row">
+                    <div className="academy-map-line" />
+                    {ri < zone.rows.length - 1 && (
+                      <div className={`academy-map-turn ${ri % 2 === 0 ? 'academy-map-turn--right' : 'academy-map-turn--left'}`} />
+                    )}
+                    {row.map(node => (
+                      <MapNode
+                        key={node.day}
+                        {...node}
+                        isToday={node.date === todayDate}
+                        onClick={() => setSelected(node)}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       </div>

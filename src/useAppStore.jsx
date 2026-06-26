@@ -36,12 +36,13 @@ const init = {
   totalSpent: 0,
   settled: false,
   screen: 'town',
+  screenParams: {},
   damageNumbers: [],
   notification: null,
 }
 
 const DEMO_PROFILE = {
-  playerName: '窮鬼勇者',
+  playerName: '新手勇者',
   level: 1,
   exp: 0,
   expInLevel: 0,
@@ -62,6 +63,7 @@ const DEMO_PROFILE = {
   avatarGender: 'girl',
   consecutiveDays: 0,
   collection: [],
+  nameConfirmed: false,
   onboardingDone: false,
 }
 
@@ -95,7 +97,7 @@ function reducer(state, action) {
     case 'SET_PROFILE':
       return { ...state, profile: action.profile }
     case 'SET_SCREEN':
-      return { ...state, screen: action.screen }
+      return { ...state, screen: action.screen, screenParams: action.params ?? {} }
     case 'INIT_DAY': {
       const { monster, expenses, dayRecord } = action
       const budget = state.profile?.dailyBudget ?? action.profile?.dailyBudget ?? 1000
@@ -319,8 +321,8 @@ export function AppProvider({ children }) {
     await refreshToday()
   }, [state, refreshToday])
 
-  const navigate = useCallback((screen) => {
-    dispatch({ type: 'SET_SCREEN', screen })
+  const navigate = useCallback((screen, params) => {
+    dispatch({ type: 'SET_SCREEN', screen, params })
   }, [])
 
   return (

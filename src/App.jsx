@@ -10,6 +10,7 @@ import ProfileScreen from './screens/ProfileScreen'
 import QuestScreen   from './screens/QuestScreen'
 import MissionScreen from './screens/MissionScreen'
 import splashBg from './assets/academy-art/splash-bg.webp'
+import Avatar from './components/Avatar'
 
 const SCREEN_MAP = {
   town:    TownScreen,
@@ -46,61 +47,18 @@ function LoadingScreen() {
   )
 }
 
-function OnboardingOverlay() {
-  const { state, dispatch } = useApp()
-  const { profile, user } = state
-  const [step, setStep] = useState(0)
-
-  if (!profile || profile.onboardingDone) return null
-
-  const pages = [
-    {
-      title: '歡迎成為窮鬼勇者',
-      text: '每一筆記帳都是一次攻擊。先記下消費，再看今日怪物扣血。',
-      hint: '目標：守住預算，擊殺今日怪物。',
-      action: '下一步',
-    },
-    {
-      title: '今日：主要戰鬥',
-      text: '底部「今日」是主入口。點「開始記帳攻擊」就能輸入分類、備註與金額。',
-      hint: '記帳金額會轉成傷害，預算剩越多越容易打倒怪物。',
-      action: '下一步',
-    },
-    {
-      title: '地圖：看本月路線',
-      text: '地圖會把每天的結果變成路線節點，擊殺、未滅、未記帳和首領都會分開顯示。',
-      hint: '節點可點開，看當天怪物、花費、評級與獎勵。',
-      action: '下一步',
-    },
-    {
-      title: '任務：每日與成就',
-      text: '每日任務每天重置，長期成就會累積。完成後記得進任務頁領獎。',
-      hint: '任務獎勵會給經驗、黃色星星或紫色星星。',
-      action: '下一步',
-    },
-    {
-      title: '補給：四種貨幣',
-      text: '黃色星星和紫色星星可直購收集品；一般扭蛋券抽一般池，金色扭蛋券抽限定池。',
-      hint: '金色扭蛋券主要來自公會月度挑戰。',
-      action: '下一步',
-    },
-    {
-      title: '公會：家庭財務基地',
-      text: '公會不是聊天公會，第一版是你的財務基地：收入、固定支出、儲蓄和共用基金都在這裡。',
-      hint: '月度挑戰完成後可拿金色扭蛋券。',
-      action: '下一步',
-    },
-    {
-      title: '頭像：資料與設定',
-      text: '點左上角頭像可以改玩家名稱、男/女主角、每日預算、自訂分類，也能查看稱號和收藏。',
-      hint: '找不到設定時，先點頭像。',
-      action: '開始冒險',
-    },
-  ]
-  const page = pages[step]
+function StarterRegistrationCard({ profile, user, dispatch }) {
+  const [nameInput, setNameInput] = useState(['窮鬼勇者', '新手勇者'].includes(profile?.playerName) ? '' : (profile?.playerName ?? ''))
+  const [gender, setGender] = useState(profile?.avatarGender ?? 'girl')
 
   async function finish() {
-    const data = { onboardingDone: true }
+    const playerName = nameInput.trim().slice(0, 12) || '新手勇者'
+    const data = {
+      playerName,
+      avatarGender: gender,
+      nameConfirmed: true,
+      onboardingDone: true,
+    }
     dispatch({ type: 'UPDATE_PROFILE', data })
     if (user) {
       try {
@@ -120,38 +78,61 @@ function OnboardingOverlay() {
     >
       <motion.div
         className="academy-onboarding__card"
-        key={step}
         initial={{ y: 18, scale: 0.98 }}
         animate={{ y: 0, scale: 1 }}
       >
-        <div className="academy-onboarding__badge">{step + 1}/{pages.length}</div>
-        <div className="academy-onboarding__title">{page.title}</div>
-        <div className="academy-onboarding__text">{page.text}</div>
-        <div className="academy-onboarding__hint">{page.hint}</div>
-        <div className="academy-onboarding__dots">
-          {pages.map((_, i) => <span key={i} className={i === step ? 'is-active' : ''} />)}
+        <div className="academy-onboarding__badge">冒險者登錄</div>
+        <div className="academy-onboarding__title">寫下你的名字</div>
+        <div className="academy-onboarding__text">
+          這個名字會顯示在主畫面與遠征紀錄裡。先選一位主角，之後也可以到設定更換。
         </div>
-        <div className="flex gap-2">
-          {step > 0 && (
-            <button className="academy-onboarding__ghost" onClick={() => setStep(v => v - 1)}>
-              上一步
+
+        <input
+          className="academy-name-input"
+          value={nameInput}
+          maxLength={12}
+          onChange={e => setNameInput(e.target.value)}
+          placeholder="例如：小小勇者"
+        />
+
+        <div className="academy-starter-gender">
+          {[
+            { key: 'girl', label: '女主角' },
+            { key: 'boy', label: '男主角' },
+          ].map(option => (
+            <button
+              key={option.key}
+              className={gender === option.key ? 'is-active' : ''}
+              onClick={() => setGender(option.key)}
+            >
+              <Avatar
+                gender={option.key}
+                variant="full"
+                outfit={profile?.equipped?.outfit ?? 'academy'}
+                frame={profile?.equipped?.frame ?? 'soft_gold'}
+                accessory={profile?.equipped?.accessory ?? 'star_pin'}
+                className="academy-starter-avatar"
+              />
+              <b>{option.label}</b>
             </button>
-          )}
-          {step < pages.length - 1 && (
-            <button className="academy-onboarding__ghost" onClick={finish}>
-              略過
-            </button>
-          )}
-          <button
-            className="academy-small-button flex-1"
-            onClick={() => step < pages.length - 1 ? setStep(v => v + 1) : finish()}
-          >
-            {page.action}
-          </button>
+          ))}
         </div>
+
+        <button className="academy-small-button w-full" onClick={finish}>
+          開始記帳冒險
+        </button>
       </motion.div>
     </motion.div>
   )
+}
+
+function OnboardingOverlay() {
+  const { state, dispatch } = useApp()
+  const { profile, user } = state
+
+  if (!profile || profile.nameConfirmed) return null
+
+  return <StarterRegistrationCard profile={profile} user={user} dispatch={dispatch} />
 }
 
 function AppContent() {
