@@ -338,6 +338,10 @@ export default function ProfileScreen() {
   const collectionIds = new Set((profile?.collection ?? []).map(item => item.id))
   const avatarGender = profile?.avatarGender ?? 'girl'
   const playerName = profile?.playerName?.trim() || '新手勇者'
+  const directTab = ['wardrobe', 'settings'].includes(screenParams?.tab) ? screenParams.tab : null
+  const pageTitle = directTab === 'wardrobe' ? '衣櫃'
+    : directTab === 'settings' ? '設定'
+    : '冒險者資料'
   const activeSet = WARDROBE.set.find(set => (
     (equipped.outfit ?? 'academy') === set.outfit &&
     (equipped.accessory ?? 'star_pin') === set.accessory &&
@@ -481,12 +485,12 @@ export default function ProfileScreen() {
 
       <div className="relative z-10 flex items-center gap-2 px-4 pb-2 pt-4">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>
-        <div className="flex-1 text-center text-sm font-black text-[#26324A]">冒險者資料</div>
+        <div className="flex-1 text-center text-sm font-black text-[#26324A]">{pageTitle}</div>
         <div className="w-10" />
       </div>
 
       <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
-        <div className="academy-card mb-3 text-center">
+        {!directTab && <div className="academy-card mb-3 text-center">
           <div className="mx-auto mb-2 flex justify-center">
             <Avatar
               gender={avatarGender}
@@ -503,9 +507,9 @@ export default function ProfileScreen() {
           <div className="mx-auto mt-2 w-52">
             <ExpBar expInLevel={expInLevel} expToNext={expToNext} />
           </div>
-        </div>
+        </div>}
 
-        <div className="mb-3 grid grid-cols-4 gap-2">
+        {!directTab && <div className="mb-3 grid grid-cols-4 gap-2">
           {[
             { label: '黃色星星', val: profile?.stars?.yellow ?? 0, tone: 'gold' },
             { label: '紫色星星', val: profile?.stars?.purple ?? 0, tone: 'purple' },
@@ -517,9 +521,9 @@ export default function ProfileScreen() {
               <div className="text-[9px] font-bold">{c.label}</div>
             </div>
           ))}
-        </div>
+        </div>}
 
-        <div className="academy-tabs mb-3">
+        {!directTab && <div className="academy-tabs mb-3">
           {[
             { k: 'stats', label: '狀態' },
             { k: 'titles', label: '稱號' },
@@ -530,7 +534,7 @@ export default function ProfileScreen() {
               {t.label}
             </button>
           ))}
-        </div>
+        </div>}
 
         {tab === 'stats' && (
           <div className="academy-card">

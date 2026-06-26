@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { generateDayMonster, formatMoney } from '../gameLogic'
-import { getMonthDayRecords, getMonthExpenses } from '../firebase'
+import { DEFAULT_CATEGORIES, generateDayMonster, formatMoney } from '../gameLogic'
+import { addExpense, getMonthDayRecords, getMonthExpenses, setDayRecord } from '../firebase'
 import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
 import mapBg from '../assets/academy-art/map-bg.webp'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
+import zoneAcademy from '../assets/academy-art/map-zones/week1-academy.webp'
+import zoneMarket from '../assets/academy-art/map-zones/week2-market.webp'
+import zoneForest from '../assets/academy-art/map-zones/week3-forest.webp'
+import zoneBoss from '../assets/academy-art/map-zones/week4-boss.webp'
 
 // 節點狀態設定
 const NODE_CONFIG = {
@@ -20,10 +24,10 @@ const NODE_CONFIG = {
 }
 
 const MAP_ZONES = [
-  { key: 'academy', title: '第 1 週｜學院入口', sub: '建立記帳節奏，讓路線亮起來', range: [1, 7] },
-  { key: 'market', title: '第 2 週｜魔法市集', sub: '誘惑變多，檢查每天是否守住預算', range: [8, 14] },
-  { key: 'forest', title: '第 3 週｜帳本森林', sub: '花費開始累積，路線會留下戰鬥痕跡', range: [15, 21] },
-  { key: 'boss', title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', range: [22, 31] },
+  { key: 'academy', title: '第 1 週｜學院入口', sub: '建立記帳節奏，讓路線亮起來', range: [1, 7], bg: zoneAcademy },
+  { key: 'market', title: '第 2 週｜魔法市集', sub: '誘惑變多，檢查每天是否守住預算', range: [8, 14], bg: zoneMarket },
+  { key: 'forest', title: '第 3 週｜帳本森林', sub: '花費開始累積，路線會留下戰鬥痕跡', range: [15, 21], bg: zoneForest },
+  { key: 'boss', title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', range: [22, 31], bg: zoneBoss },
 ]
 
 function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
@@ -44,9 +48,8 @@ function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
     >
       <GameIcon name={cfg.icon} />
       {spent > 0 && <i className="academy-map-node__spent" />}
-      <div className="academy-map-node__date">
-        {day}日
-      </div>
+      <div className="academy-map-node__date">{day}</div>
+      <span className="academy-map-node__suffix">日</span>
     </motion.button>
   )
 }
@@ -129,6 +132,10 @@ export default function MapScreen() {
   const zones = buildZones(days)
 
   const [selected, setSelected] = useState(null)
+  const [backfillAmount, setBackfillAmount] = useState('')
+  const [backfillCategory, setBackfillCategory] = useState(DEFAULT_CATEGORIES[0]?.label ?? '其他')
+  const [backfillNote, setBackfillNote] = useState('')
+  const [savingBackfill, setSavingBackfill] = useState(false)
 
   const stats = useMemo(() => {
     const elapsedDays = days.filter(d => d.date <= todayDate)
@@ -150,6 +157,46 @@ export default function MapScreen() {
       ratingCounts,
     }
   }, [budget, days, monthExpenseItems, todayDate])
+
+  async function submitBackfill() {
+    if (!user || !selected) return
+    const amount = Number(backfillAmount)
+    if (!amount || amount <= 0) return
+    setSavingBackfill(true)
+    try {
+      const expense = {
+        date: selected.date,
+        amount,
+        category: backfillCategory,
+        note: backfillNote.trim() || '補登消費',
+      }
+      const ref = await addExpense(user.uid, expense)
+      await setDayRecord(user.uid, selected.date, {
+        settled: true,
+        backfilled: true,
+        rewardScale: 0,
+        spent: (selected.spent ?? 0) + amount,
+        rewards: { yellow: 0, purple: 0, normalTicket: 0, goldTicket: 0, exp: 0 },
+      })
+      const nextItem = { ...expense, id: ref.id }
+      setMonthExpenseItems(items => [...items, nextItem])
+      setMonthExpenses(expenses => ({
+        ...expenses,
+        [selected.date]: (expenses[selected.date] ?? 0) + amount,
+      }))
+      setMonthRecords(records => ({
+        ...records,
+        [selected.date]: { ...(records[selected.date] ?? {}), backfilled: true, settled: true, spent: (selected.spent ?? 0) + amount },
+      }))
+      setSelected(node => node ? { ...node, spent: (node.spent ?? 0) + amount, record: { ...(node.record ?? {}), backfilled: true } } : node)
+      setBackfillAmount('')
+      setBackfillNote('')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSavingBackfill(false)
+    }
+  }
 
   return (
     <div className="academy-screen" style={{ '--monster-sprites': `url(${monsterSprites})` }}>
@@ -224,7 +271,11 @@ export default function MapScreen() {
             </div>
           )}
           {zones.map(zone => (
-            <section key={zone.key} className={`academy-map-zone academy-map-zone--${zone.key}`}>
+            <section
+              key={zone.key}
+              className={`academy-map-zone academy-map-zone--${zone.key}`}
+              style={{ '--zone-image': `url(${zone.bg})` }}
+            >
               <div className="academy-map-zone__head">
                 <div>
                   <strong>{zone.title}</strong>
@@ -307,6 +358,34 @@ export default function MapScreen() {
             >
               前往今日討伐
             </button>
+          )}
+          {selected.date < todayDate && selected.status === 'no_record' && (
+            <div className="academy-backfill-panel">
+              <div className="academy-backfill-panel__title">
+                <b>補登這一天</b>
+                <span>補登只修正歷史資料，不重新發放當日獎勵。</span>
+              </div>
+              <div className="academy-backfill-row">
+                <select value={backfillCategory} onChange={e => setBackfillCategory(e.target.value)}>
+                  {DEFAULT_CATEGORIES.map(cat => <option key={cat.id} value={cat.label}>{cat.label}</option>)}
+                </select>
+                <input
+                  type="number"
+                  value={backfillAmount}
+                  onChange={e => setBackfillAmount(e.target.value)}
+                  placeholder="金額"
+                />
+              </div>
+              <input
+                className="academy-backfill-note"
+                value={backfillNote}
+                onChange={e => setBackfillNote(e.target.value)}
+                placeholder="備註，可留空"
+              />
+              <button className="academy-small-button mt-2 w-full" onClick={submitBackfill} disabled={savingBackfill}>
+                {savingBackfill ? '補登中...' : '補登消費'}
+              </button>
+            </div>
           )}
         </motion.div>
       )}
