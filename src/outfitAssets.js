@@ -18,6 +18,7 @@ import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png
 
 // ── 背景 imports ────────────────────────────────────────────────
 import homeBg from './assets/academy-art/home-bg.webp'
+import girlAcademyStarter from './assets/academy-art/academy-set/girl-academy-starter.webp'
 import summerBeachBg from './assets/academy-art/summer-set/beach-bg.webp'
 import girlSummerIdle from './assets/academy-art/summer-set/girl-summer-idle.webp'
 import sakuraFestivalBg from './assets/academy-art/sakura-set/sakura-bg-close.webp'
@@ -26,21 +27,6 @@ import rainyDetectiveBg from './assets/academy-art/rainy-detective-set/rainy-bg.
 import girlRainyDetective from './assets/academy-art/rainy-detective-set/girl-rainy-detective.webp'
 
 // ── 幀動畫 imports（從影片抽幀 + 黑底去背，4fps × 12幀 = 3s loop）──
-
-// 女生學院服
-import gaF01 from './assets/academy-art/generated/frames/girl-academy/f01.png'
-import gaF02 from './assets/academy-art/generated/frames/girl-academy/f02.png'
-import gaF03 from './assets/academy-art/generated/frames/girl-academy/f03.png'
-import gaF04 from './assets/academy-art/generated/frames/girl-academy/f04.png'
-import gaF05 from './assets/academy-art/generated/frames/girl-academy/f05.png'
-import gaF06 from './assets/academy-art/generated/frames/girl-academy/f06.png'
-import gaF07 from './assets/academy-art/generated/frames/girl-academy/f07.png'
-import gaF08 from './assets/academy-art/generated/frames/girl-academy/f08.png'
-import gaF09 from './assets/academy-art/generated/frames/girl-academy/f09.png'
-import gaF10 from './assets/academy-art/generated/frames/girl-academy/f10.png'
-import gaF11 from './assets/academy-art/generated/frames/girl-academy/f11.png'
-import gaF12 from './assets/academy-art/generated/frames/girl-academy/f12.png'
-const GIRL_ACADEMY_FRAMES = [gaF01,gaF02,gaF03,gaF04,gaF05,gaF06,gaF07,gaF08,gaF09,gaF10,gaF11,gaF12]
 
 // 女生粉晶禮服
 import gcgF01 from './assets/academy-art/generated/frames/girl-crystal-gown/f01.png'
@@ -137,9 +123,9 @@ export const OUTFIT_CONFIG = {
   academy: {
     name: '星術學院套裝',
     desc: '預設主角造型',
-    girlImage:  girlBaseImg,
+    girlImage:  girlAcademyStarter,
     boyImage:   boyBaseImg,
-    girlFrames: GIRL_ACADEMY_FRAMES,
+    girlFrames: null,
     boyFrames:  null,           // TODO: 生成男生幀
     girlBlink:  null,
     boyBlink:   null,
