@@ -583,9 +583,9 @@
 }
 
 .academy-screen--rainy .academy-screen-character {
-  top: 244px;
-  width: 52vw;
-  max-width: 212px;
+  top: 208px;
+  width: 60vw;
+  max-width: 240px;
 }
 
 .academy-screen--rainy .academy-hud,
