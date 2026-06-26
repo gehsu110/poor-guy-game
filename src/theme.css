@@ -322,6 +322,57 @@
   background: var(--color-brand-500);
 }
 
+.academy-screen--academy .academy-bg-soft {
+  background: linear-gradient(180deg, rgba(255,248,236,.02), rgba(255,248,236,.12) 58%, rgba(82,63,120,.22));
+}
+
+.academy-screen--academy .academy-home-hero {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  isolation: auto;
+}
+
+.academy-screen--academy .academy-home-hero::before,
+.academy-screen--academy .academy-home-hero__shine { display: none; }
+
+.academy-screen--academy .academy-bg {
+  transform: scale(1.18);
+  transform-origin: center 66%;
+  object-position: center 62%;
+}
+
+.academy-screen--academy .academy-screen-character {
+  top: 148px;
+  width: 61vw;
+  max-width: 236px;
+}
+
+.academy-screen--academy .academy-status-board {
+  border-color: rgba(255,229,178,.42);
+  background:
+    linear-gradient(135deg, rgba(255,250,235,.74), rgba(239,229,255,.46)),
+    radial-gradient(circle at 86% 18%, rgba(231,173,54,.18), transparent 38%);
+  box-shadow: 0 12px 30px rgba(62,49,94,.18), inset 0 1px rgba(255,255,255,.22);
+}
+
+.academy-screen--academy .academy-attack-panel {
+  border-color: rgba(155,132,206,.18);
+  background: rgba(255,251,243,.90);
+}
+
+.academy-screen--academy .academy-primary-cta {
+  color: #2c2440;
+  background: linear-gradient(135deg, #ffd875, #e7ad36 62%, #c98921);
+}
+
+.academy-screen--academy .academy-home-content {
+  padding-top: 0;
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+}
+
+.academy-screen--academy .academy-attack-panel { margin-bottom: 8px; }
+
 /* Complete summer collection: scene, props, motion, and UI palette travel together. */
 .academy-screen--summer .academy-bg-soft {
   background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(24,133,168,.04) 48%, rgba(255,244,215,.34));

@@ -18,6 +18,7 @@ import boySuit         from './assets/academy-art/generated/outfits/boy-suit.png
 
 // ── 背景 imports ────────────────────────────────────────────────
 import homeBg from './assets/academy-art/home-bg.webp'
+import academyBg from './assets/academy-art/academy-set/academy-bg.webp'
 import girlAcademyStarter from './assets/academy-art/academy-set/girl-academy-starter.webp'
 import summerBeachBg from './assets/academy-art/summer-set/beach-bg.webp'
 import girlSummerIdle from './assets/academy-art/summer-set/girl-summer-idle.webp'
@@ -131,7 +132,7 @@ export const OUTFIT_CONFIG = {
     boyBlink:   null,
     girlVideo:  null,
     boyVideo:   null,
-    bg:         homeBg,
+    bg:         academyBg,
     bgTheme:    'academy',
   },
   saving_hero: {
