@@ -660,6 +660,21 @@
 }
 
 .rainy-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+.rainy-scene::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 21%;
+  height: 78px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 38% 70%, rgba(136,212,218,.16), transparent 58%),
+    radial-gradient(ellipse at 68% 56%, rgba(255,218,150,.12), transparent 62%);
+  filter: blur(10px);
+  opacity: .68;
+  animation: rainy-pavement-glow 5.8s ease-in-out infinite;
+}
 .rainy-lantern-glow {
   position: absolute;
   top: 18%;
@@ -682,6 +697,7 @@
   filter: blur(3px);
 }
 @keyframes rainy-lantern-breathe { 50% { opacity: .64; transform: scale(1.08); } }
+@keyframes rainy-pavement-glow { 50% { opacity: .42; transform: scaleX(1.04); } }
 .rainy-drop {
   position: absolute;
   top: -38px;
@@ -689,7 +705,7 @@
   height: 42px;
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(218,247,255,0), rgba(218,247,255,.62));
-  opacity: .62;
+  opacity: 0;
   animation: rainy-fall 1.9s linear infinite;
 }
 .rainy-drop--one { left: 18%; animation-delay: -.2s; }

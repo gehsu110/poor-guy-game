@@ -69,8 +69,8 @@ const WARDROBE = {
     },
     {
       id: 'rainy_detective_set',
-      name: '雨夜偵探套裝',
-      desc: '紫髮側辮、帳本燈與雨巷探案',
+      name: '雨後偵探套裝',
+      desc: '紫灰短髮、帳本燈與雨後巷弄探案',
       outfit: 'rainy_detective',
       accessory: 'none',
       frame: 'crystal',
@@ -94,7 +94,7 @@ const WARDROBE = {
     { id: 'suit',       name: '都市精英套裝',desc: '職場感套裝',   owned: true },  // 暫時解鎖
     { id: 'summer_beach', name: '星潮海灘裝', desc: '貝殼水手夏日造型', owned: true },
     { id: 'sakura_festival', name: '櫻燈祭典裝', desc: '月下和風祭典造型', owned: true },
-    { id: 'rainy_detective', name: '雨夜偵探裝', desc: '帳本燈與透明雨衣', owned: true },
+    { id: 'rainy_detective', name: '雨後偵探裝', desc: '帳本燈與透明雨衣', owned: true },
     { id: 'mint_coat',  name: '薄荷外套',   desc: '清爽補給色',   owned: false },
   ],
   accessory: [

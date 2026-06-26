@@ -235,8 +235,8 @@ export const OUTFIT_CONFIG = {
     bgTheme: 'sakura',
   },
   rainy_detective: {
-    name: '雨夜偵探套裝',
-    desc: '帳本探案與雨巷燈火主題限定',
+    name: '雨後偵探套裝',
+    desc: '雨後帳本探案與濕巷燈火主題限定',
     girlImage: girlRainyDetective,
     boyImage: null,
     girlFrames: null,
