@@ -107,6 +107,17 @@ export default function TownScreen() {
           <i className="sakura-petal sakura-petal--four" />
         </div>
       )}
+      {bgTheme === 'rainy' && (
+        <div className="rainy-scene" aria-hidden="true">
+          <span className="rainy-lantern-glow" />
+          <span className="rainy-ground-shadow" />
+          <i className="rainy-drop rainy-drop--one" />
+          <i className="rainy-drop rainy-drop--two" />
+          <i className="rainy-drop rainy-drop--three" />
+          <i className="rainy-drop rainy-drop--four" />
+          <i className="rainy-drop rainy-drop--five" />
+        </div>
+      )}
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
       {video ? (
         <ChromaKeyCanvas

@@ -22,6 +22,8 @@ import summerBeachBg from './assets/academy-art/summer-set/beach-bg.webp'
 import girlSummerIdle from './assets/academy-art/summer-set/girl-summer-idle.webp'
 import sakuraFestivalBg from './assets/academy-art/sakura-set/sakura-bg-close.webp'
 import girlSakuraFestival from './assets/academy-art/sakura-set/girl-sakura-festival.webp'
+import rainyDetectiveBg from './assets/academy-art/rainy-detective-set/rainy-bg.webp'
+import girlRainyDetective from './assets/academy-art/rainy-detective-set/girl-rainy-detective.webp'
 
 // ── 幀動畫 imports（從影片抽幀 + 黑底去背，4fps × 12幀 = 3s loop）──
 
@@ -231,6 +233,18 @@ export const OUTFIT_CONFIG = {
     boyVideo: null,
     bg: sakuraFestivalBg,
     bgTheme: 'sakura',
+  },
+  rainy_detective: {
+    name: '雨夜偵探套裝',
+    desc: '帳本探案與雨巷燈火主題限定',
+    girlImage: girlRainyDetective,
+    boyImage: null,
+    girlFrames: null,
+    boyFrames: null,
+    girlVideo: null,
+    boyVideo: null,
+    bg: rainyDetectiveBg,
+    bgTheme: 'rainy',
   },
 }
 
