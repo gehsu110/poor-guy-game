@@ -238,29 +238,29 @@ export default function MapScreen() {
 
       {/* 地圖主體 */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
-        <div className="academy-card mb-3">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="academy-map-report mb-3">
+          <div className="academy-map-report__head">
             <div>
-              <div className="text-sm font-black text-[#26324A]">本月戰報</div>
-              <div className="text-[10px] font-bold text-[#8E87A8]">記帳、預算、討伐進度</div>
+              <div className="academy-map-report__title">本月戰報</div>
+              <div className="academy-map-report__subtitle">記帳、預算、討伐進度</div>
             </div>
-            <span className="academy-status academy-status--done">{stats.recorded}/{stats.total} 天</span>
+            <span className="academy-map-report__stamp">{stats.recorded}/{stats.total} 天</span>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="academy-stat-box text-center">
-              <div className="text-[10px] font-bold text-[#8E87A8]">總消費</div>
-              <div className="text-xs font-black text-[#26324A]">NT${formatMoney(stats.totalSpent)}</div>
+          <div className="academy-map-report__stats">
+            <div className="academy-map-report__stat">
+              <div>總消費</div>
+              <strong>NT${formatMoney(stats.totalSpent)}</strong>
             </div>
-            <div className="academy-stat-box text-center">
-              <div className="text-[10px] font-bold text-[#8E87A8]">日均</div>
-              <div className="text-xs font-black text-[#26324A]">NT${formatMoney(stats.avgSpent)}</div>
+            <div className="academy-map-report__stat">
+              <div>日均</div>
+              <strong>NT${formatMoney(stats.avgSpent)}</strong>
             </div>
-            <div className="academy-stat-box text-center">
-              <div className="text-[10px] font-bold text-[#8E87A8]">預算內</div>
-              <div className="text-xs font-black text-[#178B82]">{stats.underBudget} 天</div>
+            <div className="academy-map-report__stat academy-map-report__stat--safe">
+              <div>預算內</div>
+              <strong>{stats.underBudget} 天</strong>
             </div>
           </div>
-          <div className="mt-3 grid grid-cols-4 gap-2">
+          <div className="academy-map-report__ratings">
             {['S', 'A', 'B', 'C'].map(rating => (
               <div key={rating} className="academy-rating-chip">
                 <b>{rating}</b>
