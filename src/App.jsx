@@ -156,7 +156,7 @@ function AppContent() {
         <OnboardingOverlay />
         {notification && (
           <motion.div
-            className="pointer-events-none absolute left-1/2 top-20 z-[80] -translate-x-1/2 whitespace-nowrap rounded-2xl border border-[#FFD166]/50 bg-white/95 px-4 py-2 text-sm font-black text-[#D9961E] shadow-xl"
+            className="academy-toast"
             initial={{ y: -18, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -18, opacity: 0 }}

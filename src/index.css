@@ -1226,6 +1226,28 @@ video.academy-screen-character {
   border-color: rgba(255,127,163,0.48);
 }
 
+.academy-toast {
+  pointer-events: none;
+  position: absolute;
+  right: 16px;
+  left: 16px;
+  top: calc(72px + env(safe-area-inset-top));
+  z-index: 80;
+  max-width: 390px;
+  margin: 0 auto;
+  border-radius: 18px;
+  border: 1px solid rgba(255,209,102,0.5);
+  background: rgba(255,255,255,0.96);
+  padding: 9px 13px;
+  color: #d9961e;
+  font-size: 12px;
+  font-weight: 1000;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 14px 28px rgba(86,74,130,0.16);
+  overflow-wrap: anywhere;
+}
+
 .academy-attack-panel {
   position: relative;
   z-index: 4;
@@ -1448,10 +1470,10 @@ video.academy-screen-character {
 .academy-battle-arena {
   position: relative;
   display: flex;
-  height: 386px;
+  height: 340px;
   flex-direction: column;
   justify-content: flex-start;
-  padding-top: 4px;
+  padding-top: 0;
 }
 
 .academy-battle-hp {
@@ -1465,10 +1487,98 @@ video.academy-screen-character {
   backdrop-filter: blur(16px);
 }
 
+.academy-battle-budget-pill {
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.68);
+  background: rgba(255,255,255,0.86);
+  padding: 9px 12px;
+  color: #d9961e;
+  font-size: 12px;
+  font-weight: 1000;
+  box-shadow: 0 8px 18px rgba(86,74,130,0.12);
+}
+
+.academy-battle-budget-pill.is-over {
+  color: #d9517b;
+  background: rgba(255,229,238,0.9);
+}
+
+.academy-battle-top-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.academy-battle-top-stats span {
+  display: grid;
+  min-width: 0;
+  min-height: 46px;
+  place-items: center;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.74);
+  background: rgba(255,255,255,0.72);
+  box-shadow: 0 8px 16px rgba(86,74,130,0.08);
+  text-align: center;
+}
+
+.academy-battle-top-stats small {
+  color: #8e87a8;
+  font-size: 8px;
+  font-weight: 1000;
+  line-height: 1.1;
+}
+
+.academy-battle-top-stats b {
+  color: #26324a;
+  font-size: 11px;
+  font-weight: 1000;
+  line-height: 1.1;
+}
+
+.academy-battle-top-stats .is-over b {
+  color: #d9517b;
+}
+
+.academy-battle-meter-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  color: #8e87a8;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-battle-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.academy-battle-meta span {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  background: rgba(241,236,255,0.8);
+  padding: 3px 7px 3px 4px;
+  color: #5e5590;
+  font-size: 9px;
+  font-weight: 1000;
+}
+
+.academy-battle-meta .game-icon {
+  width: 17px;
+  height: 17px;
+}
+
 .academy-battle-stage {
   position: relative;
   display: flex;
-  height: 296px;
+  height: 224px;
   align-items: center;
   justify-content: center;
   margin-top: 0;
@@ -1489,8 +1599,8 @@ video.academy-screen-character {
 
 .academy-battle-monster-art {
   display: block;
-  width: 306px;
-  height: 306px;
+  width: 262px;
+  height: 262px;
   object-fit: contain;
   object-position: center bottom;
   filter: drop-shadow(0 12px 12px rgba(86,74,130,0.2));
@@ -1511,17 +1621,61 @@ video.academy-screen-character {
 .academy-battle-log {
   position: relative;
   z-index: 5;
-  margin-top: -10px;
+  margin-top: -4px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.56);
+  padding: 8px;
+  backdrop-filter: blur(12px);
 }
 
-.academy-battle-log .flex.max-h-24 {
-  max-height: 46px;
+.academy-battle-empty-log {
+  border-radius: 16px;
+  background: rgba(255,255,255,0.78);
+  padding: 9px 10px;
+  color: #8e87a8;
+  font-size: 11px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.academy-battle-expense-list {
+  display: flex;
+  max-height: 50px;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+}
+
+.academy-battle-expense-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.82);
+  padding: 7px 8px;
+  box-shadow: inset 0 0 0 1px rgba(231,222,246,0.42);
+}
+
+.academy-battle-row-action {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #f1ecff;
+  padding: 4px 7px;
+  color: #7b63d8;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-battle-row-action.is-danger {
+  background: #ffe5ee;
+  color: #d9517b;
 }
 
 .academy-battle-panel {
   position: relative;
   z-index: 6;
-  margin-top: 6px;
+  margin-top: 7px;
   padding: 10px;
   border-radius: 24px;
 }
@@ -1532,13 +1686,53 @@ video.academy-screen-character {
   gap: 8px;
 }
 
+.academy-battle-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.academy-battle-panel-head b,
+.academy-battle-panel-head small {
+  display: block;
+}
+
+.academy-battle-panel-head b {
+  color: #26324a;
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.academy-battle-panel-head small {
+  margin-top: 1px;
+  color: #8e87a8;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.academy-battle-panel-head > span {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgba(223,248,245,0.9);
+  padding: 5px 9px;
+  color: #178b82;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-battle-panel-head > span.is-over {
+  background: #ffe5ee;
+  color: #d9517b;
+}
+
 @media (max-height: 760px) {
   .academy-battle-arena {
-    height: 300px;
+    height: 284px;
   }
 
   .academy-battle-stage {
-    height: 210px;
+    height: 168px;
   }
 
   .academy-battle-monster {
@@ -1547,8 +1741,8 @@ video.academy-screen-character {
   }
 
   .academy-battle-monster-art {
-    width: 225px;
-    height: 225px;
+    width: 208px;
+    height: 208px;
   }
 
   .academy-category--compact {
@@ -1612,6 +1806,37 @@ video.academy-screen-character {
 .academy-first-person-projectile {
   left: 50%;
   bottom: -8px;
+}
+
+.academy-battle-clear-card {
+  position: absolute;
+  inset-inline: 32px;
+  top: 126px;
+  z-index: 20;
+  border-radius: 24px;
+  border: 1px solid rgba(255,211,95,0.5);
+  background: rgba(255,255,255,0.92);
+  padding: 14px 16px;
+  text-align: center;
+  box-shadow: 0 18px 38px rgba(86,74,130,0.22);
+  backdrop-filter: blur(16px);
+}
+
+.academy-battle-reward-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  background: rgba(255,245,201,0.9);
+  padding: 4px 8px 4px 5px;
+  color: #9a681b;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-battle-reward-pill .game-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .academy-impact-star {

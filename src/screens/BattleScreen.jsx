@@ -144,11 +144,30 @@ function TierBadge({ tier }) {
   return <span className="academy-status">今日咒靈</span>
 }
 
-function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit, showProjectile, showImpact }) {
+function getBattleDrop(tier) {
+  if (tier === 'monthboss') return { normalTicket: 3 }
+  if (tier === 'boss' || tier === 'weekend') return { normalTicket: 2 }
+  return { normalTicket: 1 }
+}
+
+function BattleRewardPill({ type, value }) {
+  const icon = type === 'normalTicket' ? 'ticket-normal' : 'ticket-gold'
+  const label = type === 'normalTicket' ? '一般券' : '金券'
+  return (
+    <span className="academy-battle-reward-pill">
+      <GameIcon name={icon} />
+      <b>{label} +{value}</b>
+    </span>
+  )
+}
+
+function MonsterArea({ monster, currentHp, totalSpent, budget, isHit, damageNumbers, hitKey, isCrit, showProjectile, showImpact }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
   const isAngry = hpPct < 0.3 && !defeated
+  const spentPct = budget > 0 ? Math.min(totalSpent / budget, 1) : 0
+  const drop = getBattleDrop(monster.tier)
 
   return (
     <div className="academy-battle-arena">
@@ -163,7 +182,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit,
           <TierBadge tier={monster.tier} />
         </div>
 
-        <div className="mb-1 flex justify-between text-[10px] font-black text-[#8E87A8]">
+        <div className="academy-battle-meter-row">
           <span>血量</span>
           <span>{defeated ? '0' : formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
         </div>
@@ -173,6 +192,11 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit,
             animate={{ width: `${hpPct * 100}%` }}
             transition={{ duration: 0.55, ease: 'easeOut' }}
           />
+        </div>
+        <div className="academy-battle-meta">
+          <span><GameIcon name="battle" /> 特效 星軌斬擊</span>
+          <span><GameIcon name="coin-gold" /> 預算 {Math.round(spentPct * 100)}%</span>
+          <span><GameIcon name="ticket-normal" /> 掉落 +{drop.normalTicket}</span>
         </div>
       </div>
 
@@ -227,7 +251,7 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit,
       <AnimatePresence>
         {defeated && (
           <motion.div
-            className="absolute inset-x-8 top-40 z-20 rounded-3xl border border-[#FFD166]/50 bg-white/90 px-5 py-4 text-center shadow-2xl backdrop-blur"
+            className="academy-battle-clear-card"
             initial={{ y: 10, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 10, opacity: 0 }}
@@ -236,7 +260,10 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit,
               <span className="academy-icon academy-icon--star" />
             </div>
             <div className="mt-1 text-sm font-black text-[#26324A]">淨化成功</div>
-            <div className="text-[10px] font-bold text-[#8E87A8]">獎勵會在每日結算發放</div>
+            <div className="mt-1 flex justify-center gap-1">
+              <BattleRewardPill type="normalTicket" value={drop.normalTicket} />
+            </div>
+            <div className="mt-1 text-[10px] font-bold text-[#8E87A8]">任務與結算徽章會在今日結算同步</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -348,10 +375,13 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
 
   return (
     <div className="academy-battle-pad">
-      <div className="flex justify-between text-[11px] font-black text-[#8E87A8]">
-        <span>今日消費 <b className="text-[#26324A]">NT${formatMoney(spent)}</b></span>
-        <span className={remaining < 0 ? 'text-[#FF6D98]' : 'text-[#24B7B0]'}>
-          {remaining < 0 ? `超支 NT$${formatMoney(-remaining)}` : `剩餘 NT$${formatMoney(remaining)}`}
+      <div className="academy-battle-panel-head">
+        <div>
+          <b>記帳攻擊</b>
+          <small>{previewDmg ? `本筆預估傷害 -${formatMoney(previewDmg)}` : '選分類並輸入金額'}</small>
+        </div>
+        <span className={remaining < 0 ? 'is-over' : ''}>
+          {remaining < 0 ? `超支 ${formatMoney(-remaining)}` : `剩餘 ${formatMoney(remaining)}`}
         </span>
       </div>
 
@@ -444,20 +474,20 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
 function ExpenseList({ expenses, onEdit, onDelete, categories }) {
   if (!expenses.length) {
     return (
-      <div className="rounded-2xl bg-white/80 px-3 py-3 text-center text-xs font-bold text-[#8E87A8]">
+      <div className="academy-battle-empty-log">
         還沒有記帳紀錄，輸入消費即可施法。
       </div>
     )
   }
 
   return (
-    <div className="flex max-h-24 flex-col gap-1 overflow-y-auto">
+    <div className="academy-battle-expense-list">
       {[...expenses].reverse().map((e, i) => {
         const cat = categories.find(c => c.id === e.category)
         return (
           <motion.div
             key={e.id ?? i}
-            className="flex items-center gap-2 rounded-2xl bg-white/85 px-3 py-2 shadow-sm"
+            className="academy-battle-expense-row"
             initial={{ x: -14, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: i * 0.02 }}
@@ -468,11 +498,37 @@ function ExpenseList({ expenses, onEdit, onDelete, categories }) {
               {e.note && <div className="truncate text-[10px] font-bold text-[#8E87A8]">{e.note}</div>}
             </div>
             <div className="text-sm font-black text-[#D9961E]">NT${formatMoney(e.amount)}</div>
-            <button className="rounded-full bg-[#F1ECFF] px-2 py-1 text-[10px] font-black text-[#7B63D8]" onClick={() => onEdit(e)}>改</button>
-            <button className="rounded-full bg-[#FFE5EE] px-2 py-1 text-[10px] font-black text-[#FF6D98]" onClick={() => onDelete(e.id)}>刪</button>
+            <button className="academy-battle-row-action" onClick={() => onEdit(e)}>改</button>
+            <button className="academy-battle-row-action is-danger" onClick={() => onDelete(e.id)}>刪</button>
           </motion.div>
         )
       })}
+    </div>
+  )
+}
+
+function BattleTopStats({ budget, totalSpent, currentHp, monster }) {
+  const remaining = budget - totalSpent
+  const attackPower = Math.max(0, Math.round(totalSpent / 10))
+  const hpPct = monster?.maxHp > 0 ? Math.round((Math.max(0, currentHp) / monster.maxHp) * 100) : 0
+  return (
+    <div className="academy-battle-top-stats">
+      <span>
+        <small>今日消費</small>
+        <b>NT${formatMoney(totalSpent)}</b>
+      </span>
+      <span>
+        <small>攻擊力</small>
+        <b>+{attackPower}</b>
+      </span>
+      <span className={remaining < 0 ? 'is-over' : ''}>
+        <small>{remaining < 0 ? '超支' : '剩餘'}</small>
+        <b>NT${formatMoney(Math.abs(remaining))}</b>
+      </span>
+      <span>
+        <small>怪物血量</small>
+        <b>{hpPct}%</b>
+      </span>
     </div>
   )
 }
@@ -488,6 +544,7 @@ export default function BattleScreen() {
   const [editingExpense, setEditingExpense] = useState(null)
   const budget = profile?.dailyBudget ?? 1000
   const categories = [...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])]
+  const remaining = budget - totalSpent
 
   async function handleSubmit(data) {
     const spentBase = editingExpense ? totalSpent - Number(editingExpense.amount ?? 0) : totalSpent
@@ -535,15 +592,18 @@ export default function BattleScreen() {
           <div className="text-sm font-black text-[#26324A]">今日討伐</div>
           <div className="text-[10px] font-bold text-[#8E87A8]">{state.date}</div>
         </div>
-        <div className="rounded-2xl border border-white/60 bg-white/85 px-3 py-2 text-xs font-black text-[#D9961E] shadow-md">
-          NT${formatMoney(Math.max(0, budget - totalSpent))}
+        <div className={`academy-battle-budget-pill ${remaining < 0 ? 'is-over' : ''}`}>
+          {remaining < 0 ? `超支 ${formatMoney(-remaining)}` : `剩餘 ${formatMoney(remaining)}`}
         </div>
       </div>
 
       <div className="academy-battle-content relative z-10 flex-1 overflow-hidden px-4 pb-[92px]">
+        <BattleTopStats budget={budget} totalSpent={totalSpent} currentHp={currentHp} monster={monster} />
         <MonsterArea
           monster={monster}
           currentHp={currentHp}
+          totalSpent={totalSpent}
+          budget={budget}
           isHit={isHit}
           damageNumbers={damageNumbers}
           hitKey={hitKey}
@@ -553,7 +613,10 @@ export default function BattleScreen() {
         />
         <div className="academy-battle-log">
           <div className="mb-1 flex items-center justify-between">
-            <div className="text-xs font-black text-[#26324A]">今日記錄</div>
+            <div>
+              <div className="text-xs font-black text-[#26324A]">今日記錄</div>
+              <div className="text-[10px] font-bold text-[#8E87A8]">最近紀錄摘要</div>
+            </div>
             <div className="text-[10px] font-black text-[#8E87A8]">{expenses.length} 筆</div>
           </div>
           <ExpenseList expenses={expenses} categories={categories} onEdit={setEditingExpense} onDelete={deleteExpenseEntry} />
