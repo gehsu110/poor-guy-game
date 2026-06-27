@@ -3544,6 +3544,161 @@ video.academy-screen-character {
   font-weight: 1000;
 }
 
+.academy-shop-ui-preview {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,211,95,0.18), transparent 35%),
+    linear-gradient(135deg, rgba(255,255,255,0.78), rgba(248,242,255,0.78));
+}
+
+.academy-shop-ui-preview__grid {
+  display: grid;
+  gap: 9px;
+}
+
+.academy-shop-ui-demo {
+  display: grid;
+  gap: 7px;
+  border-radius: 18px;
+  border: 1px solid rgba(231,222,246,0.78);
+  background: rgba(255,255,255,0.66);
+  padding: 9px;
+}
+
+.academy-shop-ui-demo__label {
+  color: #7161b8;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-shop-ui-ticket-source,
+.academy-shop-reminder-card,
+.academy-shop-quest-row,
+.academy-shop-settlement-card {
+  border-radius: 16px;
+  background: rgba(255,252,246,0.82);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.52);
+}
+
+.academy-shop-ui-ticket-source,
+.academy-shop-reminder-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 9px;
+}
+
+.academy-shop-ui-ticket-source .game-icon,
+.academy-shop-reminder-card .game-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.academy-shop-ui-ticket-source b,
+.academy-shop-reminder-card b,
+.academy-shop-quest-row b,
+.academy-shop-settlement-card b {
+  display: block;
+  color: #26324a;
+  font-size: 12px;
+  font-weight: 1000;
+  line-height: 1.2;
+}
+
+.academy-shop-ui-ticket-source small,
+.academy-shop-reminder-card small,
+.academy-shop-quest-row small,
+.academy-shop-settlement-card small {
+  display: block;
+  margin-top: 2px;
+  color: #8e87a8;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.academy-shop-ui-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.academy-shop-ui-hud span {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.78);
+  padding: 4px 9px 4px 5px;
+  color: #5e5590;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-shop-ui-hud .game-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.academy-shop-quest-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px;
+}
+
+.academy-shop-quest-row button {
+  display: inline-flex;
+  min-height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff5c9, #ffd35f);
+  padding: 5px 9px;
+  color: #5e5590;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-shop-quest-row .game-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.academy-shop-settlement-card {
+  position: relative;
+  min-height: 68px;
+  overflow: hidden;
+  padding: 14px 88px 14px 12px;
+}
+
+.academy-shop-settlement-card::before {
+  content: '';
+  position: absolute;
+  right: -18px;
+  bottom: -22px;
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  background: rgba(47,175,159,0.14);
+}
+
+.academy-shop-settlement-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #c7fff4, #fff5c9);
+  padding: 5px 8px;
+  color: #168f87;
+  font-size: 9px;
+  font-weight: 1000;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.58);
+}
+
 .academy-small-button .academy-resource-amount {
   border-color: rgba(255,255,255,0.34);
   background: rgba(255,255,255,0.34);

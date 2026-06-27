@@ -338,6 +338,72 @@ function RewardPreview() {
   )
 }
 
+function UtilityPresentationPreview() {
+  return (
+    <section className="academy-shop-section academy-shop-ui-preview">
+      <div className="academy-shop-section__head">
+        <div>
+          <b>功能呈現樣張</b>
+          <small>先看出現位置，不先做成正式商品</small>
+        </div>
+        <span className="academy-status">預覽</span>
+      </div>
+
+      <div className="academy-shop-ui-preview__grid">
+        <div className="academy-shop-ui-demo academy-shop-ui-demo--source">
+          <div className="academy-shop-ui-demo__label">金券碎片</div>
+          <div className="academy-shop-ui-ticket-source">
+            <GameIcon name="ticket-gold" />
+            <div>
+              <b>完整金券</b>
+              <small>公會月度挑戰取得，不新增碎片數量</small>
+            </div>
+          </div>
+        </div>
+
+        <div className="academy-shop-ui-demo academy-shop-ui-demo--hud">
+          <div className="academy-shop-ui-demo__label">每日加成</div>
+          <div className="academy-shop-ui-hud">
+            <span><GameIcon name="coin-gold" /> 今日黃星 +1</span>
+            <span><GameIcon name="battle" /> 任務獎勵 +10%</span>
+          </div>
+        </div>
+
+        <div className="academy-shop-ui-demo academy-shop-ui-demo--reminder">
+          <div className="academy-shop-ui-demo__label">提醒外觀</div>
+          <div className="academy-shop-reminder-card">
+            <GameIcon name="daily" />
+            <div>
+              <b>今晚 9:00</b>
+              <small>星鈴提醒你記一筆帳</small>
+            </div>
+          </div>
+        </div>
+
+        <div className="academy-shop-ui-demo academy-shop-ui-demo--quest">
+          <div className="academy-shop-ui-demo__label">任務刷新券</div>
+          <div className="academy-shop-quest-row">
+            <div>
+              <b>每日任務</b>
+              <small>完成任務拿補給</small>
+            </div>
+            <button><GameIcon name="ticket-normal" /> 刷新 1/1</button>
+          </div>
+        </div>
+
+        <div className="academy-shop-ui-demo academy-shop-ui-demo--badge">
+          <div className="academy-shop-ui-demo__label">結算徽章</div>
+          <div className="academy-shop-settlement-card">
+            <span className="academy-shop-settlement-badge">預算達成</span>
+            <b>今日結算</b>
+            <small>消費 NT$320 / 預算 NT$1,000</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function ShopScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile, user } = state
@@ -688,6 +754,7 @@ export default function ShopScreen() {
         {tab === 'exchange' && (
           <div className="flex flex-col gap-2">
             <RewardPreview />
+            {exchangeCategory === 'utility' && <UtilityPresentationPreview />}
             <section className="academy-shop-section">
               <div className="academy-shop-section__head">
                 <div>
