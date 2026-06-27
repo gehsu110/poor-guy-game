@@ -601,7 +601,7 @@ export default function BattleScreen() {
         </div>
       </div>
 
-      <div className="academy-battle-content relative z-10 flex-1 overflow-hidden px-4 pb-[92px]">
+      <div className="academy-battle-content relative z-10 flex-1 overflow-y-auto px-4">
         <BattleTopStats budget={budget} totalSpent={totalSpent} currentHp={currentHp} monster={monster} />
         <MonsterArea
           monster={monster}

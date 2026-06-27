@@ -275,12 +275,13 @@ export function AppProvider({ children }) {
   }, [state.user, state.monster])
 
   const submitExpense = useCallback(async ({ category, amount, note }) => {
-    if (!state.user) return
     const date = todayStr()
     const budget = state.profile?.dailyBudget ?? 1000
     const numericAmount = Number(amount)
     const expense = { category, amount: numericAmount, note, date }
-    const ref = await addExpense(state.user.uid, expense)
+    const ref = state.user
+      ? await addExpense(state.user.uid, expense)
+      : { id: `local-${Date.now()}-${Math.random().toString(36).slice(2)}` }
     const expenseWithId = { ...expense, id: ref.id }
     const { damage, mult } = calcDamage(numericAmount, state.totalSpent, budget)
     const nextExpenses = [...state.expenses, expenseWithId]
@@ -295,7 +296,7 @@ export function AppProvider({ children }) {
 
     const newHp = Math.max(0, state.currentHp - damage)
     if (state.currentHp > 0 && newHp <= 0) {
-      await setDayRecord(state.user.uid, date, { defeated: true, settled: false })
+      if (state.user) await setDayRecord(state.user.uid, date, { defeated: true, settled: false })
       dispatch({
         type: 'SET_NOTIFICATION',
         notification: { type: 'kill', message: '今日咒靈已淨化，獎勵會在每日結算發放。' },

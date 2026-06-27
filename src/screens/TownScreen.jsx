@@ -3,6 +3,7 @@ import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
 import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
+import Avatar from '../components/Avatar'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
 
@@ -13,10 +14,13 @@ function IdentityHUD({ profile, onSettingsClick }) {
   const expInLevel = profile?.expInLevel ?? 0
   const expToNext = profile?.expToNext ?? 100
   const expPct = expToNext > 0 ? Math.min(100, Math.round((expInLevel / expToNext) * 100)) : 100
+  const gender = profile?.avatarGender ?? 'girl'
+  const frame = profile?.equipped?.frame ?? 'soft_gold'
   return (
     <div className="academy-identity-hud">
       <div className="academy-status-board">
         <div className="academy-identity-chip">
+          <Avatar gender={gender} variant="portrait" frame={frame} className="academy-hud-avatar" />
           <span className="academy-identity-chip__copy">
             <strong>{playerName}</strong>
             <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
