@@ -524,7 +524,7 @@ export default function BattleScreen() {
       <img src={battleBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
-      <div className="relative z-20 flex items-center gap-2 px-4 pb-1 pt-4">
+      <div className="academy-safe-top relative z-20 flex items-center gap-2 px-4 pb-1">
         <button
           className="tap-bounce rounded-2xl border border-white/60 bg-white/85 px-3 py-2 text-sm font-black text-[#8E87A8] shadow-md"
           onClick={() => navigate('town')}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { COLLECTIBLE_TITLES, DEFAULT_CATEGORIES, getTitle, TITLES, formatMoney } from '../gameLogic'
+import { COLLECTIBLE_TITLES, getTitle, TITLES, formatMoney } from '../gameLogic'
 import { loginWithGoogle, updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
 import Avatar from '../components/Avatar'
@@ -313,12 +313,8 @@ export default function ProfileScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile, user, screenParams } = state
   const [tab, setTab] = useState(screenParams?.tab ?? 'stats')
-  const [editBudget, setEditBudget] = useState(false)
-  const [budgetInput, setBudgetInput] = useState(String(profile?.dailyBudget ?? 1000))
   const [editName, setEditName] = useState(false)
   const [nameInput, setNameInput] = useState(profile?.playerName ?? '新手勇者')
-  const [customName, setCustomName] = useState('')
-  const [customColor, setCustomColor] = useState('#C8A8E9')
 
   const level = profile?.level ?? 1
   const expInLevel = profile?.expInLevel ?? 0
@@ -340,20 +336,6 @@ export default function ProfileScreen() {
       await loginWithGoogle()
     } catch (e) {
       console.error(e)
-    }
-  }
-
-  async function saveBudget() {
-    const val = Number(budgetInput)
-    if (!val || val < 100) return
-    dispatch({ type: 'UPDATE_PROFILE', data: { dailyBudget: val } })
-    setEditBudget(false)
-    if (user) {
-      try {
-        await updateProfile(user.uid, { dailyBudget: val })
-      } catch (e) {
-        console.error(e)
-      }
     }
   }
 
@@ -415,44 +397,6 @@ export default function ProfileScreen() {
     }
   }
 
-  async function saveCategories(nextCategories) {
-    dispatch({ type: 'UPDATE_PROFILE', data: { customCategories: nextCategories } })
-    if (user) {
-      try {
-        await updateProfile(user.uid, { customCategories: nextCategories })
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
-  async function addCustomCategory() {
-    const label = customName.trim().slice(0, 6)
-    if (!label) return
-    const usedLabels = new Set([...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])].map(c => c.label))
-    if (usedLabels.has(label)) {
-      dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'profile', message: '這個分類已經存在' } })
-      setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 1800)
-      return
-    }
-    const nextCategories = [
-      ...(profile?.customCategories ?? []),
-      {
-        id: `custom_${Date.now()}`,
-        label,
-        iconKey: 'custom',
-        color: customColor,
-      },
-    ]
-    setCustomName('')
-    await saveCategories(nextCategories)
-  }
-
-  async function deleteCustomCategory(categoryId) {
-    const nextCategories = (profile?.customCategories ?? []).filter(c => c.id !== categoryId)
-    await saveCategories(nextCategories)
-  }
-
   async function updatePreference(key, value) {
     const preferences = {
       ...(profile?.preferences ?? {}),
@@ -473,7 +417,7 @@ export default function ProfileScreen() {
       <img src={profileBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
-      <div className="relative z-10 flex items-center gap-2 px-4 pb-2 pt-4">
+      <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>
         <div className="flex-1 text-center text-sm font-black text-[#26324A]">{pageTitle}</div>
         <div className="w-10" />
@@ -591,11 +535,12 @@ export default function ProfileScreen() {
                 />
               )}
 
-              <div className="academy-settings-subtitle">主角外觀</div>
-              <p className="academy-settings-copy">
-                這是角色版本偏好，不是套裝衣櫃。套裝收藏仍從主畫面的「造型」入口管理。
-              </p>
-              <div className="grid grid-cols-2 gap-2">
+              <SettingRow
+                label="主角外觀"
+                value={avatarGender === 'boy' ? '男主角' : '女主角'}
+                note="這是角色版本偏好，不是套裝衣櫃；套裝收藏仍從主畫面的「造型」入口管理。"
+              />
+              <div className="academy-avatar-segment">
                 {[
                   { k: 'boy', label: '男主角' },
                   { k: 'girl', label: '女主角' },
@@ -605,75 +550,9 @@ export default function ProfileScreen() {
                     className={`academy-avatar-option ${avatarGender === a.k ? 'is-active' : ''}`}
                     onClick={() => chooseAvatar(a.k)}
                   >
-                    <Avatar
-                      gender={a.k}
-                      variant="full"
-                      frame={equipped.frame ?? 'soft_gold'}
-                      outfit={equipped.outfit ?? 'academy'}
-                      accessory={equipped.accessory ?? 'star_pin'}
-                      className="academy-avatar-choice"
-                    />
                     <span>{a.label}</span>
                   </button>
                 ))}
-              </div>
-            </SettingSection>
-
-            <SettingSection title="帳本設定" eyebrow="Ledger">
-              {editBudget ? (
-                <div className="academy-settings-edit-row">
-                  <input
-                    type="number"
-                    value={budgetInput}
-                    onChange={e => setBudgetInput(e.target.value)}
-                    className="min-w-0 flex-1 rounded-2xl border border-[#E7DEF6] bg-white px-3 py-2 text-sm font-bold outline-none"
-                  />
-                  <button className="academy-small-button" onClick={saveBudget}>儲存</button>
-                </div>
-              ) : (
-                <SettingRow
-                  label="每日預算"
-                  value={`NT${formatMoney(profile?.dailyBudget ?? 1000)}`}
-                  note="今日攻擊力與怪物血量會依照這個數字計算。"
-                  action={<button className="academy-inline-action" onClick={() => setEditBudget(true)}>修改</button>}
-                />
-              )}
-
-              <div className="academy-settings-subtitle">自訂記帳分類</div>
-              <div className="mb-3 grid grid-cols-6 gap-2">
-                {['#FFB3C6', '#A8D8EA', '#C8A8E9', '#A8E6CF', '#FFE4A0', '#FFCBA4'].map(color => (
-                  <button
-                    key={color}
-                    className={`academy-color-swatch ${customColor === color ? 'is-active' : ''}`}
-                    style={{ background: color }}
-                    aria-label={color}
-                    onClick={() => setCustomColor(color)}
-                  />
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={customName}
-                  onChange={e => setCustomName(e.target.value)}
-                  className="min-w-0 flex-1 rounded-2xl border border-[#E7DEF6] bg-white px-3 py-2 text-sm font-bold outline-none"
-                  placeholder="例如：飲料、寵物"
-                  maxLength={6}
-                />
-                <button className="academy-small-button" onClick={addCustomCategory}>新增</button>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {(profile?.customCategories ?? []).length === 0 ? (
-                  <div className="w-full rounded-2xl bg-white/70 px-3 py-3 text-center text-xs font-bold text-[#8E87A8]">
-                    目前使用系統預設分類
-                  </div>
-                ) : (profile?.customCategories ?? []).map(cat => (
-                  <div key={cat.id} className="academy-category-chip">
-                    <span style={{ background: cat.color }} />
-                    <b>{cat.label}</b>
-                  <button onClick={() => deleteCustomCategory(cat.id)}>刪除</button>
-                </div>
-              ))}
               </div>
             </SettingSection>
 
@@ -693,7 +572,7 @@ export default function ProfileScreen() {
                 />
               )}
               <SettingRow
-                label="資料分類"
+                label="資料分層"
                 value="規劃中"
                 note="未來會把遊戲進度與記帳明細分開管理，方便匯出與刪除。"
               />
@@ -710,7 +589,44 @@ export default function ProfileScreen() {
               />
             </SettingSection>
 
-            <SettingSection title="提醒與體驗" eyebrow="Comfort">
+            <SettingSection title="聲音與回饋" eyebrow="Audio">
+              <SettingRow
+                label="背景音樂"
+                value="準備中"
+                note="未來首頁、地圖與 Boss 會有不同氛圍；預設會保持安靜。"
+                action={(
+                  <SettingToggle
+                    checked={!!profile?.preferences?.musicEnabled}
+                    label="背景音樂"
+                    onClick={() => updatePreference('musicEnabled', !profile?.preferences?.musicEnabled)}
+                  />
+                )}
+              />
+              <SettingRow
+                label="操作音效"
+                note="控制記帳、戰鬥、任務、抽獎與升級的短音效。"
+                action={(
+                  <SettingToggle
+                    checked={profile?.preferences?.soundEnabled !== false}
+                    label="操作音效"
+                    onClick={() => updatePreference('soundEnabled', profile?.preferences?.soundEnabled === false)}
+                  />
+                )}
+              />
+              <SettingRow
+                label="震動回饋"
+                note="用在記帳成功、擊敗怪物與重要獎勵等短回饋。"
+                action={(
+                  <SettingToggle
+                    checked={profile?.preferences?.hapticsEnabled !== false}
+                    label="震動回饋"
+                    onClick={() => updatePreference('hapticsEnabled', profile?.preferences?.hapticsEnabled === false)}
+                  />
+                )}
+              />
+            </SettingSection>
+
+            <SettingSection title="提醒與說明" eyebrow="Guide">
               <SettingRow
                 label="每日記帳提醒"
                 note="提醒功能會在通知權限流程完成後啟用。"
@@ -719,17 +635,6 @@ export default function ProfileScreen() {
                     checked={!!profile?.preferences?.dailyReminder}
                     label="每日記帳提醒"
                     onClick={() => updatePreference('dailyReminder', !profile?.preferences?.dailyReminder)}
-                  />
-                )}
-              />
-              <SettingRow
-                label="音效"
-                note="控制戰鬥、抽獎與獎勵音效。"
-                action={(
-                  <SettingToggle
-                    checked={profile?.preferences?.soundEnabled !== false}
-                    label="音效"
-                    onClick={() => updatePreference('soundEnabled', profile?.preferences?.soundEnabled === false)}
                   />
                 )}
               />

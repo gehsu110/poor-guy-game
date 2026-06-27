@@ -149,7 +149,7 @@ export default function MissionScreen() {
       <img src={guildBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
-      <div className="relative z-10 flex items-center gap-2 px-4 pb-2 pt-4">
+      <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>
         <div className="flex-1 text-center text-sm font-black text-[#26324A]">任務與成就</div>
         <div className="w-10" />

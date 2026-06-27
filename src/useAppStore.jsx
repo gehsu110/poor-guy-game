@@ -60,6 +60,7 @@ const DEMO_PROFILE = {
   equipped: { set: 'academy_set', outfit: 'academy', accessory: 'star_pin', frame: 'soft_gold' },
   claimedMissions: {},
   guildChallengeClaims: {},
+  preferences: { musicEnabled: false, soundEnabled: true, hapticsEnabled: true, dailyReminder: false, reduceMotion: false },
   avatarGender: 'girl',
   consecutiveDays: 0,
   collection: [],

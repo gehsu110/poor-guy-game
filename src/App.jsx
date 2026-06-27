@@ -10,7 +10,6 @@ import ProfileScreen from './screens/ProfileScreen'
 import QuestScreen   from './screens/QuestScreen'
 import MissionScreen from './screens/MissionScreen'
 import splashBg from './assets/academy-art/splash-bg.webp'
-import Avatar from './components/Avatar'
 
 const SCREEN_MAP = {
   town:    TownScreen,
@@ -77,14 +76,17 @@ function StarterRegistrationCard({ profile, user, dispatch }) {
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="academy-onboarding__card"
+        className="academy-onboarding__panel"
         initial={{ y: 18, scale: 0.98 }}
         animate={{ y: 0, scale: 1 }}
       >
-        <div className="academy-onboarding__badge">冒險者登錄</div>
-        <div className="academy-onboarding__title">寫下你的名字</div>
+        <div className="academy-onboarding__crest">
+          <span className="academy-icon academy-icon--star" />
+        </div>
+        <div className="academy-onboarding__kicker">學院登錄處</div>
+        <div className="academy-onboarding__title">建立冒險者資料</div>
         <div className="academy-onboarding__text">
-          這個名字會顯示在主畫面與遠征紀錄裡。先選一位主角，之後也可以到設定更換。
+          名字會顯示在主畫面與遠征紀錄。主角外觀是角色版本偏好，之後可在設定更換。
         </div>
 
         <input
@@ -95,7 +97,8 @@ function StarterRegistrationCard({ profile, user, dispatch }) {
           placeholder="例如：小小勇者"
         />
 
-        <div className="academy-starter-gender">
+        <div className="academy-onboarding__label">主角外觀</div>
+        <div className="academy-starter-switch">
           {[
             { key: 'girl', label: '女主角' },
             { key: 'boy', label: '男主角' },
@@ -105,15 +108,7 @@ function StarterRegistrationCard({ profile, user, dispatch }) {
               className={gender === option.key ? 'is-active' : ''}
               onClick={() => setGender(option.key)}
             >
-              <Avatar
-                gender={option.key}
-                variant="full"
-                outfit={profile?.equipped?.outfit ?? 'academy'}
-                frame={profile?.equipped?.frame ?? 'soft_gold'}
-                accessory={profile?.equipped?.accessory ?? 'star_pin'}
-                className="academy-starter-avatar"
-              />
-              <b>{option.label}</b>
+              <span>{option.label}</span>
             </button>
           ))}
         </div>

@@ -693,6 +693,10 @@ body {
   touch-action: pan-y;
 }
 
+.academy-safe-top {
+  padding-top: calc(1rem + env(safe-area-inset-top));
+}
+
 .academy-bg {
   position: absolute;
   inset: 0;
@@ -1797,6 +1801,20 @@ video.academy-screen-character {
   color: #26324a;
   border-color: rgba(139,124,255,0.5);
   background: #f1ecff;
+}
+
+.academy-avatar-segment {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.academy-avatar-segment .academy-avatar-option {
+  min-height: 48px;
+  justify-content: center;
+  border-radius: 16px;
+  padding: 10px 12px;
+  font-size: 13px;
 }
 
 .academy-settings-page {
@@ -3807,24 +3825,43 @@ video.academy-screen-character {
   inset: 0;
   z-index: 90;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 18px;
-  background: linear-gradient(180deg, rgba(80,58,125,0.18), rgba(80,58,125,0.38));
-  backdrop-filter: blur(8px);
+  align-items: stretch;
+  justify-content: flex-end;
+  padding: calc(28px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+  background:
+    linear-gradient(180deg, rgba(67,58,120,0.1) 0%, rgba(67,58,120,0.22) 48%, rgba(67,58,120,0.48) 100%),
+    rgba(255,248,236,0.08);
+  backdrop-filter: blur(6px);
 }
 
-.academy-onboarding__card {
+.academy-onboarding__panel {
   width: 100%;
-  border-radius: 28px;
+  margin-top: auto;
+  border-radius: 32px;
   border: 1px solid rgba(255,255,255,0.82);
-  background: rgba(255,255,255,0.92);
-  box-shadow: 0 20px 44px rgba(86,74,130,0.22);
-  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,248,236,0.86)),
+    rgba(255,255,255,0.86);
+  box-shadow: 0 22px 48px rgba(38,48,74,0.26);
+  padding: 20px;
+  backdrop-filter: blur(16px);
 }
 
-.academy-onboarding__badge {
+.academy-onboarding__crest {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  color: #7161b8;
+  background: #f1ecff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.72);
+}
+
+.academy-onboarding__kicker {
   display: inline-flex;
+  margin-top: 14px;
   border-radius: 999px;
   background: #f1ecff;
   color: #7b63d8;
@@ -3836,7 +3873,7 @@ video.academy-screen-character {
 .academy-onboarding__title {
   margin-top: 10px;
   color: #26324a;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 1000;
 }
 
@@ -3891,6 +3928,37 @@ video.academy-screen-character {
 
 .academy-name-input::placeholder {
   color: #a8a1ba;
+}
+
+.academy-onboarding__label {
+  margin: 2px 0 8px;
+  color: #26324a;
+  font-size: 12px;
+  font-weight: 1000;
+}
+
+.academy-starter-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.academy-starter-switch button {
+  min-height: 48px;
+  border-radius: 16px;
+  border: 1.5px solid #e7def6;
+  background: rgba(255,255,255,0.76);
+  color: #77738d;
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.academy-starter-switch button.is-active {
+  border-color: rgba(113,97,184,0.6);
+  background: #f1ecff;
+  color: #26324a;
+  box-shadow: 0 10px 18px rgba(113,97,184,0.14);
 }
 
 .academy-starter-gender {

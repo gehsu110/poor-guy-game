@@ -166,7 +166,7 @@ export default function TownScreen() {
         />
       ) : null}
       {/* UI 層（z-10，疊在角色上） */}
-      <div className="relative z-10 px-4 pt-4">
+      <div className="academy-safe-top relative z-10 px-4">
         <IdentityHUD profile={profile} onSettingsClick={() => navigate('profile', { tab: 'settings' })} />
       </div>
 

@@ -218,7 +218,7 @@ export default function MapScreen() {
       <div className="academy-bg academy-map-bg" aria-hidden="true" />
       <div className="academy-bg-soft" />
       {/* 頂部 */}
-      <div className="relative z-10 flex items-center px-4 pt-4 pb-2 gap-2">
+      <div className="academy-safe-top relative z-10 flex items-center px-4 pb-2 gap-2">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>
         <div className="flex-1">
           <div className="text-sm font-black text-[#26324A]">本月遠征路線</div>
