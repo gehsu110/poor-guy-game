@@ -171,36 +171,32 @@ function MonsterArea({ monster, currentHp, totalSpent, budget, isHit, damageNumb
 
   return (
     <div className="academy-battle-arena">
-      <div className="academy-battle-hp">
-        <div className="mb-1.5 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="truncate text-sm font-black text-[#26324A]">{monster.name}</div>
-            <div className="text-[10px] font-bold text-[#8E87A8]">
-              {defeated ? '淨化完成，今天很穩。' : '輸入一筆消費，施放術式。'}
-            </div>
-          </div>
-          <TierBadge tier={monster.tier} />
-        </div>
-
-        <div className="academy-battle-meter-row">
-          <span>血量</span>
-          <span>{defeated ? '0' : formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
-        </div>
-        <div className="h-2.5 overflow-hidden rounded-full bg-[#ECE7F5]">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#52DED4] via-[#FFD166] to-[#FF7FA3]"
-            animate={{ width: `${hpPct * 100}%` }}
-            transition={{ duration: 0.55, ease: 'easeOut' }}
-          />
-        </div>
-        <div className="academy-battle-meta">
-          <span><GameIcon name="battle" /> 特效 星軌斬擊</span>
-          <span><GameIcon name="coin-gold" /> 預算 {Math.round(spentPct * 100)}%</span>
-          <span><GameIcon name="ticket-normal" /> 掉落 +{drop.normalTicket}</span>
-        </div>
-      </div>
-
       <div className={`academy-battle-stage ${isHit ? 'is-casting' : ''}`}>
+        <div className="academy-battle-hp">
+          <div className="academy-battle-hp__head">
+            <div className="min-w-0">
+              <div className="truncate text-sm font-black text-[#26324A]">{monster.name}</div>
+            </div>
+            <TierBadge tier={monster.tier} />
+          </div>
+
+          <div className="academy-battle-meter-row">
+            <span>HP</span>
+            <span>{defeated ? '0' : formatMoney(currentHp)} / {formatMoney(monster.maxHp)}</span>
+          </div>
+          <div className="academy-battle-meter">
+            <motion.div
+              animate={{ width: `${hpPct * 100}%` }}
+              transition={{ duration: 0.55, ease: 'easeOut' }}
+            />
+          </div>
+          <div className="academy-battle-meta">
+            <span><GameIcon name="battle" /> 星軌斬擊</span>
+            <span><GameIcon name="coin-gold" /> 預算 {Math.round(spentPct * 100)}%</span>
+            <span><GameIcon name="ticket-normal" /> +{drop.normalTicket}</span>
+          </div>
+        </div>
+
         <div className="academy-battle-stage__sigil" />
         <div className="academy-battle-stage__rail academy-battle-stage__rail--left" />
         <div className="academy-battle-stage__rail academy-battle-stage__rail--right" />
@@ -546,18 +542,9 @@ function BattleTopStats({ totalSpent, currentHp, monster }) {
   const hpPct = monster?.maxHp > 0 ? Math.round((Math.max(0, currentHp) / monster.maxHp) * 100) : 0
   return (
     <div className="academy-battle-top-stats">
-      <span>
-        <small>今日消費</small>
-        <b>NT${formatMoney(totalSpent)}</b>
-      </span>
-      <span>
-        <small>攻擊力</small>
-        <b>+{attackPower}</b>
-      </span>
-      <span>
-        <small>怪物血量</small>
-        <b>{hpPct}%</b>
-      </span>
+      <span>今日 NT${formatMoney(totalSpent)}</span>
+      <span>攻擊 +{attackPower}</span>
+      <span>HP {hpPct}%</span>
     </div>
   )
 }
