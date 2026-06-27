@@ -60,6 +60,7 @@
 }
 
 .academy-identity-chip,
+.academy-exp-track,
 .academy-currency-rail {
   min-height: 0;
 }
@@ -95,6 +96,45 @@
   box-shadow: inset 0 0 0 1px rgba(113,97,184,.13);
 }
 .academy-settings-gate .game-icon { width: 21px; height: 21px; flex: 0 0 auto; color: currentColor; }
+
+.academy-exp-track {
+  display: grid;
+  gap: 3px;
+  padding: 0 3px;
+  color: var(--color-ink-500);
+}
+
+.academy-exp-track__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: currentColor;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.academy-exp-track__meta b {
+  color: var(--color-ink-900);
+  font-weight: 1000;
+}
+
+.academy-exp-track__bar {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.46);
+  box-shadow: inset 0 0 0 1px rgba(91,76,126,.08);
+}
+
+.academy-exp-track__bar i {
+  display: block;
+  height: 100%;
+  min-width: 6px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-brand-500), #8ddbd1 70%, var(--color-reward-500));
+  box-shadow: 0 0 10px rgba(113,97,184,.22);
+}
 
 .academy-currency-rail {
   display: grid;
@@ -513,6 +553,23 @@
   box-shadow: inset 0 0 0 1px rgba(255,221,161,.24), 0 0 16px rgba(244,176,105,.12);
 }
 
+.academy-screen--sakura .academy-exp-track {
+  color: rgba(255,225,222,.78);
+}
+
+.academy-screen--sakura .academy-exp-track__meta b {
+  color: #fff6e8;
+}
+
+.academy-screen--sakura .academy-exp-track__bar {
+  background: rgba(255,240,220,.14);
+  box-shadow: inset 0 0 0 1px rgba(255,220,190,.16);
+}
+
+.academy-screen--sakura .academy-exp-track__bar i {
+  background: linear-gradient(90deg, #76558f, #bf6e7f 60%, #d5a34e);
+}
+
 .academy-screen--sakura .academy-mini-currency {
   color: #ffe8dc;
   background: rgba(255,240,220,.13);
@@ -629,6 +686,23 @@
   color: #effffb;
   background: rgba(141,221,211,.13);
   box-shadow: inset 0 0 0 1px rgba(141,221,211,.24), 0 0 16px rgba(104,204,194,.12);
+}
+
+.academy-screen--rainy .academy-exp-track {
+  color: rgba(218,244,240,.78);
+}
+
+.academy-screen--rainy .academy-exp-track__meta b {
+  color: #f6fbff;
+}
+
+.academy-screen--rainy .academy-exp-track__bar {
+  background: rgba(211,241,238,.13);
+  box-shadow: inset 0 0 0 1px rgba(185,232,226,.18);
+}
+
+.academy-screen--rainy .academy-exp-track__bar i {
+  background: linear-gradient(90deg, #7dd9cc, #5d5a9b 62%, #d2a14a);
 }
 
 .academy-screen--rainy .academy-mini-currency {

@@ -28,6 +28,14 @@ const MAP_ZONES = [
   { key: 'boss', title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', tag: '月底壓力區', range: [22, 31], bg: zoneBoss },
 ]
 
+const MAP_LEGEND_ITEMS = [
+  { cls: 'today', label: '今日位置', desc: '目前可以前往戰鬥與記帳的節點。' },
+  { cls: 'defeated', label: '已擊殺', desc: '這一天有完成記帳並擊敗怪物。' },
+  { cls: 'undefeated', label: '未滅', desc: '有花費紀錄，但怪物尚未被擊敗。' },
+  { cls: 'no_record', label: '未記', desc: '過去日期尚未記帳，可補登但不發放完整獎勵。' },
+  { cls: 'monthboss', label: '月底 Boss', desc: '月底壓力節點，代表月末挑戰。' },
+]
+
 function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
   const cfg = tier === 'monthboss' ? NODE_CONFIG.monthboss
     : tier !== 'normal' && tier !== 'normal_special' ? NODE_CONFIG.boss
@@ -142,6 +150,7 @@ export default function MapScreen() {
   const [backfillCategory, setBackfillCategory] = useState(DEFAULT_CATEGORIES[0]?.label ?? '其他')
   const [backfillNote, setBackfillNote] = useState('')
   const [savingBackfill, setSavingBackfill] = useState(false)
+  const [showMapHelp, setShowMapHelp] = useState(false)
 
   const stats = useMemo(() => {
     const elapsedDays = days.filter(d => d.date <= todayDate)
@@ -215,25 +224,13 @@ export default function MapScreen() {
           <div className="text-sm font-black text-[#26324A]">本月遠征路線</div>
           <div className="text-xs font-bold text-[#8E87A8]">{year}年{month}月</div>
         </div>
-        <div className="academy-mini-stat academy-mini-stat--blue">
-          <span className="font-black">{stats.killed}</span>
-          <span className="text-[9px]">/{stats.total}天</span>
-        </div>
-      </div>
-
-      <div className="relative z-10 flex gap-2 px-4 pb-2 overflow-x-auto">
-        {[
-          { cls: 'defeated', label: '已擊殺' },
-          { cls: 'today', label: '今日位置' },
-          { cls: 'undefeated', label: '未滅' },
-          { cls: 'no_record', label: '未記' },
-          { cls: 'monthboss', label: '月底 Boss' },
-        ].map(({ cls, label }) => (
-          <div key={label} className="academy-map-legend">
-            <span className={`academy-map-legend__dot academy-map-legend__dot--${cls}`} />
-            <b>{label}</b>
-          </div>
-        ))}
+        <button
+          className="academy-map-help-button"
+          onClick={() => setShowMapHelp(true)}
+          aria-label="查看地圖節點說明"
+        >
+          ?
+        </button>
       </div>
 
       {/* 地圖主體 */}
@@ -401,6 +398,43 @@ export default function MapScreen() {
               </button>
             </div>
           )}
+        </motion.div>
+      )}
+
+      {showMapHelp && (
+        <motion.div
+          className="academy-map-help-sheet"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setShowMapHelp(false)}
+        >
+          <motion.div
+            className="academy-map-help-sheet__panel"
+            initial={{ y: 20, scale: 0.98 }}
+            animate={{ y: 0, scale: 1 }}
+            onClick={event => event.stopPropagation()}
+          >
+            <div className="academy-map-help-sheet__head">
+              <div>
+                <b>地圖節點說明</b>
+                <span>節點會依記帳與討伐進度改變。</span>
+              </div>
+              <button onClick={() => setShowMapHelp(false)} aria-label="關閉地圖說明">×</button>
+            </div>
+            <div className="academy-map-help-list">
+              {MAP_LEGEND_ITEMS.map(item => (
+                <div key={item.label} className="academy-map-help-item">
+                  <div className="academy-map-legend">
+                    <span className={`academy-map-legend__dot academy-map-legend__dot--${item.cls}`} />
+                    <b>{item.label}</b>
+                  </div>
+                  <p>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="academy-map-help-note">完整新手導覽會在功能頁穩定後再補上。</div>
+          </motion.div>
         </motion.div>
       )}
 

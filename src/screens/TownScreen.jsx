@@ -10,6 +10,9 @@ function IdentityHUD({ profile, onSettingsClick }) {
   const title = profile ? getTitle(profile.level) : null
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const playerName = profile?.playerName?.trim() || '新手勇者'
+  const expInLevel = profile?.expInLevel ?? 0
+  const expToNext = profile?.expToNext ?? 100
+  const expPct = expToNext > 0 ? Math.min(100, Math.round((expInLevel / expToNext) * 100)) : 100
   return (
     <div className="academy-identity-hud">
       <div className="academy-status-board">
@@ -21,6 +24,15 @@ function IdentityHUD({ profile, onSettingsClick }) {
           <button className="academy-settings-gate" onClick={onSettingsClick} aria-label="開啟設定">
             <GameIcon name="settings" />
           </button>
+        </div>
+        <div className="academy-exp-track" aria-label={`經驗 ${expInLevel}/${expToNext}`}>
+          <div className="academy-exp-track__meta">
+            <span>EXP</span>
+            <b>{expInLevel}/{expToNext}</b>
+          </div>
+          <div className="academy-exp-track__bar">
+            <i style={{ width: `${expPct}%` }} />
+          </div>
         </div>
         <div className="academy-currency-rail" aria-label="收藏資源">
           <button className="academy-mini-currency academy-mini-currency--gold" title="黃星：每日與任務獎勵"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></button>
