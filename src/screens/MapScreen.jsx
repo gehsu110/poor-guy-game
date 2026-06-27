@@ -279,17 +279,18 @@ export default function MapScreen() {
           {zones.map(zone => (
             <section
               key={zone.key}
-      className={`academy-map-zone academy-map-zone--${zone.key}`}
-      style={{ '--zone-image': `url(${zone.bg})` }}
-    >
-      {zone.key === 'boss' && (
-        <div className="academy-map-zone__boss-atmosphere" aria-hidden="true">
-          <span className="academy-map-boss-cloud academy-map-boss-cloud--one" />
-          <span className="academy-map-boss-cloud academy-map-boss-cloud--two" />
-          <span className="academy-map-boss-gate-glow" />
-        </div>
-      )}
-      <div className="academy-map-zone__head">
+              className={`academy-map-zone academy-map-zone--${zone.key}`}
+              style={{ '--zone-image': `url(${zone.bg})` }}
+            >
+              {zone.key === 'boss' && (
+                <div className="academy-map-zone__boss-atmosphere" aria-hidden="true">
+                  <span className="academy-map-boss-cloud academy-map-boss-cloud--one" />
+                  <span className="academy-map-boss-cloud academy-map-boss-cloud--two" />
+                  <span className="academy-map-boss-gate-glow" />
+                  <span className="academy-map-boss-path-glow" />
+                </div>
+              )}
+              <div className="academy-map-zone__head">
                 <div>
                   <strong>{zone.title}</strong>
                   <small>{zone.sub}</small>
