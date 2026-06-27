@@ -354,9 +354,15 @@
 }
 
 .academy-screen--academy .academy-screen-character {
-  top: 286px;
-  width: 54vw;
-  max-width: 212px;
+  top: 276px;
+  width: 58vw;
+  max-width: 228px;
+}
+
+.academy-screen--academy img.academy-screen-character[src*="home-hero-boy-v2"] {
+  top: 174px;
+  width: 42vw;
+  max-width: 166px;
 }
 
 .academy-screen--academy .academy-status-board {
@@ -456,10 +462,9 @@
 }
 
 .academy-screen--summer .academy-screen-character {
-  /* 讓腳底落在沙灘上，並留出上方天空，轉圈時也不會貼著 HUD。 */
-  top: 96px;
-  width: 68vw;
-  max-width: 268px;
+  top: 202px;
+  width: 70vw;
+  max-width: 276px;
 }
 
 .summer-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
@@ -512,9 +517,9 @@
 }
 
 .academy-screen--sakura .academy-screen-character {
-  top: 258px;
-  width: 50vw;
-  max-width: 206px;
+  top: 252px;
+  width: 61vw;
+  max-width: 244px;
 }
 
 .academy-screen--sakura .academy-hud,
@@ -604,7 +609,7 @@
 }
 .sakura-ground-shadow {
   position: absolute;
-  top: 548px;
+  top: 570px;
   left: 50%;
   width: 104px;
   height: 16px;
@@ -648,9 +653,9 @@
 }
 
 .academy-screen--qixi .academy-screen-character {
-  top: 248px;
-  width: 60vw;
-  max-width: 240px;
+  top: 228px;
+  width: 66vw;
+  max-width: 264px;
   filter: drop-shadow(0 20px 18px rgba(12,10,38,.30)) drop-shadow(0 0 18px rgba(226,197,112,.16));
 }
 
@@ -750,7 +755,7 @@
 }
 .qixi-ground-shadow {
   position: absolute;
-  top: 558px;
+  top: 572px;
   left: 50%;
   width: 112px;
   height: 17px;
@@ -808,9 +813,9 @@
 }
 
 .academy-screen--rainy .academy-screen-character {
-  top: 208px;
-  width: 60vw;
-  max-width: 240px;
+  top: 224px;
+  width: 66vw;
+  max-width: 264px;
 }
 
 .academy-screen--rainy .academy-hud,
@@ -920,7 +925,7 @@
 }
 .rainy-ground-shadow {
   position: absolute;
-  top: 548px;
+  top: 572px;
   left: 50%;
   width: 108px;
   height: 17px;
