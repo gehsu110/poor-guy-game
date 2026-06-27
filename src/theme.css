@@ -462,7 +462,7 @@
 }
 
 .academy-screen--summer .academy-screen-character {
-  top: 188px;
+  top: 218px;
   width: 68vw;
   max-width: 266px;
 }
@@ -517,7 +517,7 @@
 }
 
 .academy-screen--sakura .academy-screen-character {
-  top: 202px;
+  top: 231px;
   width: 64vw;
   max-width: 252px;
 }
@@ -653,7 +653,7 @@
 }
 
 .academy-screen--qixi .academy-screen-character {
-  top: 202px;
+  top: 230px;
   width: 64vw;
   max-width: 254px;
   filter: drop-shadow(0 20px 18px rgba(12,10,38,.30)) drop-shadow(0 0 18px rgba(226,197,112,.16));
@@ -813,7 +813,7 @@
 }
 
 .academy-screen--rainy .academy-screen-character {
-  top: 204px;
+  top: 231px;
   width: 64vw;
   max-width: 254px;
 }
