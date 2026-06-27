@@ -350,7 +350,6 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
   const [error, setError] = useState('')
   const [showCalculator, setShowCalculator] = useState(false)
 
-  const remaining = budget - spent
   const currentCat = categories.find(c => c.id === category)
 
   function handleAmountSubmit(val) {
@@ -383,9 +382,6 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
           <b>記帳攻擊</b>
           <small>{previewDmg ? `本筆預估傷害 -${formatMoney(previewDmg)}` : '選分類並輸入金額'}</small>
         </div>
-        <span className={remaining < 0 ? 'is-over' : ''}>
-          {remaining < 0 ? `超支 ${formatMoney(-remaining)}` : `剩餘 ${formatMoney(remaining)}`}
-        </span>
       </div>
 
       {editingExpense && (
@@ -431,7 +427,7 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
 
       <div className="academy-battle-actions">
         <button className="academy-calculator-toggle" onClick={() => setShowCalculator(value => !value)}>
-          {showCalculator ? '收起計算' : '加總計算'}
+          {showCalculator ? '收起加總' : '多筆加總'}
         </button>
         <button className="academy-battle-submit" onClick={() => handleAmountSubmit(evaluatedAmount)}>
           記帳攻擊
@@ -449,7 +445,7 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
           >
             <div className="academy-calculator-sheet__header">
               <div>
-                <span>加總計算</span>
+                <span>多筆加總</span>
                 <b>NT$ {formatMoney(evaluatedAmount)}</b>
               </div>
               <button onClick={() => setShowCalculator(false)}>完成</button>
@@ -470,6 +466,41 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
           {error}
         </motion.div>
       )}
+    </div>
+  )
+}
+
+function ExpenseLogSummary({ expenses, categories, expanded, onToggle, onEdit, onDelete }) {
+  const total = expenses.reduce((sum, item) => sum + Number(item.amount ?? 0), 0)
+  const latest = [...expenses].reverse()[0]
+  const latestCat = categories.find(c => c.id === latest?.category)
+
+  return (
+    <div className={`academy-battle-log ${expanded ? 'is-expanded' : ''}`}>
+      <button className="academy-battle-log-toggle" onClick={onToggle} aria-expanded={expanded}>
+        <div>
+          <div className="text-xs font-black text-[#26324A]">今日明細</div>
+          <div className="text-[10px] font-bold text-[#8E87A8]">
+            {expenses.length
+              ? `${expenses.length} 筆・NT$${formatMoney(total)}${latestCat ? `・最近 ${latestCat.label}` : ''}`
+              : '還沒有紀錄'}
+          </div>
+        </div>
+        <span>{expanded ? '收合' : '展開'}</span>
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="academy-battle-log-detail"
+          >
+            <ExpenseList expenses={expenses} categories={categories} onEdit={onEdit} onDelete={onDelete} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -510,8 +541,7 @@ function ExpenseList({ expenses, onEdit, onDelete, categories }) {
   )
 }
 
-function BattleTopStats({ budget, totalSpent, currentHp, monster }) {
-  const remaining = budget - totalSpent
+function BattleTopStats({ totalSpent, currentHp, monster }) {
   const attackPower = Math.max(0, Math.round(totalSpent / 10))
   const hpPct = monster?.maxHp > 0 ? Math.round((Math.max(0, currentHp) / monster.maxHp) * 100) : 0
   return (
@@ -523,10 +553,6 @@ function BattleTopStats({ budget, totalSpent, currentHp, monster }) {
       <span>
         <small>攻擊力</small>
         <b>+{attackPower}</b>
-      </span>
-      <span className={remaining < 0 ? 'is-over' : ''}>
-        <small>{remaining < 0 ? '超支' : '剩餘'}</small>
-        <b>NT${formatMoney(Math.abs(remaining))}</b>
       </span>
       <span>
         <small>怪物血量</small>
@@ -545,6 +571,7 @@ export default function BattleScreen() {
   const [showImpact, setShowImpact] = useState(false)
   const [hitKey, setHitKey] = useState(0)
   const [editingExpense, setEditingExpense] = useState(null)
+  const [logExpanded, setLogExpanded] = useState(false)
   const budget = profile?.dailyBudget ?? 1000
   const categories = [...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])]
   const remaining = budget - totalSpent
@@ -602,7 +629,7 @@ export default function BattleScreen() {
       </div>
 
       <div className="academy-battle-content relative z-10 flex-1 overflow-y-auto px-4">
-        <BattleTopStats budget={budget} totalSpent={totalSpent} currentHp={currentHp} monster={monster} />
+        <BattleTopStats totalSpent={totalSpent} currentHp={currentHp} monster={monster} />
         <MonsterArea
           monster={monster}
           currentHp={currentHp}
@@ -615,16 +642,6 @@ export default function BattleScreen() {
           showProjectile={showProjectile}
           showImpact={showImpact}
         />
-        <div className="academy-battle-log">
-          <div className="mb-1 flex items-center justify-between">
-            <div>
-              <div className="text-xs font-black text-[#26324A]">今日記錄</div>
-              <div className="text-[10px] font-bold text-[#8E87A8]">最近紀錄摘要</div>
-            </div>
-            <div className="text-[10px] font-black text-[#8E87A8]">{expenses.length} 筆</div>
-          </div>
-          <ExpenseList expenses={expenses} categories={categories} onEdit={setEditingExpense} onDelete={deleteExpenseEntry} />
-        </div>
 
         <div className="academy-card academy-battle-panel">
           <ExpensePanel
@@ -637,6 +654,18 @@ export default function BattleScreen() {
             categories={categories}
           />
         </div>
+
+        <ExpenseLogSummary
+          expenses={expenses}
+          categories={categories}
+          expanded={logExpanded}
+          onToggle={() => setLogExpanded(value => !value)}
+          onEdit={expense => {
+            setEditingExpense(expense)
+            setLogExpanded(false)
+          }}
+          onDelete={deleteExpenseEntry}
+        />
       </div>
 
       <BottomNav current="town" navigate={navigate} />

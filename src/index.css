@@ -1430,8 +1430,8 @@ video.academy-screen-character {
   display: flex;
   position: relative;
   z-index: 3;
-  width: 306px;
-  height: 296px;
+  width: 248px;
+  height: 226px;
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 14px 18px rgba(93,72,130,0.2));
@@ -1507,7 +1507,7 @@ video.academy-screen-character {
 .academy-battle-arena {
   position: relative;
   display: flex;
-  height: 340px;
+  height: 276px;
   flex-direction: column;
   justify-content: flex-start;
   padding-top: 0;
@@ -1517,9 +1517,9 @@ video.academy-screen-character {
   position: relative;
   z-index: 4;
   border: 1px solid rgba(255,255,255,0.8);
-  border-radius: 22px;
+  border-radius: 20px;
   background: rgba(255,255,255,0.86);
-  padding: 10px 12px;
+  padding: 8px 10px;
   box-shadow: 0 10px 24px rgba(86,74,130,0.14);
   backdrop-filter: blur(16px);
 }
@@ -1542,7 +1542,7 @@ video.academy-screen-character {
 
 .academy-battle-content {
   min-height: 0;
-  padding-bottom: calc(7.75rem + env(safe-area-inset-bottom));
+  padding-bottom: calc(7.25rem + env(safe-area-inset-bottom));
   overscroll-behavior: contain;
   scrollbar-width: none;
 }
@@ -1553,17 +1553,17 @@ video.academy-screen-character {
 
 .academy-battle-top-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  margin-bottom: 7px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 6px;
 }
 
 .academy-battle-top-stats span {
   display: grid;
   min-width: 0;
-  min-height: 46px;
+  min-height: 38px;
   place-items: center;
-  border-radius: 16px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.74);
   background: rgba(255,255,255,0.72);
   box-shadow: 0 8px 16px rgba(86,74,130,0.08);
@@ -1626,7 +1626,7 @@ video.academy-screen-character {
 .academy-battle-stage {
   position: relative;
   display: flex;
-  height: 224px;
+  height: 174px;
   align-items: center;
   justify-content: center;
   margin-top: 0;
@@ -1651,7 +1651,7 @@ video.academy-screen-character {
   left: 50%;
   bottom: 12px;
   z-index: 0;
-  width: min(72%, 250px);
+  width: min(70%, 202px);
   aspect-ratio: 1;
   border-radius: 50%;
   background:
@@ -1665,7 +1665,7 @@ video.academy-screen-character {
 
 .academy-battle-stage__rail {
   position: absolute;
-  bottom: 48px;
+  bottom: 36px;
   z-index: 1;
   width: 92px;
   height: 2px;
@@ -1686,8 +1686,8 @@ video.academy-screen-character {
 
 .academy-battle-monster-art {
   display: block;
-  width: 262px;
-  height: 262px;
+  width: 218px;
+  height: 218px;
   object-fit: contain;
   object-position: center bottom;
   filter: drop-shadow(0 12px 12px rgba(86,74,130,0.2));
@@ -1708,12 +1708,36 @@ video.academy-screen-character {
 .academy-battle-log {
   position: relative;
   z-index: 5;
-  margin-top: -10px;
+  margin-top: 8px;
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.72);
   background: rgba(255,255,255,0.56);
   padding: 8px;
   backdrop-filter: blur(12px);
+}
+
+.academy-battle-log-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+}
+
+.academy-battle-log-toggle span {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgba(241,236,255,0.84);
+  padding: 5px 9px;
+  color: #7b63d8;
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.academy-battle-log-detail {
+  overflow: hidden;
 }
 
 .academy-battle-empty-log {
@@ -1728,7 +1752,7 @@ video.academy-screen-character {
 
 .academy-battle-expense-list {
   display: flex;
-  max-height: 42px;
+  max-height: 172px;
   flex-direction: column;
   gap: 5px;
   overflow-y: auto;
@@ -1762,15 +1786,15 @@ video.academy-screen-character {
 .academy-battle-panel {
   position: relative;
   z-index: 6;
-  margin-top: 8px;
-  padding: 9px;
+  margin-top: 6px;
+  padding: 8px;
   border-radius: 24px;
 }
 
 .academy-battle-pad {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
 .academy-battle-panel-head {
@@ -1815,21 +1839,21 @@ video.academy-screen-character {
 
 @media (max-height: 760px) {
   .academy-battle-arena {
-    height: 284px;
+    height: 238px;
   }
 
   .academy-battle-stage {
-    height: 168px;
+    height: 138px;
   }
 
   .academy-battle-monster {
-    width: 225px;
-    height: 210px;
+    width: 206px;
+    height: 188px;
   }
 
   .academy-battle-monster-art {
-    width: 208px;
-    height: 208px;
+    width: 184px;
+    height: 184px;
   }
 
   .academy-category--compact {

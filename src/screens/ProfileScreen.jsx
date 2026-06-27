@@ -167,17 +167,23 @@ function supportsGender(set, gender) {
     : Boolean(config.girlImage || config.girlFrames || config.girlVideo)
 }
 
+function isSetOwned(set, collectionIds) {
+  return set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
+}
+
 function WardrobePanel({ avatarGender, activeSet, collectionIds, onEquipSet }) {
   const [filter, setFilter] = useState('all')
-  const visibleSets = WARDROBE_SETS.filter(set => {
-    const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
+  const supportedSets = WARDROBE_SETS.filter(set => supportsGender(set, avatarGender))
+  const visibleSets = supportedSets.filter(set => {
+    const owned = isSetOwned(set, collectionIds)
     if (filter === 'all') return true
     if (filter === 'owned') return owned
     if (filter === 'locked') return !owned
     return set.tags.includes(filter)
   })
-  const currentSet = activeSet ?? WARDROBE_SETS[0]
-  const ownedCount = WARDROBE_SETS.filter(set => set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)).length
+  const fallbackSet = supportedSets.find(set => isSetOwned(set, collectionIds)) ?? supportedSets[0] ?? WARDROBE_SETS[0]
+  const currentSet = activeSet && supportsGender(activeSet, avatarGender) ? activeSet : fallbackSet
+  const ownedCount = supportedSets.filter(set => isSetOwned(set, collectionIds)).length
 
   return (
     <div className="academy-collection">
@@ -198,7 +204,7 @@ function WardrobePanel({ avatarGender, activeSet, collectionIds, onEquipSet }) {
       <section className="academy-collection-toolbar">
         <div>
           <b>套裝收藏</b>
-          <small>{ownedCount}/{WARDROBE_SETS.length} 已擁有</small>
+          <small>{ownedCount}/{supportedSets.length} 已擁有</small>
         </div>
         <div className="academy-wardrobe-cats">
           {WARDROBE_FILTERS.map(c => (
@@ -215,15 +221,15 @@ function WardrobePanel({ avatarGender, activeSet, collectionIds, onEquipSet }) {
 
       <div className="academy-style-grid">
         {visibleSets.map(set => {
-          const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
-          const active = activeSet?.id === set.id
+          const owned = isSetOwned(set, collectionIds)
+          const active = currentSet?.id === set.id
           const hasBoy = supportsGender(set, 'boy')
           const hasGirl = supportsGender(set, 'girl')
           return (
             <button
               key={set.id}
               className={`academy-style-card ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-              onClick={() => owned && onEquipSet(set)}
+              onClick={() => owned && supportsGender(set, avatarGender) && onEquipSet(set)}
             >
               <OutfitStage gender={avatarGender} outfitId={set.outfit} className="academy-style-card__stage" />
               <div className="academy-style-card__body">
@@ -384,10 +390,26 @@ export default function ProfileScreen() {
   }
 
   async function chooseAvatar(gender) {
-    dispatch({ type: 'UPDATE_PROFILE', data: { avatarGender: gender } })
+    const currentSet = WARDROBE_SETS.find(set => (equipped.outfit ?? 'academy') === set.outfit)
+    const nextSupportedSet = currentSet && supportsGender(currentSet, gender)
+      ? null
+      : WARDROBE_SETS.find(set => supportsGender(set, gender) && isSetOwned(set, collectionIds))
+    const data = nextSupportedSet
+      ? {
+          avatarGender: gender,
+          equipped: {
+            ...equipped,
+            outfit: nextSupportedSet.outfit,
+            accessory: nextSupportedSet.accessory,
+            frame: nextSupportedSet.frame,
+            set: nextSupportedSet.id,
+          },
+        }
+      : { avatarGender: gender }
+    dispatch({ type: 'UPDATE_PROFILE', data })
     if (user) {
       try {
-        await updateProfile(user.uid, { avatarGender: gender })
+        await updateProfile(user.uid, data)
       } catch (e) {
         console.error(e)
       }

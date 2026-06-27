@@ -462,9 +462,9 @@
 }
 
 .academy-screen--summer .academy-screen-character {
-  top: 202px;
-  width: 70vw;
-  max-width: 276px;
+  top: 218px;
+  width: 68vw;
+  max-width: 266px;
 }
 
 .summer-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
@@ -517,9 +517,9 @@
 }
 
 .academy-screen--sakura .academy-screen-character {
-  top: 252px;
-  width: 61vw;
-  max-width: 244px;
+  top: 236px;
+  width: 64vw;
+  max-width: 252px;
 }
 
 .academy-screen--sakura .academy-hud,
@@ -653,9 +653,9 @@
 }
 
 .academy-screen--qixi .academy-screen-character {
-  top: 228px;
-  width: 66vw;
-  max-width: 264px;
+  top: 236px;
+  width: 64vw;
+  max-width: 254px;
   filter: drop-shadow(0 20px 18px rgba(12,10,38,.30)) drop-shadow(0 0 18px rgba(226,197,112,.16));
 }
 
@@ -813,9 +813,9 @@
 }
 
 .academy-screen--rainy .academy-screen-character {
-  top: 224px;
-  width: 66vw;
-  max-width: 264px;
+  top: 238px;
+  width: 64vw;
+  max-width: 254px;
 }
 
 .academy-screen--rainy .academy-hud,
@@ -938,21 +938,22 @@
 @keyframes rainy-pavement-glow { 50% { opacity: .42; transform: scaleX(1.04); } }
 .rainy-drop {
   position: absolute;
-  top: -38px;
-  width: 2px;
-  height: 42px;
+  top: auto;
+  bottom: 19%;
+  width: 26px;
+  height: 3px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(218,247,255,0), rgba(218,247,255,.62));
-  opacity: 0;
-  animation: rainy-fall 1.9s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(218,247,255,.42), transparent);
+  opacity: .36;
+  animation: rainy-shimmer 4.2s ease-in-out infinite;
 }
 .rainy-drop--one { left: 18%; animation-delay: -.2s; }
-.rainy-drop--two { left: 34%; animation-delay: -1.1s; animation-duration: 2.3s; }
-.rainy-drop--three { left: 52%; animation-delay: -.7s; animation-duration: 1.7s; }
-.rainy-drop--four { left: 70%; animation-delay: -1.5s; animation-duration: 2.1s; }
-.rainy-drop--five { left: 86%; animation-delay: -.9s; animation-duration: 2.5s; }
-@keyframes rainy-fall {
-  to { translate: -42px 640px; opacity: .08; }
+.rainy-drop--two { left: 34%; animation-delay: -1.1s; width: 34px; }
+.rainy-drop--three { left: 52%; animation-delay: -.7s; width: 30px; }
+.rainy-drop--four { left: 70%; animation-delay: -1.5s; width: 38px; }
+.rainy-drop--five { left: 86%; animation-delay: -.9s; width: 24px; }
+@keyframes rainy-shimmer {
+  50% { opacity: .12; transform: scaleX(.72); }
 }
 
 @media (max-width: 430px) {
