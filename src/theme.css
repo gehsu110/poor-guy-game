@@ -128,6 +128,15 @@
 .academy-mini-currency--purple .game-icon { color: var(--color-brand-500); }
 .academy-mini-currency--pink .game-icon { color: var(--color-danger-500); }
 
+.academy-home-content {
+  padding-top: 0;
+  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
+}
+
+.academy-attack-panel {
+  margin-bottom: 10px;
+}
+
 .academy-hud__labels { color: var(--color-ink-500); }
 .academy-value-primary { color: var(--color-ink-900); }
 .is-safe { color: var(--color-safe-500); }
@@ -395,13 +404,6 @@
   background: linear-gradient(135deg, #ffd875, #e7ad36 62%, #c98921);
 }
 
-.academy-screen--academy .academy-home-content {
-  padding-top: 0;
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
-}
-
-.academy-screen--academy .academy-attack-panel { margin-bottom: 8px; }
-
 /* Complete summer collection: scene, props, motion, and UI palette travel together. */
 .academy-screen--summer .academy-bg-soft {
   background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(24,133,168,.04) 48%, rgba(255,244,215,.34));
@@ -603,15 +605,6 @@
   box-shadow: inset 0 0 0 1px rgba(124,83,99,.08);
 }
 
-.academy-screen--sakura .academy-home-content {
-  padding-top: 0;
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
-}
-
-.academy-screen--sakura .academy-attack-panel {
-  margin-bottom: 8px;
-}
-
 .sakura-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
 .sakura-moon-glow {
   position: absolute; top: 2%; left: 50%; width: 180px; height: 180px; translate: -50% 0;
@@ -730,15 +723,6 @@
   box-shadow: inset 0 0 0 1px rgba(70,111,120,.08);
 }
 
-.academy-screen--rainy .academy-home-content {
-  padding-top: 0;
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
-}
-
-.academy-screen--rainy .academy-attack-panel {
-  margin-bottom: 8px;
-}
-
 .rainy-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
 .rainy-scene::before {
   content: '';
@@ -798,37 +782,21 @@
 }
 
 @media (max-width: 430px) {
-  .academy-screen--sakura .academy-home-content {
-    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  .academy-home-content {
+    padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
   }
 
-  .academy-screen--sakura .academy-attack-panel {
-    margin-bottom: 10px;
-  }
-
-  .academy-screen--rainy .academy-home-content {
-    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
-  }
-
-  .academy-screen--rainy .academy-attack-panel {
+  .academy-attack-panel {
     margin-bottom: 10px;
   }
 }
 
 @media (max-width: 390px) {
-  .academy-screen--sakura .academy-home-content {
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  .academy-home-content {
+    padding-bottom: calc(6.25rem + env(safe-area-inset-bottom));
   }
 
-  .academy-screen--sakura .academy-attack-panel {
-    margin-bottom: 12px;
-  }
-
-  .academy-screen--rainy .academy-home-content {
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
-  }
-
-  .academy-screen--rainy .academy-attack-panel {
+  .academy-attack-panel {
     margin-bottom: 12px;
   }
 }

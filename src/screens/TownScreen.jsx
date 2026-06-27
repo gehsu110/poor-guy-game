@@ -158,7 +158,7 @@ export default function TownScreen() {
         <IdentityHUD profile={profile} onSettingsClick={() => navigate('profile', { tab: 'settings' })} />
       </div>
 
-      <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pb-24 pt-2">
+      <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pt-2">
         <HeroShowcase onWardrobeClick={() => navigate('profile', { tab: 'wardrobe' })} />
         <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>

@@ -4,8 +4,6 @@ import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, generateDayMonster, formatMoney } from '../gameLogic'
 import { addExpense, getMonthDayRecords, getMonthExpenses, setDayRecord } from '../firebase'
 import { BottomNav } from './TownScreen'
-import GameIcon from '../components/GameIcon'
-import mapBg from '../assets/academy-art/map-bg.webp'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
 import zoneAcademy from '../assets/academy-art/map-zones/week1-academy.webp'
 import zoneMarket from '../assets/academy-art/map-zones/week2-market.webp'
@@ -14,13 +12,13 @@ import zoneBoss from '../assets/academy-art/map-zones/week4-boss.webp'
 
 // 節點狀態設定
 const NODE_CONFIG = {
-  defeated:  { icon: 'skull', label: '擊殺' },
-  undefeated:{ icon: 'battle', label: '未滅' },
-  no_record: { icon: 'unknown', label: '未記' },
-  today:     { icon: 'battle', label: '今日' },
-  future:    { icon: 'unknown', label: '未來' },
-  boss:      { icon: 'boss', label: '首領' },
-  monthboss: { icon: 'boss', label: '月底首領' },
+  defeated:  { label: '擊殺' },
+  undefeated:{ label: '未滅' },
+  no_record: { label: '未記' },
+  today:     { label: '今日' },
+  future:    { label: '未來' },
+  boss:      { label: '首領' },
+  monthboss: { label: '月底首領' },
 }
 
 const MAP_ZONES = [
@@ -35,6 +33,9 @@ function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
     : tier !== 'normal' && tier !== 'normal_special' ? NODE_CONFIG.boss
     : NODE_CONFIG[status] ?? NODE_CONFIG.future
 
+  const marker = tier === 'monthboss' ? 'monthboss'
+    : tier !== 'normal' && tier !== 'normal_special' ? 'boss'
+    : status
   const size = tier === 'monthboss' ? 'academy-map-node--large' : tier !== 'normal' ? 'academy-map-node--boss' : ''
   const isDim = status === 'future' || status === 'no_record'
 
@@ -46,10 +47,12 @@ function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
       animate={isToday ? { scale: [1, 1.1, 1], boxShadow: ['0 0 0 0 rgba(200,168,233,0)', '0 0 0 8px rgba(200,168,233,0.4)', '0 0 0 0 rgba(200,168,233,0)'] } : {}}
       transition={{ duration: 2, repeat: Infinity }}
     >
-      <GameIcon name={cfg.icon} />
+      <span className={`academy-map-node__marker academy-map-node__marker--${marker}`} aria-hidden="true">
+        <i />
+      </span>
       {spent > 0 && <i className="academy-map-node__spent" />}
       <div className="academy-map-node__date">{day}</div>
-      <span className="academy-map-node__suffix">日</span>
+      <span className="academy-map-node__suffix">{cfg.label}</span>
     </motion.button>
   )
 }
@@ -199,8 +202,8 @@ export default function MapScreen() {
   }
 
   return (
-    <div className="academy-screen" style={{ '--monster-sprites': `url(${monsterSprites})` }}>
-      <img src={mapBg} alt="" className="academy-bg" draggable="false" />
+    <div className="academy-screen academy-screen--map" style={{ '--monster-sprites': `url(${monsterSprites})` }}>
+      <div className="academy-bg academy-map-bg" aria-hidden="true" />
       <div className="academy-bg-soft" />
       {/* 頂部 */}
       <div className="relative z-10 flex items-center px-4 pt-4 pb-2 gap-2">
