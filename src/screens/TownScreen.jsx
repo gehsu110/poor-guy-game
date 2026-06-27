@@ -39,7 +39,7 @@ function HeroShowcase({ hasVideo, onWardrobeClick }) {
       <div className="academy-home-hero__shine" />
       <button className="academy-wardrobe-fab" onClick={onWardrobeClick}>
         <GameIcon name="wardrobe" />
-        <b>衣櫃</b>
+        <b>造型</b>
       </button>
     </section>
   )

@@ -5,126 +5,124 @@ import { COLLECTIBLE_TITLES, DEFAULT_CATEGORIES, getTitle, TITLES, formatMoney }
 import { loginWithGoogle, updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
 import Avatar from '../components/Avatar'
-import { getOutfitAssets } from '../outfitAssets'
+import { OUTFIT_CONFIG, getOutfitAssets } from '../outfitAssets'
 import profileBg from '../assets/academy-art/profile-bg.webp'
-import LayeredCharacter from '../components/LayeredCharacter'
-import { CHARACTER_ITEMS } from '../characterItems'
 
-const WARDROBE = {
-  set: [
-    {
-      id: 'academy_set',
-      name: '星術學院套裝',
-      desc: '預設主角造型',
-      outfit: 'academy',
-      accessory: 'star_pin',
-      frame: 'soft_gold',
-      owned: true,
-    },
-    // saving_hero_set 暫時隱藏（外觀與學院服重複，待製作獨立素材）
-    {
-      id: 'pink_magic_set',
-      name: '粉晶禮服套裝',
-      desc: '紫星直購造型',
-      outfit: 'pink_robe',
-      accessory: 'ribbon',
-      frame: 'frame_ribbon',
-      owned: true,   // 暫時解鎖測試用
-    },
-    {
-      id: 'night_cape_set',
-      name: '星夜斗篷套裝',
-      desc: '扭蛋稀有造型',
-      outfit: 'night_cape',
-      accessory: 'crown',
-      frame: 'moon',
-      owned: true,   // 暫時解鎖測試用
-    },
-    {
-      id: 'suit_set',
-      name: '都市精英套裝',
-      desc: '職場感限定套裝',
-      outfit: 'suit',
-      accessory: 'none',
-      frame: 'soft_gold',
-      owned: true,   // 暫時解鎖測試用
-    },
-    {
-      id: 'summer_beach_set',
-      name: '星潮海灘套裝',
-      desc: '泳裝、貝殼髮飾與海灘主題場景',
-      outfit: 'summer_beach',
-      accessory: 'none',
-      frame: 'crystal',
-      owned: true,
-    },
-    {
-      id: 'sakura_festival_set',
-      name: '櫻燈祭典套裝',
-      desc: '短髮盤辮、櫻扇、金魚袋與月下神社',
-      outfit: 'sakura_festival',
-      accessory: 'none',
-      frame: 'moon',
-      owned: true,
-    },
-    {
-      id: 'rainy_detective_set',
-      name: '雨後偵探套裝',
-      desc: '紫灰短髮、帳本燈與雨後巷弄探案',
-      outfit: 'rainy_detective',
-      accessory: 'none',
-      frame: 'crystal',
-      owned: true,
-    },
-    {
-      id: 'mint_supply_set',
-      name: '薄荷補給套裝',
-      desc: '黃星直購造型',
-      outfit: 'mint_coat',
-      accessory: 'star_pin',
-      frame: 'crystal',
-      owned: false,
-    },
-  ],
-  outfit: [
-    { id: 'academy',    name: '星術學院服', desc: '預設主角服裝', owned: true },
-    // saving_hero 暫時隱藏，待製作獨立素材
-    { id: 'pink_robe',  name: '粉晶禮服',   desc: '可愛柔粉風',   owned: true },  // 暫時解鎖
-    { id: 'night_cape', name: '星夜斗篷',   desc: '扭蛋稀有服裝', owned: true },  // 暫時解鎖
-    { id: 'suit',       name: '都市精英套裝',desc: '職場感套裝',   owned: true },  // 暫時解鎖
-    { id: 'summer_beach', name: '星潮海灘裝', desc: '貝殼水手夏日造型', owned: true },
-    { id: 'sakura_festival', name: '櫻燈祭典裝', desc: '月下和風祭典造型', owned: true },
-    { id: 'rainy_detective', name: '雨後偵探裝', desc: '帳本燈與透明雨衣', owned: true },
-    { id: 'mint_coat',  name: '薄荷外套',   desc: '清爽補給色',   owned: false },
-  ],
-  accessory: [
-    { id: 'none',     name: '不戴頭飾',   desc: '乾淨頭像',       owned: true },
-    { id: 'star_pin', name: '星星髮夾',   desc: '亮晶晶小標記',   owned: true },
-    { id: 'ribbon',   name: '粉色緞帶',   desc: '更可愛的感覺',   owned: true },
-    { id: 'crown',    name: '勇者小冠',   desc: '月底挑戰感',     owned: false },
-  ],
-  frame: [
-    { id: 'soft_gold', name: '柔金頭像框', desc: '預設邊框',       owned: true },
-    { id: 'ribbon',    name: '緞帶頭像框', desc: '粉色收藏框',     owned: true },
-    { id: 'moon',      name: '夜櫻頭像框', desc: '祭典感外框',     owned: true },
-    { id: 'crystal',   name: '冰晶頭像框', desc: '紫星直購預覽',   owned: false },
-  ],
-  reward: [
-    { ...CHARACTER_ITEMS.ledger_book, owned: true, testLabel: '30 筆記帳任務' },
-    { ...CHARACTER_ITEMS.budget_wand, owned: true, testLabel: '守預算 7 天' },
-    { ...CHARACTER_ITEMS.saving_crown, owned: true, testLabel: '月度 S 評級' },
-  ],
-}
-
-const WARDROBE_CATS = [
-  { key: 'set', label: '套裝' },
-  { key: 'outfit', label: '服裝' },
-  { key: 'accessory', label: '頭飾' },
-  { key: 'frame', label: '頭像框' },
-  { key: 'reward', label: '獎勵' },
+const WARDROBE_SETS = [
+  {
+    id: 'academy_set',
+    name: '星術學院套裝',
+    desc: '預設主角造型',
+    outfit: 'academy',
+    accessory: 'star_pin',
+    frame: 'soft_gold',
+    owned: true,
+    rarity: 'N',
+    series: '主線',
+    source: '初始取得',
+    tags: ['owned', 'achievement'],
+  },
+  {
+    id: 'pink_magic_set',
+    name: '粉晶禮服套裝',
+    desc: '紫星直購造型',
+    outfit: 'pink_robe',
+    accessory: 'ribbon',
+    frame: 'frame_ribbon',
+    owned: true,
+    rarity: 'SR',
+    series: '星術收藏',
+    source: '紫星兌換',
+    tags: ['owned'],
+  },
+  {
+    id: 'night_cape_set',
+    name: '星夜斗篷套裝',
+    desc: '扭蛋稀有造型',
+    outfit: 'night_cape',
+    accessory: 'crown',
+    frame: 'moon',
+    owned: true,
+    rarity: 'SR',
+    series: '星術收藏',
+    source: '補給抽獎',
+    tags: ['owned'],
+  },
+  {
+    id: 'suit_set',
+    name: '都市精英套裝',
+    desc: '職場感限定套裝',
+    outfit: 'suit',
+    accessory: 'none',
+    frame: 'soft_gold',
+    owned: true,
+    rarity: 'R',
+    series: '城市任務',
+    source: '活動預覽',
+    tags: ['owned'],
+  },
+  {
+    id: 'summer_beach_set',
+    name: '星潮海灘套裝',
+    desc: '泳裝、貝殼髮飾與海灘主題場景',
+    outfit: 'summer_beach',
+    accessory: 'none',
+    frame: 'crystal',
+    owned: true,
+    rarity: 'SSR',
+    series: '季節限定',
+    source: '夏日活動',
+    tags: ['owned', 'season'],
+  },
+  {
+    id: 'sakura_festival_set',
+    name: '櫻燈祭典套裝',
+    desc: '短髮盤辮、櫻扇、金魚袋與月下神社',
+    outfit: 'sakura_festival',
+    accessory: 'none',
+    frame: 'moon',
+    owned: true,
+    rarity: 'SSR',
+    series: '節日限定',
+    source: '祭典活動',
+    tags: ['owned', 'event'],
+  },
+  {
+    id: 'rainy_detective_set',
+    name: '雨後偵探套裝',
+    desc: '紫灰短髮、帳本燈與雨後巷弄探案',
+    outfit: 'rainy_detective',
+    accessory: 'none',
+    frame: 'crystal',
+    owned: true,
+    rarity: 'SR',
+    series: '故事活動',
+    source: '雨後探案',
+    tags: ['owned', 'achievement'],
+  },
+  {
+    id: 'mint_supply_set',
+    name: '薄荷補給套裝',
+    desc: '黃星直購造型',
+    outfit: 'mint_coat',
+    accessory: 'star_pin',
+    frame: 'crystal',
+    owned: false,
+    rarity: 'R',
+    series: '補給商店',
+    source: '黃星兌換',
+    tags: ['locked'],
+  },
 ]
 
-const DEFAULT_EQUIPPED = { outfit: 'academy', accessory: 'star_pin', frame: 'soft_gold' }
+const WARDROBE_FILTERS = [
+  { key: 'all', label: '全部' },
+  { key: 'owned', label: '已擁有' },
+  { key: 'season', label: '季節' },
+  { key: 'event', label: '節日' },
+  { key: 'achievement', label: '成就' },
+  { key: 'locked', label: '未解鎖' },
+]
 
 /** 顯示套裝縮圖：優先用真實生成圖，沒有則 fallback 到 Avatar 元件 */
 function OutfitPreview({ gender, outfitId, className }) {
@@ -135,145 +133,97 @@ function OutfitPreview({ gender, outfitId, className }) {
   return <Avatar gender={gender} variant="full" outfit={outfitId} className={className} />
 }
 
-function ModularPreview({ gender, outfitId, equipped, className }) {
-  const { image } = getOutfitAssets(outfitId, gender)
-  if (!image) return <OutfitPreview gender={gender} outfitId={outfitId} className={className} />
-  return <LayeredCharacter gender={gender} equipped={equipped} baseAsset={image} className={className} />
+function OutfitStage({ gender, outfitId, className = '' }) {
+  const { bg } = getOutfitAssets(outfitId, gender)
+  return (
+    <div className={`academy-outfit-stage ${className}`}>
+      <img src={bg} alt="" className="academy-outfit-stage__bg" draggable="false" />
+      <OutfitPreview gender={gender} outfitId={outfitId} className="academy-outfit-stage__avatar" />
+    </div>
+  )
 }
 
-function WardrobePanel({ avatarGender, equipped, activeSet, collectionIds, onEquipSet, onEquipCosmetic }) {
-  const [cat, setCat] = useState('set')
+function supportsGender(set, gender) {
+  const config = OUTFIT_CONFIG[set.outfit]
+  if (!config) return false
+  return gender === 'boy'
+    ? Boolean(config.boyImage || config.boyFrames || config.boyVideo)
+    : Boolean(config.girlImage || config.girlFrames || config.girlVideo)
+}
+
+function WardrobePanel({ avatarGender, activeSet, collectionIds, onEquipSet }) {
+  const [filter, setFilter] = useState('all')
+  const visibleSets = WARDROBE_SETS.filter(set => {
+    const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
+    if (filter === 'all') return true
+    if (filter === 'owned') return owned
+    if (filter === 'locked') return !owned
+    return set.tags.includes(filter)
+  })
+  const currentSet = activeSet ?? WARDROBE_SETS[0]
+  const ownedCount = WARDROBE_SETS.filter(set => set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)).length
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="academy-card">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="text-sm font-black text-[#26324A]">目前造型</div>
-          <span className="academy-status">{activeSet?.name ?? '自訂搭配'}</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <ModularPreview
-            gender={avatarGender}
-            outfitId={equipped.outfit ?? 'academy'}
-            equipped={equipped}
-            className="academy-wardrobe-hero"
-          />
-          <div className="min-w-0 flex-1 text-xs font-bold leading-6 text-[#8E87A8]">
-            <div>服裝：{WARDROBE.outfit.find(i => i.id === (equipped.outfit ?? 'academy'))?.name}</div>
-            <div>頭飾：{WARDROBE.accessory.find(i => i.id === (equipped.accessory ?? 'star_pin'))?.name}</div>
-            <div>頭像框：{WARDROBE.frame.find(i => i.id === (equipped.frame ?? 'soft_gold'))?.name}</div>
-            <div>左手：{CHARACTER_ITEMS[equipped.handLeft]?.name ?? '無'}</div>
-            <div>右手：{CHARACTER_ITEMS[equipped.handRight]?.name ?? '無'}</div>
+    <div className="academy-collection">
+      <section className="academy-style-hero">
+        <OutfitStage gender={avatarGender} outfitId={currentSet.outfit} />
+        <div className="academy-style-hero__info">
+          <span className="academy-style-kicker">{currentSet.series}</span>
+          <h2>{currentSet.name}</h2>
+          <p>{currentSet.desc}</p>
+          <div className="academy-style-meta">
+            <span>{currentSet.rarity}</span>
+            <span>{currentSet.source}</span>
+            <span>{supportsGender(currentSet, 'boy') && supportsGender(currentSet, 'girl') ? '男女皆可' : avatarGender === 'boy' ? '男主角預覽' : '女主角預覽'}</span>
           </div>
         </div>
-        {avatarGender === 'girl' && (
-          <div className="academy-layered-preview-note">
-            獎勵物件目前為衣櫃定位預覽；首頁動畫將在角色骨架分層完成後啟用。
-          </div>
-        )}
-      </div>
+      </section>
 
-      <div className="academy-card">
-        <div className="academy-wardrobe-cats mb-3">
-          {WARDROBE_CATS.map(c => (
+      <section className="academy-collection-toolbar">
+        <div>
+          <b>套裝收藏</b>
+          <small>{ownedCount}/{WARDROBE_SETS.length} 已擁有</small>
+        </div>
+        <div className="academy-wardrobe-cats">
+          {WARDROBE_FILTERS.map(c => (
             <button
               key={c.key}
-              className={`academy-wardrobe-cat-btn ${cat === c.key ? 'is-active' : ''}`}
-              onClick={() => setCat(c.key)}
+              className={`academy-wardrobe-cat-btn ${filter === c.key ? 'is-active' : ''}`}
+              onClick={() => setFilter(c.key)}
             >
               {c.label}
             </button>
           ))}
         </div>
+      </section>
 
-        {cat === 'set' && (
-          <div className="grid grid-cols-2 gap-2">
-            {WARDROBE.set.map(set => {
-              const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
-              const active = activeSet?.id === set.id
-              return (
-                <button
-                  key={set.id}
-                  className={`academy-outfit-set ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-                  onClick={() => owned && onEquipSet(set)}
-                >
-                  <OutfitPreview
-                    gender={avatarGender}
-                    outfitId={set.outfit}
-                    className="academy-outfit-set__avatar"
-                  />
+      <div className="academy-style-grid">
+        {visibleSets.map(set => {
+          const owned = set.owned || collectionIds.has(set.id) || collectionIds.has(set.outfit)
+          const active = activeSet?.id === set.id
+          const hasBoy = supportsGender(set, 'boy')
+          const hasGirl = supportsGender(set, 'girl')
+          return (
+            <button
+              key={set.id}
+              className={`academy-style-card ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
+              onClick={() => owned && onEquipSet(set)}
+            >
+              <OutfitStage gender={avatarGender} outfitId={set.outfit} className="academy-style-card__stage" />
+              <div className="academy-style-card__body">
+                <div className="academy-style-card__title">
                   <b>{set.name}</b>
-                  <small>{owned ? set.desc : '未解鎖'}</small>
-                </button>
-              )
-            })}
-          </div>
-        )}
-
-        {cat === 'outfit' && (
-          <div className="grid grid-cols-2 gap-2">
-            {WARDROBE.outfit.map(item => {
-              const owned = item.owned || collectionIds.has(item.id)
-              const active = (equipped.outfit ?? 'academy') === item.id
-              return (
-                <button
-                  key={item.id}
-                  className={`academy-outfit-set ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-                  onClick={() => owned && onEquipCosmetic('outfit', item.id)}
-                >
-                  <OutfitPreview
-                    gender={avatarGender}
-                    outfitId={item.id}
-                    className="academy-outfit-set__avatar"
-                  />
-                  <b>{item.name}</b>
-                  <small>{owned ? item.desc : '未解鎖'}</small>
-                </button>
-              )
-            })}
-          </div>
-        )}
-
-        {['accessory', 'frame'].includes(cat) && (
-          <div className="grid grid-cols-2 gap-2">
-            {WARDROBE[cat].map(item => {
-              const owned = item.owned || collectionIds.has(item.id)
-              const defaultVal = DEFAULT_EQUIPPED[cat]
-              const active = (equipped[cat] ?? defaultVal) === item.id
-              return (
-                <button
-                  key={item.id}
-                  className={`academy-wardrobe-item ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-                  onClick={() => owned && onEquipCosmetic(cat, item.id)}
-                >
-                  <span className={`academy-wardrobe-swatch academy-wardrobe-swatch--${item.id}`} />
-                  <b>{item.name}</b>
-                  <small>{owned ? item.desc : '未解鎖'}</small>
-                </button>
-              )
-            })}
-          </div>
-        )}
-
-        {cat === 'reward' && (
-          <div className="grid grid-cols-2 gap-2">
-            {WARDROBE.reward.map(item => {
-              const active = equipped[item.slot] === item.id
-              const owned = item.owned || collectionIds.has(item.id)
-              return (
-                <button
-                  key={item.id}
-                  className={`academy-reward-item ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-                  onClick={() => owned && onEquipCosmetic(item.slot, active ? 'none' : item.id)}
-                >
-                  <img src={item.girlAsset} alt="" draggable="false" />
-                  <b>{item.name}</b>
-                  <small>{active ? '點擊卸下' : item.testLabel}</small>
-                </button>
-              )
-            })}
-          </div>
-        )}
+                  <span>{set.rarity}</span>
+                </div>
+                <small>{owned ? set.source : '未解鎖'}</small>
+                <div className="academy-style-card__tags">
+                  <i>{set.series}</i>
+                  <i>{hasBoy && hasGirl ? '男女' : hasBoy ? '男' : '女'}</i>
+                </div>
+              </div>
+            </button>
+          )
+        })}
       </div>
     </div>
   )
@@ -339,14 +289,10 @@ export default function ProfileScreen() {
   const avatarGender = profile?.avatarGender ?? 'girl'
   const playerName = profile?.playerName?.trim() || '新手勇者'
   const directTab = ['wardrobe', 'settings'].includes(screenParams?.tab) ? screenParams.tab : null
-  const pageTitle = directTab === 'wardrobe' ? '衣櫃'
+  const pageTitle = directTab === 'wardrobe' ? '造型收藏'
     : directTab === 'settings' ? '設定'
     : '冒險者資料'
-  const activeSet = WARDROBE.set.find(set => (
-    (equipped.outfit ?? 'academy') === set.outfit &&
-    (equipped.accessory ?? 'star_pin') === set.accessory &&
-    (equipped.frame ?? 'soft_gold') === set.frame
-  ))
+  const activeSet = WARDROBE_SETS.find(set => (equipped.outfit ?? 'academy') === set.outfit)
 
   async function handleGoogleLink() {
     try {
@@ -402,18 +348,6 @@ export default function ProfileScreen() {
     if (user) {
       try {
         await updateProfile(user.uid, { avatarGender: gender })
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
-  async function equipCosmetic(slot, itemId) {
-    const data = { equipped: { ...equipped, [slot]: itemId } }
-    dispatch({ type: 'UPDATE_PROFILE', data })
-    if (user) {
-      try {
-        await updateProfile(user.uid, data)
       } catch (e) {
         console.error(e)
       }
@@ -527,7 +461,7 @@ export default function ProfileScreen() {
           {[
             { k: 'stats', label: '狀態' },
             { k: 'titles', label: '稱號' },
-            { k: 'wardrobe', label: '衣櫃' },
+            { k: 'wardrobe', label: '造型' },
             { k: 'settings', label: '設定' },
           ].map(t => (
             <button key={t.k} className={tab === t.k ? 'is-active' : ''} onClick={() => setTab(t.k)}>
@@ -569,7 +503,6 @@ export default function ProfileScreen() {
             activeSet={activeSet}
             collectionIds={collectionIds}
             onEquipSet={equipSet}
-            onEquipCosmetic={equipCosmetic}
           />
         )}
 

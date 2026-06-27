@@ -110,9 +110,9 @@ const PATHS = {
   ),
   wardrobe: (
     <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 13h32a5 5 0 015 5v35H11V18a5 5 0 015-5z" />
-      <path d="M32 13v40M22 23h4M38 23h4M21 43c5-5 17-5 22 0" />
-      <path d="M32 26c4 0 7 3 7 7 0 5-4 8-7 8s-7-3-7-8c0-4 3-7 7-7z" />
+      <path d="M32 9c-5 0-8 3-8 7 0 5 4 7 8 7s8-2 8-7c0-4-3-7-8-7z" />
+      <path d="M24 18l-11 8 7 10 5-3v20h14V33l5 3 7-10-11-8" />
+      <path d="M32 34l2.2 4.3 4.8.7-3.5 3.4.9 4.8-4.4-2.3-4.4 2.3.9-4.8L25 39l4.8-.7z" />
     </g>
   ),
   guild: (
