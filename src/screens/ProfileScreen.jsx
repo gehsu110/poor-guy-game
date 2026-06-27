@@ -147,10 +147,13 @@ function OutfitPreview({ gender, outfitId, className }) {
 }
 
 function OutfitStage({ gender, outfitId, className = '' }) {
-  const { bg } = getOutfitAssets(outfitId, gender)
+  const { bg, bgTheme } = getOutfitAssets(outfitId, gender)
   return (
-    <div className={`academy-outfit-stage ${className}`}>
+    <div className={`academy-outfit-stage academy-outfit-stage--${bgTheme ?? 'academy'} ${className}`}>
       <img src={bg} alt="" className="academy-outfit-stage__bg" draggable="false" />
+      <span className="academy-outfit-stage__fx academy-outfit-stage__fx--one" />
+      <span className="academy-outfit-stage__fx academy-outfit-stage__fx--two" />
+      <span className="academy-outfit-stage__fx academy-outfit-stage__fx--three" />
       <OutfitPreview gender={gender} outfitId={outfitId} className="academy-outfit-stage__avatar" />
     </div>
   )
@@ -343,6 +346,7 @@ export default function ProfileScreen() {
     : directTab === 'settings' ? '設定'
     : '冒險者資料'
   const activeSet = WARDROBE_SETS.find(set => (equipped.outfit ?? 'academy') === set.outfit)
+  const profilePortraitImage = getOutfitAssets(equipped.outfit ?? 'academy', avatarGender).image
 
   async function handleGoogleLink() {
     try {
@@ -445,6 +449,7 @@ export default function ProfileScreen() {
               frame={equipped.frame ?? 'soft_gold'}
               outfit={equipped.outfit ?? 'academy'}
               accessory={equipped.accessory ?? 'star_pin'}
+              src={profilePortraitImage}
               className="academy-profile-avatar"
             />
           </div>

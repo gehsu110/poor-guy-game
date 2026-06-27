@@ -5,6 +5,7 @@ import { updateProfile } from '../firebase'
 import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
+import { getOutfitAssets } from '../outfitAssets'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
 
@@ -194,12 +195,9 @@ function drawGacha(count = 1, gold = false) {
 
 function CurrencyCard({ icon, label, value }) {
   return (
-    <div className="academy-currency-card">
+    <div className="academy-currency-card" title={label} aria-label={`${label} ${value ?? 0}`}>
       <GameIcon name={icon} />
-      <div className="min-w-0 text-center">
-        <div className="academy-currency-card__label">{label}</div>
-        <div className="academy-currency-card__value">{value ?? 0}</div>
-      </div>
+      <div className="academy-currency-card__value">{value ?? 0}</div>
     </div>
   )
 }
@@ -208,14 +206,15 @@ function ShopPlayerCard({ profile }) {
   const frame = profile?.equipped?.frame ?? 'soft_gold'
   const gender = profile?.avatarGender ?? 'girl'
   const name = profile?.playerName?.trim() || '新手勇者'
+  const portraitImage = getOutfitAssets(profile?.equipped?.outfit ?? 'academy', gender).image
   return (
     <div className="academy-shop-player-card">
       <div className={`academy-shop-player-avatar academy-avatar-frame--${frame}`}>
-        <Avatar gender={gender} variant="portrait" frame={frame} />
+        <Avatar gender={gender} variant="portrait" frame={frame} src={portraitImage} />
       </div>
       <div>
         <b>{name}</b>
-        <small>頭像框展示位</small>
+        <small>目前造型頭像</small>
       </div>
     </div>
   )

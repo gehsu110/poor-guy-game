@@ -16,11 +16,12 @@ function IdentityHUD({ profile, onSettingsClick }) {
   const expPct = expToNext > 0 ? Math.min(100, Math.round((expInLevel / expToNext) * 100)) : 100
   const gender = profile?.avatarGender ?? 'girl'
   const frame = profile?.equipped?.frame ?? 'soft_gold'
+  const portraitImage = getOutfitAssets(profile?.equipped?.outfit ?? 'academy', gender).image
   return (
     <div className="academy-identity-hud">
       <div className="academy-status-board">
         <div className="academy-identity-chip">
-          <Avatar gender={gender} variant="portrait" frame={frame} className="academy-hud-avatar" />
+          <Avatar gender={gender} variant="portrait" frame={frame} src={portraitImage} className="academy-hud-avatar" />
           <span className="academy-identity-chip__copy">
             <strong>{playerName}</strong>
             <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>

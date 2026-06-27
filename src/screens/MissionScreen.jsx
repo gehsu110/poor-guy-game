@@ -4,7 +4,7 @@ import { useApp } from '../useAppStore'
 import { updateProfile, calcLevel } from '../firebase'
 import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
-import guildBg from '../assets/academy-art/guild-bg.webp'
+import missionBg from '../assets/academy-art/profile-bg.webp'
 import { buildQixiActivityMissions } from '../events/qixi2026'
 import { formatMoney, getTitle, todayStr } from '../gameLogic'
 
@@ -317,9 +317,14 @@ export default function MissionScreen() {
   }
 
   return (
-    <div className="academy-screen">
-      <img src={guildBg} alt="" className="academy-bg" draggable="false" />
+    <div className="academy-screen academy-mission-screen">
+      <img src={missionBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
+      <div className="academy-mission-atmosphere" aria-hidden="true">
+        <span />
+        <i />
+        <b />
+      </div>
 
       <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>

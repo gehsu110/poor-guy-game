@@ -6,12 +6,14 @@ export default function Avatar({
   frame = 'soft_gold',
   outfit = 'academy',
   accessory = 'none',
+  src = null,
   className = '',
 }) {
   return (
     <div
       className={[
         'academy-avatar',
+        src ? 'academy-avatar--custom' : '',
         `academy-avatar--${gender}`,
         `academy-avatar--${variant}`,
         `academy-avatar-frame--${frame}`,
@@ -20,7 +22,7 @@ export default function Avatar({
         className,
       ].join(' ')}
     >
-      <img src={avatars} alt="" draggable="false" />
+      <img src={src ?? avatars} alt="" draggable="false" />
     </div>
   )
 }
