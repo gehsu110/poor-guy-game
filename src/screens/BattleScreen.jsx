@@ -201,6 +201,9 @@ function MonsterArea({ monster, currentHp, totalSpent, budget, isHit, damageNumb
       </div>
 
       <div className={`academy-battle-stage ${isHit ? 'is-casting' : ''}`}>
+        <div className="academy-battle-stage__sigil" />
+        <div className="academy-battle-stage__rail academy-battle-stage__rail--left" />
+        <div className="academy-battle-stage__rail academy-battle-stage__rail--right" />
         <motion.div
           className={`academy-battle-monster ${isHit ? 'monster-hit' : ''}`}
           animate={
@@ -577,8 +580,9 @@ export default function BattleScreen() {
   }
 
   return (
-    <div className="academy-screen">
+    <div className="academy-screen academy-screen--battle">
       <img src={battleBg} alt="" className="academy-bg" draggable="false" />
+      <div className="academy-battle-scene-glow" />
       <div className="academy-bg-soft" />
 
       <div className="academy-safe-top relative z-20 flex items-center gap-2 px-4 pb-1">

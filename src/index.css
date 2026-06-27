@@ -750,6 +750,24 @@ body {
   pointer-events: none;
 }
 
+.academy-screen--battle .academy-bg-soft {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,245,201,0.28), transparent 34%),
+    radial-gradient(circle at 50% 56%, rgba(113,97,184,0.26), transparent 38%),
+    linear-gradient(180deg, rgba(39,48,74,0.08), rgba(39,48,74,0.22));
+}
+
+.academy-battle-scene-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at 50% 48%, rgba(255,211,95,0.2), transparent 34%),
+    radial-gradient(ellipse at 50% 62%, rgba(113,97,184,0.18), transparent 42%),
+    linear-gradient(180deg, transparent 0 42%, rgba(39,48,74,0.16) 100%);
+}
+
 .academy-card,
 .academy-hud,
 .academy-attack-panel {
@@ -1583,6 +1601,7 @@ video.academy-screen-character {
   justify-content: center;
   margin-top: 0;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .academy-battle-stage::before {
@@ -1595,6 +1614,44 @@ video.academy-screen-character {
   border-radius: 50%;
   background: radial-gradient(ellipse, rgba(139,124,255,0.2), rgba(82,222,212,0.08), transparent 72%);
   filter: blur(6px);
+}
+
+.academy-battle-stage__sigil {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 0;
+  width: min(72%, 250px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.38) 0 12%, transparent 13%),
+    repeating-conic-gradient(from 0deg, rgba(255,211,95,0.44) 0 8deg, transparent 8deg 18deg),
+    radial-gradient(circle, transparent 0 47%, rgba(255,211,95,0.36) 48% 50%, transparent 51% 62%, rgba(113,97,184,0.18) 63% 66%, transparent 67%);
+  opacity: 0.82;
+  transform: translateX(-50%) rotate(-6deg);
+  filter: blur(0.1px) drop-shadow(0 0 14px rgba(255,211,95,0.25));
+}
+
+.academy-battle-stage__rail {
+  position: absolute;
+  bottom: 48px;
+  z-index: 1;
+  width: 92px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255,211,95,0.7), transparent);
+  box-shadow: 0 0 12px rgba(255,211,95,0.34);
+}
+
+.academy-battle-stage__rail--left {
+  left: 28px;
+  transform: rotate(-22deg);
+}
+
+.academy-battle-stage__rail--right {
+  right: 28px;
+  transform: rotate(22deg);
 }
 
 .academy-battle-monster-art {
