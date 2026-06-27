@@ -22,10 +22,10 @@ const NODE_CONFIG = {
 }
 
 const MAP_ZONES = [
-  { key: 'academy', title: '第 1 週｜學院入口', sub: '建立記帳節奏，讓路線亮起來', range: [1, 7], bg: zoneAcademy },
-  { key: 'market', title: '第 2 週｜魔法市集', sub: '誘惑變多，檢查每天是否守住預算', range: [8, 14], bg: zoneMarket },
-  { key: 'forest', title: '第 3 週｜帳本森林', sub: '花費開始累積，路線會留下戰鬥痕跡', range: [15, 21], bg: zoneForest },
-  { key: 'boss', title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', range: [22, 31], bg: zoneBoss },
+  { key: 'academy', title: '第 1 週｜學院入口', sub: '建立記帳節奏，讓路線亮起來', tag: '啟程區', range: [1, 7], bg: zoneAcademy },
+  { key: 'market', title: '第 2 週｜魔法市集', sub: '誘惑變多，檢查每天是否守住預算', tag: '誘惑區', range: [8, 14], bg: zoneMarket },
+  { key: 'forest', title: '第 3 週｜帳本森林', sub: '花費開始累積，路線會留下戰鬥痕跡', tag: '迷霧區', range: [15, 21], bg: zoneForest },
+  { key: 'boss', title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', tag: '月底壓力區', range: [22, 31], bg: zoneBoss },
 ]
 
 function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
@@ -295,9 +295,9 @@ export default function MapScreen() {
                   <strong>{zone.title}</strong>
                   <small>{zone.sub}</small>
                 </div>
-                {zone.key === 'boss' && <span>月底壓力區</span>}
+                <span>{zone.tag}</span>
               </div>
-              <div className="academy-map-card flex flex-col gap-8 py-5">
+              <div className={`academy-map-card academy-map-card--${zone.key} flex flex-col gap-8 py-5`}>
                 {zone.rows.map((row, ri) => (
                   <div key={`${zone.key}-${ri}`} className="academy-map-row">
                     <div className="academy-map-line" />
