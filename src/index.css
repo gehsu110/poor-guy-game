@@ -2686,18 +2686,18 @@ video.academy-screen-character {
 }
 
 .academy-outfit-stage--rainy .academy-outfit-stage__fx {
-  top: -18%;
-  width: 2px;
-  height: 58%;
+  bottom: 16%;
+  height: 4px;
   border-radius: 999px;
-  background: linear-gradient(180deg, transparent, rgba(199,242,246,0.54), transparent);
-  transform: rotate(14deg);
-  animation: outfit-rain-fall 1.8s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(199,242,246,0.5), rgba(255,223,160,0.18), transparent);
+  opacity: .48;
+  filter: blur(.3px);
+  animation: outfit-rainy-shimmer 4.2s ease-in-out infinite;
 }
 
-.academy-outfit-stage--rainy .academy-outfit-stage__fx--one { left: 20%; }
-.academy-outfit-stage--rainy .academy-outfit-stage__fx--two { left: 52%; animation-delay: -.7s; }
-.academy-outfit-stage--rainy .academy-outfit-stage__fx--three { left: 78%; animation-delay: -1.2s; }
+.academy-outfit-stage--rainy .academy-outfit-stage__fx--one { left: 14%; width: 42%; }
+.academy-outfit-stage--rainy .academy-outfit-stage__fx--two { left: 38%; bottom: 24%; width: 48%; animation-delay: -1.4s; }
+.academy-outfit-stage--rainy .academy-outfit-stage__fx--three { left: 30%; bottom: 9%; width: 36%; animation-delay: -2.6s; }
 
 .academy-outfit-stage--sakura .academy-outfit-stage__fx {
   top: -8px;
@@ -2728,7 +2728,7 @@ video.academy-screen-character {
 
 @keyframes outfit-star-twinkle { 50% { opacity: .22; transform: scale(.52); } }
 @keyframes outfit-thread-flow { to { translate: 42px 0; opacity: .08; } }
-@keyframes outfit-rain-fall { to { translate: -32px 150%; opacity: .08; } }
+@keyframes outfit-rainy-shimmer { 50% { opacity: .16; transform: scaleX(.72); } }
 @keyframes outfit-petal-fall { to { translate: 30px 190px; rotate: 360deg; opacity: .08; } }
 @keyframes outfit-water-shimmer { 50% { opacity: .28; transform: scaleX(1.18); } }
 
