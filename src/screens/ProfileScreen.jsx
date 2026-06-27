@@ -268,6 +268,47 @@ function TitleList({ currentLevel }) {
   )
 }
 
+function SettingSection({ title, eyebrow, children }) {
+  return (
+    <section className="academy-settings-section">
+      <div className="academy-settings-section__head">
+        <span>{eyebrow}</span>
+        <b>{title}</b>
+      </div>
+      <div className="academy-settings-section__body">{children}</div>
+    </section>
+  )
+}
+
+function SettingRow({ label, value, note, action, danger = false }) {
+  return (
+    <div className={`academy-settings-row ${danger ? 'academy-settings-row--danger' : ''}`}>
+      <div className="min-w-0 flex-1">
+        <div className="academy-settings-row__label">{label}</div>
+        {note && <div className="academy-settings-row__note">{note}</div>}
+      </div>
+      <div className="academy-settings-row__side">
+        {value && <span>{value}</span>}
+        {action}
+      </div>
+    </div>
+  )
+}
+
+function SettingToggle({ checked, onClick, label }) {
+  return (
+    <button
+      type="button"
+      className={`academy-setting-toggle ${checked ? 'is-active' : ''}`}
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={checked}
+    >
+      <span />
+    </button>
+  )
+}
+
 export default function ProfileScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile, user, screenParams } = state
@@ -412,6 +453,21 @@ export default function ProfileScreen() {
     await saveCategories(nextCategories)
   }
 
+  async function updatePreference(key, value) {
+    const preferences = {
+      ...(profile?.preferences ?? {}),
+      [key]: value,
+    }
+    dispatch({ type: 'UPDATE_PROFILE', data: { preferences } })
+    if (user) {
+      try {
+        await updateProfile(user.uid, { preferences })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
   return (
     <div className="academy-screen">
       <img src={profileBg} alt="" className="academy-bg" draggable="false" />
@@ -423,7 +479,7 @@ export default function ProfileScreen() {
         <div className="w-10" />
       </div>
 
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-32">
         {!directTab && <div className="academy-card mb-3 text-center">
           <div className="mx-auto mb-2 flex justify-center">
             <Avatar
@@ -507,11 +563,10 @@ export default function ProfileScreen() {
         )}
 
         {tab === 'settings' && (
-          <div className="flex flex-col gap-3">
-            <div className="academy-card">
-              <div className="mb-3 text-xs font-black text-[#26324A]">玩家名稱</div>
+          <div className="academy-settings-page">
+            <SettingSection title="玩家資料" eyebrow="Adventurer">
               {editName ? (
-                <div className="flex gap-2">
+                <div className="academy-settings-edit-row">
                   <input
                     type="text"
                     value={nameInput}
@@ -523,18 +578,23 @@ export default function ProfileScreen() {
                   <button className="academy-small-button" onClick={savePlayerName}>儲存</button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between">
-                  <span className="font-black text-[#26324A]">{playerName}</span>
-                  <button className="text-xs font-black text-[#8B7CFF]" onClick={() => {
-                    setNameInput(playerName)
-                    setEditName(true)
-                  }}>修改</button>
-                </div>
+                <SettingRow
+                  label="暱稱"
+                  value={playerName}
+                  note="顯示在主畫面與遠征紀錄。"
+                  action={(
+                    <button className="academy-inline-action" onClick={() => {
+                      setNameInput(playerName)
+                      setEditName(true)
+                    }}>修改</button>
+                  )}
+                />
               )}
-            </div>
 
-            <div className="academy-card">
-              <div className="mb-3 text-xs font-black text-[#26324A]">主角外觀</div>
+              <div className="academy-settings-subtitle">主角外觀</div>
+              <p className="academy-settings-copy">
+                這是角色版本偏好，不是套裝衣櫃。套裝收藏仍從主畫面的「造型」入口管理。
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { k: 'boy', label: '男主角' },
@@ -557,12 +617,11 @@ export default function ProfileScreen() {
                   </button>
                 ))}
               </div>
-            </div>
+            </SettingSection>
 
-            <div className="academy-card">
-              <div className="mb-3 text-xs font-black text-[#26324A]">每日預算</div>
+            <SettingSection title="帳本設定" eyebrow="Ledger">
               {editBudget ? (
-                <div className="flex gap-2">
+                <div className="academy-settings-edit-row">
                   <input
                     type="number"
                     value={budgetInput}
@@ -572,23 +631,15 @@ export default function ProfileScreen() {
                   <button className="academy-small-button" onClick={saveBudget}>儲存</button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between">
-                  <span className="font-black text-[#26324A]">NT${formatMoney(profile?.dailyBudget ?? 1000)}</span>
-                  <button className="text-xs font-black text-[#8B7CFF]" onClick={() => setEditBudget(true)}>修改</button>
-                </div>
+                <SettingRow
+                  label="每日預算"
+                  value={`NT${formatMoney(profile?.dailyBudget ?? 1000)}`}
+                  note="今日攻擊力與怪物血量會依照這個數字計算。"
+                  action={<button className="academy-inline-action" onClick={() => setEditBudget(true)}>修改</button>}
+                />
               )}
-            </div>
 
-            <div className="academy-card">
-              <div className="mb-3 text-xs font-black text-[#26324A]">新手教學</div>
-              <div className="mb-3 text-xs font-bold leading-5 text-[#8E87A8]">
-                重新查看今日、地圖、任務、補給、公會與設定入口說明。
-              </div>
-              <button className="academy-small-button w-full" onClick={replayOnboarding}>重新觀看教學</button>
-            </div>
-
-            <div className="academy-card">
-              <div className="mb-3 text-xs font-black text-[#26324A]">自訂記帳分類</div>
+              <div className="academy-settings-subtitle">自訂記帳分類</div>
               <div className="mb-3 grid grid-cols-6 gap-2">
                 {['#FFB3C6', '#A8D8EA', '#C8A8E9', '#A8E6CF', '#FFE4A0', '#FFCBA4'].map(color => (
                   <button
@@ -620,25 +671,85 @@ export default function ProfileScreen() {
                   <div key={cat.id} className="academy-category-chip">
                     <span style={{ background: cat.color }} />
                     <b>{cat.label}</b>
-                    <button onClick={() => deleteCustomCategory(cat.id)}>刪除</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="academy-card">
-              <div className="mb-3 text-xs font-black text-[#26324A]">帳號</div>
-              {user?.isAnonymous ? (
-                <div>
-                  <div className="mb-2 text-xs font-bold text-[#8E87A8]">目前使用匿名登入，綁定雲端帳號可保存進度</div>
-                  <button className="academy-small-button w-full" onClick={handleGoogleLink}>
-                    綁定雲端帳號
-                  </button>
+                  <button onClick={() => deleteCustomCategory(cat.id)}>刪除</button>
                 </div>
+              ))}
+              </div>
+            </SettingSection>
+
+            <SettingSection title="資料與同步" eyebrow="Privacy">
+              {user?.isAnonymous ? (
+                <SettingRow
+                  label="同步狀態"
+                  value="匿名備份"
+                  note="目前可保存遊戲進度；綁定 Google 後換裝置也能取回。"
+                  action={<button className="academy-inline-action" onClick={handleGoogleLink}>綁定</button>}
+                />
               ) : (
-                <div className="text-xs font-bold text-[#8E87A8]">{user?.email ?? user?.displayName ?? '已登入'}</div>
+                <SettingRow
+                  label="同步狀態"
+                  value="已登入"
+                  note={user?.email ?? user?.displayName ?? 'Google 帳號已連結'}
+                />
               )}
-            </div>
+              <SettingRow
+                label="資料分類"
+                value="規劃中"
+                note="未來會把遊戲進度與記帳明細分開管理，方便匯出與刪除。"
+              />
+              <SettingRow
+                label="匯出資料"
+                value="CSV / JSON"
+                note="先預留入口，之後提供記帳明細匯出。"
+              />
+              <SettingRow
+                label="清除本機資料"
+                value="尚未開放"
+                note="破壞性操作會獨立確認，避免誤刪帳本。"
+                danger
+              />
+            </SettingSection>
+
+            <SettingSection title="提醒與體驗" eyebrow="Comfort">
+              <SettingRow
+                label="每日記帳提醒"
+                note="提醒功能會在通知權限流程完成後啟用。"
+                action={(
+                  <SettingToggle
+                    checked={!!profile?.preferences?.dailyReminder}
+                    label="每日記帳提醒"
+                    onClick={() => updatePreference('dailyReminder', !profile?.preferences?.dailyReminder)}
+                  />
+                )}
+              />
+              <SettingRow
+                label="音效"
+                note="控制戰鬥、抽獎與獎勵音效。"
+                action={(
+                  <SettingToggle
+                    checked={profile?.preferences?.soundEnabled !== false}
+                    label="音效"
+                    onClick={() => updatePreference('soundEnabled', profile?.preferences?.soundEnabled === false)}
+                  />
+                )}
+              />
+              <SettingRow
+                label="減少動態效果"
+                note="保留角色與頁面資訊，但降低閃爍與場景特效。"
+                action={(
+                  <SettingToggle
+                    checked={!!profile?.preferences?.reduceMotion}
+                    label="減少動態效果"
+                    onClick={() => updatePreference('reduceMotion', !profile?.preferences?.reduceMotion)}
+                  />
+                )}
+              />
+              <SettingRow
+                label="新手教學"
+                note="重新查看今日、地圖、任務、補給、公會與設定入口說明。"
+                action={<button className="academy-inline-action" onClick={replayOnboarding}>重看</button>}
+              />
+            </SettingSection>
           </div>
         )}
       </div>
