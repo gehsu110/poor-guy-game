@@ -68,6 +68,21 @@ const DEMO_PROFILE = {
   onboardingDone: false,
 }
 
+const DEV_PREVIEW_EQUIPPED = import.meta.env.DEV
+  ? { set: 'qixi_star_bridge_set', outfit: 'qixi_star_bridge', accessory: 'none', frame: 'moon' }
+  : null
+
+function withDevPreviewProfile(profile) {
+  if (!DEV_PREVIEW_EQUIPPED || !profile) return profile
+  return {
+    ...profile,
+    equipped: {
+      ...(profile.equipped ?? {}),
+      ...DEV_PREVIEW_EQUIPPED,
+    },
+  }
+}
+
 function calcCombat(monster, expenses, budget, dayRecord) {
   const totalSpent = expenses.reduce((s, e) => s + Number(e.amount ?? 0), 0)
   let hp = monster.maxHp
@@ -254,12 +269,14 @@ export function AppProvider({ children }) {
         dispatch({ type: 'SET_USER', user })
         let profile = await getProfile(user.uid)
         profile = await settleIfNeeded(user.uid, profile)
+        profile = withDevPreviewProfile(profile)
         dispatch({ type: 'SET_PROFILE', profile })
         await initToday(user, profile)
       } else {
+        const demoProfile = withDevPreviewProfile(DEMO_PROFILE)
         dispatch({ type: 'SET_USER', user: null })
-        dispatch({ type: 'SET_PROFILE', profile: DEMO_PROFILE })
-        initLocalDay(DEMO_PROFILE)
+        dispatch({ type: 'SET_PROFILE', profile: demoProfile })
+        initLocalDay(demoProfile)
       }
     })
     return unsub

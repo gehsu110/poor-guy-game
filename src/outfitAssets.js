@@ -24,6 +24,9 @@ import summerBeachBg from './assets/academy-art/summer-set/beach-bg.webp'
 import girlSummerIdle from './assets/academy-art/summer-set/girl-summer-idle.webp'
 import sakuraFestivalBg from './assets/academy-art/sakura-set/sakura-bg-close.webp'
 import girlSakuraFestival from './assets/academy-art/sakura-set/girl-sakura-festival.webp'
+import qixiStarBridgeBg from './assets/academy-art/qixi-set/qixi-bg.webp'
+import girlQixiStarBridge from './assets/academy-art/qixi-set/girl-qixi-star-bridge.webp'
+import boyQixiStarBridge from './assets/academy-art/qixi-set/boy-qixi-star-bridge.webp'
 import rainyDetectiveBg from './assets/academy-art/rainy-detective-set/rainy-bg.webp'
 import girlRainyDetective from './assets/academy-art/rainy-detective-set/girl-rainy-detective.webp'
 
@@ -220,6 +223,18 @@ export const OUTFIT_CONFIG = {
     boyVideo: null,
     bg: sakuraFestivalBg,
     bgTheme: 'sakura',
+  },
+  qixi_star_bridge: {
+    name: '星橋願望套裝',
+    desc: '七夕星河學院祭與願望帳本主題限定',
+    girlImage: girlQixiStarBridge,
+    boyImage: boyQixiStarBridge,
+    girlFrames: null,
+    boyFrames: null,
+    girlVideo: null,
+    boyVideo: null,
+    bg: qixiStarBridgeBg,
+    bgTheme: 'qixi',
   },
   rainy_detective: {
     name: '雨後偵探套裝',

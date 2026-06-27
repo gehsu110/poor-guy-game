@@ -122,6 +122,17 @@ export default function TownScreen() {
           <i className="sakura-petal sakura-petal--four" />
         </div>
       )}
+      {bgTheme === 'qixi' && (
+        <div className="qixi-scene" aria-hidden="true">
+          <span className="qixi-galaxy-glow" />
+          <span className="qixi-ground-shadow" />
+          <i className="qixi-star qixi-star--one" />
+          <i className="qixi-star qixi-star--two" />
+          <i className="qixi-star qixi-star--three" />
+          <i className="qixi-thread qixi-thread--one" />
+          <i className="qixi-thread qixi-thread--two" />
+        </div>
+      )}
       {bgTheme === 'rainy' && (
         <div className="rainy-scene" aria-hidden="true">
           <span className="rainy-lantern-glow" />

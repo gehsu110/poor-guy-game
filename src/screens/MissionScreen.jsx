@@ -5,6 +5,7 @@ import { updateProfile, calcLevel } from '../firebase'
 import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
 import guildBg from '../assets/academy-art/guild-bg.webp'
+import { buildQixiActivityMissions } from '../events/qixi2026'
 import { formatMoney, getTitle, todayStr } from '../gameLogic'
 
 const DAILY_POOL = [
@@ -174,19 +175,7 @@ function buildMissionSets(state) {
     },
   ].map(mission => ({ ...mission, group: 'achievement' }))
 
-  const activities = [
-    {
-      id: 'dragon_boat_preview',
-      group: 'activity',
-      title: '端午河岸祭典',
-      desc: '節日週完成指定記帳天數，未來可領限定套裝',
-      progress: 0,
-      target: 5,
-      reward: { exp: 200, purple: 2, outfit: '端午套裝' },
-      tag: '活動預告',
-      planned: true,
-    },
-  ]
+  const activities = buildQixiActivityMissions(state)
 
   return { daily, weekly, achievements, activities }
 }
@@ -211,6 +200,19 @@ function RewardChips({ reward }) {
       ))}
     </div>
   )
+}
+
+function mergeCollectionReward(collection, reward) {
+  if (!reward.collectionItem) return collection
+  const exists = collection.some(item => item.id === reward.collectionItem.id)
+  if (exists) return collection
+  return [
+    ...collection,
+    {
+      ...reward.collectionItem,
+      obtainedAt: Date.now(),
+    },
+  ]
 }
 
 function MissionCard({ mission, index, claimed, claimKey, onClaim }) {
@@ -292,6 +294,7 @@ export default function MissionScreen() {
     const reward = mission.reward
     const exp = (profile?.exp ?? 0) + (reward.exp ?? 0)
     const levelInfo = calcLevel(exp)
+    const collection = mergeCollectionReward(profile?.collection ?? [], reward)
     const data = {
       exp,
       ...levelInfo,
@@ -304,6 +307,7 @@ export default function MissionScreen() {
         normal: (profile?.tickets?.normal ?? 0) + (reward.normalTicket ?? 0),
         gold: (profile?.tickets?.gold ?? 0) + (reward.goldTicket ?? 0),
       },
+      collection,
       claimedMissions: { ...claimed, [key]: true },
     }
     dispatch({ type: 'UPDATE_PROFILE', data })

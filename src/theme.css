@@ -620,6 +620,167 @@
   to { translate: 54px 520px; rotate: 420deg; opacity: .1; }
 }
 
+/* Qixi star bridge collection: academy festival night with wish-ledger light. */
+.academy-screen--qixi .academy-bg-soft {
+  background: linear-gradient(180deg, rgba(14,20,64,.06), rgba(25,22,74,.15) 56%, rgba(12,11,39,.42));
+}
+
+.academy-screen--qixi .academy-home-hero {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  isolation: auto;
+}
+
+.academy-screen--qixi .academy-home-hero::before,
+.academy-screen--qixi .academy-home-hero__shine { display: none; }
+
+.academy-screen--qixi .academy-bg {
+  transform: scale(1.55);
+  transform-origin: center 76%;
+  object-position: center 76%;
+}
+
+.academy-screen--qixi .academy-screen-character {
+  top: 248px;
+  width: 60vw;
+  max-width: 240px;
+  filter: drop-shadow(0 20px 18px rgba(12,10,38,.30)) drop-shadow(0 0 18px rgba(226,197,112,.16));
+}
+
+.academy-screen--qixi .academy-hud,
+.academy-screen--qixi .academy-attack-panel {
+  border-color: rgba(206,180,255,.25);
+  background: rgba(255,250,242,.90);
+}
+
+.academy-screen--qixi .academy-status-board {
+  border-color: rgba(226,197,112,.24);
+  background:
+    linear-gradient(135deg, rgba(20,24,73,.72), rgba(61,47,117,.56) 55%, rgba(130,87,126,.32)),
+    radial-gradient(circle at 88% 12%, rgba(231,173,54,.25), transparent 36%);
+  box-shadow: 0 12px 30px rgba(8,7,30,.30), inset 0 1px rgba(255,255,255,.17);
+}
+
+.academy-screen--qixi .academy-status-board::before {
+  content: '';
+  position: absolute;
+  right: 18px;
+  bottom: -5px;
+  width: 88px;
+  height: 10px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse, rgba(231,173,54,.30), transparent 70%);
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+.academy-screen--qixi .academy-identity-chip__copy strong {
+  color: #fff8e8;
+  text-shadow: 0 2px 10px rgba(6,7,28,.34);
+}
+
+.academy-screen--qixi .academy-identity-chip__copy small {
+  color: rgba(235,225,255,.78);
+}
+
+.academy-screen--qixi .academy-settings-gate {
+  color: #fff4d5;
+  background: rgba(231,173,54,.13);
+  box-shadow: inset 0 0 0 1px rgba(231,173,54,.24), 0 0 16px rgba(231,173,54,.12);
+}
+
+.academy-screen--qixi .academy-exp-track {
+  color: rgba(235,225,255,.78);
+}
+
+.academy-screen--qixi .academy-exp-track__meta b {
+  color: #fff8e8;
+}
+
+.academy-screen--qixi .academy-exp-track__bar {
+  background: rgba(245,235,255,.13);
+  box-shadow: inset 0 0 0 1px rgba(220,205,255,.18);
+}
+
+.academy-screen--qixi .academy-exp-track__bar i {
+  background: linear-gradient(90deg, #7d70c8, #433a78 58%, #e7ad36);
+}
+
+.academy-screen--qixi .academy-mini-currency {
+  color: #f5ecff;
+  background: rgba(245,235,255,.13);
+  box-shadow: inset 0 0 0 1px rgba(220,205,255,.18);
+}
+
+.academy-screen--qixi .academy-mini-currency b {
+  color: #fff8e8;
+}
+
+.academy-screen--qixi .academy-primary-cta {
+  color: #fffaf1;
+  background: linear-gradient(135deg, #433a78, #7161b8 58%, #e7ad36);
+}
+
+.academy-screen--qixi .academy-attack-summary > div {
+  background: rgba(250,244,255,.44);
+  box-shadow: inset 0 0 0 1px rgba(83,64,130,.08);
+}
+
+.qixi-scene { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+.qixi-galaxy-glow {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: 220px;
+  height: 150px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 45%, rgba(255,246,198,.14), transparent 44%),
+    radial-gradient(circle at 62% 54%, rgba(159,144,226,.20), transparent 58%);
+  filter: blur(4px);
+  animation: qixi-galaxy-breathe 5.6s ease-in-out infinite;
+}
+.qixi-ground-shadow {
+  position: absolute;
+  top: 558px;
+  left: 50%;
+  width: 112px;
+  height: 17px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(11,10,32,.36), rgba(61,47,117,.12) 58%, transparent 72%);
+  filter: blur(3px);
+}
+@keyframes qixi-galaxy-breathe { 50% { opacity: .58; transform: scale(1.07); } }
+.qixi-star {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff8cb;
+  box-shadow: 0 0 11px rgba(255,236,154,.8);
+  animation: qixi-star-twinkle 2.9s ease-in-out infinite;
+}
+.qixi-star--one { top: 22%; left: 18%; animation-delay: -.4s; }
+.qixi-star--two { top: 31%; right: 20%; animation-delay: -1.5s; }
+.qixi-star--three { top: 44%; left: 74%; animation-delay: -2.2s; }
+@keyframes qixi-star-twinkle { 50% { opacity: .22; transform: scale(.48); } }
+.qixi-thread {
+  position: absolute;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255,236,154,.58), transparent);
+  opacity: .42;
+  animation: qixi-thread-flow 6.8s linear infinite;
+}
+.qixi-thread--one { top: 29%; left: -30%; width: 56%; rotate: -8deg; }
+.qixi-thread--two { top: 39%; right: -34%; width: 62%; rotate: 7deg; animation-delay: -3.4s; }
+@keyframes qixi-thread-flow {
+  to { translate: 180px 0; opacity: .08; }
+}
+
 .academy-screen--rainy .academy-bg-soft {
   background: linear-gradient(180deg, rgba(19,30,74,.08), rgba(25,36,76,.18) 58%, rgba(11,16,37,.42));
 }
