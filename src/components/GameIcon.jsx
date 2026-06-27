@@ -108,6 +108,13 @@ const PATHS = {
       <path className="game-icon__accent" d="M32 35l2.5 5 5.5.8-4 3.9.9 5.4-4.9-2.6-4.9 2.6.9-5.4-4-3.9 5.5-.8L32 35z" />
     </>
   ),
+  wardrobe: (
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 13h32a5 5 0 015 5v35H11V18a5 5 0 015-5z" />
+      <path d="M32 13v40M22 23h4M38 23h4M21 43c5-5 17-5 22 0" />
+      <path d="M32 26c4 0 7 3 7 7 0 5-4 8-7 8s-7-3-7-8c0-4 3-7 7-7z" />
+    </g>
+  ),
   guild: (
     <>
       <path className="game-icon__plate" d="M32 7l20 9v16c0 13.4-7.8 21.5-20 26-12.2-4.5-20-12.6-20-26V16l20-9z" />
