@@ -2739,18 +2739,7 @@ video.academy-screen-character {
 }
 
 .academy-map-report::after {
-  content: '';
-  position: absolute;
-  right: 13px;
-  top: 14px;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 2px solid rgba(217,101,115,.18);
-  background:
-    radial-gradient(circle, rgba(255,246,232,.56), rgba(217,101,115,.09) 66%, transparent 68%);
-  transform: rotate(-10deg);
-  pointer-events: none;
+  content: none;
 }
 
 .academy-map-report__head {
