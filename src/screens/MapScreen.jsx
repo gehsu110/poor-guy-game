@@ -36,12 +36,15 @@ function MapNode({ day, status, tier, spent = 0, onClick, isToday }) {
   const marker = tier === 'monthboss' ? 'monthboss'
     : tier !== 'normal' && tier !== 'normal_special' ? 'boss'
     : status
+  const tierClass = tier === 'monthboss' ? 'academy-map-node--tier-monthboss'
+    : tier !== 'normal' && tier !== 'normal_special' ? 'academy-map-node--tier-boss'
+    : 'academy-map-node--tier-normal'
   const size = tier === 'monthboss' ? 'academy-map-node--large' : tier !== 'normal' ? 'academy-map-node--boss' : ''
   const isDim = status === 'future' || status === 'no_record'
 
   return (
     <motion.button
-      className={`academy-map-node academy-map-node--${status} ${size} ${isToday ? 'is-today' : ''} ${isDim ? 'is-dim' : ''}`}
+      className={`academy-map-node academy-map-node--${status} ${tierClass} ${size} ${isToday ? 'is-today' : ''} ${isDim ? 'is-dim' : ''}`}
       onClick={onClick}
       whileTap={{ scale: 0.88 }}
       animate={isToday ? { scale: [1, 1.1, 1], boxShadow: ['0 0 0 0 rgba(200,168,233,0)', '0 0 0 8px rgba(200,168,233,0.4)', '0 0 0 0 rgba(200,168,233,0)'] } : {}}
@@ -276,10 +279,17 @@ export default function MapScreen() {
           {zones.map(zone => (
             <section
               key={zone.key}
-              className={`academy-map-zone academy-map-zone--${zone.key}`}
-              style={{ '--zone-image': `url(${zone.bg})` }}
-            >
-              <div className="academy-map-zone__head">
+      className={`academy-map-zone academy-map-zone--${zone.key}`}
+      style={{ '--zone-image': `url(${zone.bg})` }}
+    >
+      {zone.key === 'boss' && (
+        <div className="academy-map-zone__boss-atmosphere" aria-hidden="true">
+          <span className="academy-map-boss-cloud academy-map-boss-cloud--one" />
+          <span className="academy-map-boss-cloud academy-map-boss-cloud--two" />
+          <span className="academy-map-boss-gate-glow" />
+        </div>
+      )}
+      <div className="academy-map-zone__head">
                 <div>
                   <strong>{zone.title}</strong>
                   <small>{zone.sub}</small>
