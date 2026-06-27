@@ -8,6 +8,8 @@ import Avatar from '../components/Avatar'
 import { OUTFIT_CONFIG, getOutfitAssets } from '../outfitAssets'
 import profileBg from '../assets/academy-art/profile-bg.webp'
 
+const DEV_UNLOCK_QIXI_SET = import.meta.env.DEV
+
 const WARDROBE_SETS = [
   {
     id: 'academy_set',
@@ -94,11 +96,11 @@ const WARDROBE_SETS = [
     outfit: 'qixi_star_bridge',
     accessory: 'none',
     frame: 'moon',
-    owned: false,
+    owned: DEV_UNLOCK_QIXI_SET,
     rarity: 'SSR',
     series: '節日限定',
     source: '七夕星橋願望祭',
-    tags: ['locked', 'event'],
+    tags: DEV_UNLOCK_QIXI_SET ? ['owned', 'event'] : ['locked', 'event'],
   },
   {
     id: 'rainy_detective_set',

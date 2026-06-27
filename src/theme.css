@@ -174,7 +174,9 @@
 }
 
 .academy-attack-panel {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  padding: 10px 12px 12px;
+  border-radius: 24px;
 }
 
 .academy-hud__labels { color: var(--color-ink-500); }
@@ -192,6 +194,9 @@
 
 .academy-primary-cta {
   border-radius: var(--radius-control);
+  padding: 9px 14px !important;
+  font-size: 13px;
+  line-height: 1.2;
   color: #38290d;
   background: linear-gradient(135deg, #f2c75f, var(--color-reward-500));
   box-shadow: 0 9px 20px rgba(154, 104, 27, 0.22), inset 0 1px rgba(255,255,255,0.5);
@@ -343,15 +348,15 @@
 .academy-screen--academy .academy-home-hero__shine { display: none; }
 
 .academy-screen--academy .academy-bg {
-  transform: scale(1.18);
-  transform-origin: center 66%;
-  object-position: center 62%;
+  transform: scale(1.08);
+  transform-origin: center 64%;
+  object-position: center 58%;
 }
 
 .academy-screen--academy .academy-screen-character {
-  top: 148px;
-  width: 61vw;
-  max-width: 236px;
+  top: 286px;
+  width: 54vw;
+  max-width: 212px;
 }
 
 .academy-screen--academy .academy-status-board {
@@ -398,16 +403,17 @@
 .academy-attack-summary {
   display: grid;
   grid-template-columns: 1fr .82fr 1fr;
-  gap: 8px;
+  gap: 6px;
 }
 
 .academy-attack-summary > div {
   display: flex;
+  min-height: 42px;
   min-width: 0;
   flex-direction: column;
   justify-content: center;
-  border-radius: 18px;
-  padding: 8px 6px;
+  border-radius: 15px;
+  padding: 6px 5px;
   background: rgba(255,255,255,.38);
   box-shadow: inset 0 0 0 1px rgba(91,76,126,.08);
 }
@@ -415,15 +421,15 @@
 .academy-attack-summary > div:nth-child(2) { align-items: center; text-align: center; }
 .academy-attack-summary > div:last-child { align-items: flex-end; text-align: right; }
 .academy-attack-summary small { color: var(--color-ink-500); font-size: 8px; font-weight: 850; white-space: nowrap; }
-.academy-attack-summary strong { color: var(--color-ink-900); font-size: 16px; font-weight: 1000; line-height: 1.25; }
+.academy-attack-summary strong { color: var(--color-ink-900); font-size: 15px; font-weight: 1000; line-height: 1.15; }
 .academy-attack-summary__power strong { color: var(--color-reward-700); }
 .academy-attack-summary .is-safe strong { color: var(--color-safe-500); }
 .academy-attack-summary .is-danger strong { color: var(--color-danger-500); }
 
 .academy-attack-hint {
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--color-ink-500);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 750;
   text-align: center;
 }
@@ -950,7 +956,7 @@
   }
 
   .academy-attack-panel {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 }
 
@@ -960,6 +966,6 @@
   }
 
   .academy-attack-panel {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 }
