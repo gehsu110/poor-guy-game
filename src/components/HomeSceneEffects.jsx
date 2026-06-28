@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getEquippedHomeEffects } from '../homeSceneEffects'
+import coinBurstBack from '../assets/academy-art/effects/coin-burst-back.webp'
+import coinBurstFront from '../assets/academy-art/effects/coin-burst-front.webp'
 
 const AURA_PARTICLES = {
   academy_stardust: ['one', 'two', 'three', 'four', 'five'],
@@ -18,12 +20,19 @@ const GROUND_GLYPHS = ['A', 'R', 'M', 'E', 'S', 'Q', 'L', 'V']
 const GROUND_LIFTS = ['one', 'two', 'three', 'four', 'five', 'six']
 const SUCCESS_BEAMS = ['one', 'two', 'three', 'four']
 const SUCCESS_REWARDS = ['one', 'two', 'three', 'four', 'five']
+const SUCCESS_ASSETS = {
+  coin_spark_burst: {
+    back: coinBurstBack,
+    front: coinBurstFront,
+  },
+}
 
 export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse, layer = 'all' }) {
   const effects = getEquippedHomeEffects(equipped, theme)
   const [summonKey, setSummonKey] = useState(null)
   const auraParticles = AURA_PARTICLES[effects.backgroundAura] ?? []
   const successParticles = SUCCESS_PARTICLES[effects.successEffect] ?? []
+  const successAsset = SUCCESS_ASSETS[effects.successEffect]
   const hasGroundEffect = Boolean(effects.groundEffect)
   const hasSuccessEffect = Boolean(effects.successEffect)
   const showBackLayer = layer !== 'front'
@@ -104,6 +113,9 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
 
       {showBackLayer && burstKey && (
         <div key={`back-${burstKey}`} className={`home-scene-success home-scene-success--backplane home-scene-success--${effects.successEffect}`}>
+          {successAsset?.back && (
+            <img className="home-scene-success__asset home-scene-success__asset--back" src={successAsset.back} alt="" draggable="false" />
+          )}
           <span className="home-scene-success__ground-flare" />
           <span className="home-scene-success__halo" />
           {SUCCESS_BEAMS.map(beam => (
@@ -114,6 +126,9 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
 
       {showFrontLayer && burstKey && hasSuccessEffect && (
         <div key={`front-${burstKey}`} className={`home-scene-success home-scene-success--frontburst home-scene-success--${effects.successEffect}`}>
+          {successAsset?.front && (
+            <img className="home-scene-success__asset home-scene-success__asset--front" src={successAsset.front} alt="" draggable="false" />
+          )}
           {successParticles.map(particle => (
             <i key={particle} className={`home-scene-success__particle home-scene-success__particle--${particle}`} />
           ))}

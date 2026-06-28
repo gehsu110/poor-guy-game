@@ -40,6 +40,7 @@ const init = {
   damageNumbers: [],
   notification: null,
   homeEffectPulse: null,
+  pendingHomeSuccessEffect: null,
 }
 
 const DEMO_PROFILE = {
@@ -58,7 +59,14 @@ const DEMO_PROFILE = {
   sharedFund: 0,
   guildLedger: [],
   customCategories: [],
-  equipped: { set: 'academy_set', outfit: 'academy', accessory: 'star_pin', frame: 'soft_gold' },
+  equipped: {
+    set: 'academy_set',
+    outfit: 'academy',
+    accessory: 'star_pin',
+    frame: 'soft_gold',
+    groundEffect: 'starter_magic_circle',
+    successEffect: 'coin_spark_burst',
+  },
   claimedMissions: {},
   guildChallengeClaims: {},
   preferences: { musicEnabled: false, soundEnabled: true, hapticsEnabled: true, dailyReminder: false, reduceMotion: false },
@@ -92,12 +100,30 @@ function getKillTicketReward(tier) {
   return { normal: 1, gold: 0 }
 }
 
+function withStarterHomeEffects(profile) {
+  if (!profile) return profile
+  const equipped = {
+    ...(profile.equipped ?? {}),
+    groundEffect: profile.equipped?.groundEffect ?? 'starter_magic_circle',
+    successEffect: profile.equipped?.successEffect ?? 'coin_spark_burst',
+  }
+  const collection = [...(profile.collection ?? [])]
+  const owned = new Set(collection.map(item => item.id))
+  if (!owned.has('starter_magic_circle')) {
+    collection.push({ id: 'starter_magic_circle', rarity: 'R', obtainedAt: Date.now(), source: 'starter' })
+  }
+  if (!owned.has('coin_spark_burst')) {
+    collection.push({ id: 'coin_spark_burst', rarity: 'R', obtainedAt: Date.now(), source: 'starter' })
+  }
+  return { ...profile, equipped, collection }
+}
+
 function reducer(state, action) {
   switch (action.type) {
     case 'SET_USER':
       return { ...state, user: action.user, loading: false }
     case 'SET_PROFILE':
-      return { ...state, profile: action.profile }
+      return { ...state, profile: withStarterHomeEffects(action.profile) }
     case 'SET_SCREEN':
       return { ...state, screen: action.screen, screenParams: action.params ?? {} }
     case 'INIT_DAY': {
@@ -127,8 +153,12 @@ function reducer(state, action) {
       return { ...state, damageNumbers: state.damageNumbers.filter(d => d.id !== action.id) }
     case 'SET_NOTIFICATION':
       return { ...state, notification: action.notification }
-    case 'TRIGGER_HOME_SUCCESS_EFFECT':
+    case 'QUEUE_HOME_SUCCESS_EFFECT':
+      return { ...state, pendingHomeSuccessEffect: action.id ?? Date.now() }
+    case 'PLAY_HOME_SUCCESS_EFFECT':
       return { ...state, homeEffectPulse: action.id ?? Date.now() }
+    case 'CONSUME_HOME_SUCCESS_EFFECT':
+      return { ...state, pendingHomeSuccessEffect: null, homeEffectPulse: action.id ?? state.pendingHomeSuccessEffect ?? Date.now() }
     case 'UPDATE_PROFILE':
       return { ...state, profile: { ...state.profile, ...action.data } }
     default:
@@ -257,6 +287,19 @@ export function AppProvider({ children }) {
         dispatch({ type: 'SET_USER', user })
         let profile = await getProfile(user.uid)
         profile = await settleIfNeeded(user.uid, profile)
+        const starterProfile = withStarterHomeEffects(profile)
+        const needsStarterUpdate = (
+          starterProfile?.equipped?.groundEffect !== profile?.equipped?.groundEffect ||
+          starterProfile?.equipped?.successEffect !== profile?.equipped?.successEffect ||
+          (starterProfile?.collection?.length ?? 0) !== (profile?.collection?.length ?? 0)
+        )
+        if (needsStarterUpdate) {
+          await updateProfile(user.uid, {
+            equipped: starterProfile.equipped,
+            collection: starterProfile.collection,
+          })
+          profile = starterProfile
+        }
         dispatch({ type: 'SET_PROFILE', profile })
         await initToday(user, profile)
       } else {
@@ -289,7 +332,7 @@ export function AppProvider({ children }) {
     const { damage, mult } = calcDamage(numericAmount, state.totalSpent, budget)
     const nextExpenses = [...state.expenses, expenseWithId]
     dispatch({ type: 'RECALC_DAY', expenses: nextExpenses, dayRecord: { defeated: Math.max(0, state.currentHp - damage) <= 0 } })
-    dispatch({ type: 'TRIGGER_HOME_SUCCESS_EFFECT', id: Date.now() + Math.random() })
+    dispatch({ type: 'QUEUE_HOME_SUCCESS_EFFECT', id: Date.now() + Math.random() })
 
     const damageId = Date.now() + Math.random()
     dispatch({

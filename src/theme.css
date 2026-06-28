@@ -1118,6 +1118,7 @@
 .home-scene-aura__particle,
 .home-scene-ground__spark,
 .home-scene-success__beam,
+.home-scene-success__asset,
 .home-scene-success__ground-flare,
 .home-scene-success__halo,
 .home-scene-success__reward,
@@ -1664,6 +1665,31 @@
   filter: drop-shadow(0 0 16px rgba(255,219,101,.42));
 }
 
+.home-scene-success__asset {
+  left: 50%;
+  bottom: -28px;
+  width: min(104vw, 520px);
+  max-width: none;
+  height: auto;
+  translate: -50% 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.home-scene-success__asset--back {
+  z-index: 1;
+  opacity: 1;
+  filter: brightness(1.45) saturate(1.2) drop-shadow(0 0 18px rgba(255,219,93,.72));
+}
+
+.home-scene-success__asset--front {
+  z-index: 3;
+  bottom: -20px;
+  width: min(92vw, 440px);
+  opacity: 1;
+  filter: brightness(1.28) saturate(1.18) drop-shadow(0 0 10px rgba(255,220,96,.78));
+}
+
 .home-scene-success::before {
   content: '';
   position: absolute;
@@ -1684,6 +1710,7 @@
 }
 
 .home-scene-success__ground-flare {
+  z-index: 0;
   left: 50%;
   bottom: 0;
   width: min(96%, 326px);
@@ -1691,12 +1718,13 @@
   translate: -50% 0;
   border-radius: 50%;
   background:
-    radial-gradient(ellipse at center, rgba(255,255,232,1), rgba(255,220,92,.76) 30%, rgba(255,196,62,.28) 58%, transparent 76%);
+    radial-gradient(ellipse at center, rgba(255,255,238,1), rgba(255,220,92,.92) 30%, rgba(255,196,62,.36) 58%, transparent 76%);
   filter: blur(1px);
   animation: home-success-ground-flare 1.04s ease-out both;
 }
 
 .home-scene-success__halo {
+  z-index: 1;
   left: 50%;
   bottom: 20px;
   width: min(68%, 230px);
@@ -1711,6 +1739,7 @@
 }
 
 .home-scene-success__beam {
+  z-index: 1;
   left: 50%;
   bottom: 28px;
   width: 54px;
@@ -1726,6 +1755,7 @@
 }
 
 .home-scene-success__particle {
+  z-index: 4;
   left: 50%;
   bottom: 38px;
   width: 10px;
@@ -1733,10 +1763,12 @@
   border-radius: 50%;
   background: #ffe88f;
   box-shadow: 0 0 14px rgba(255,232,143,1);
+  filter: brightness(1.25) drop-shadow(0 0 8px rgba(255,232,143,.9));
   animation: home-success-burst 1.02s ease-out both;
 }
 
 .home-scene-success__reward {
+  z-index: 4;
   left: 50%;
   bottom: 32px;
   width: 18px;
@@ -1747,6 +1779,7 @@
     linear-gradient(135deg, #fff0a7, #e0a52c);
   border: 1px solid rgba(160,104,24,.34);
   box-shadow: 0 0 12px rgba(255,207,86,.86);
+  filter: brightness(1.18) drop-shadow(0 0 8px rgba(255,207,86,.82));
   opacity: 0;
   animation: home-success-reward 1.08s ease-out both;
 }

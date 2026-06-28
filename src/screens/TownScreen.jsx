@@ -87,7 +87,7 @@ function HeroShowcase({ hasVideo, onWardrobeClick }) {
 }
 
 export default function TownScreen() {
-  const { state, navigate } = useApp()
+  const { state, dispatch, navigate } = useApp()
   const { profile } = state
   const [characterCue, setCharacterCue] = useState(null)
   const gender   = profile?.avatarGender ?? 'girl'
@@ -111,6 +111,14 @@ export default function TownScreen() {
     const timer = window.setTimeout(() => setCharacterCue(null), 900)
     return () => window.clearTimeout(timer)
   }, [state.homeEffectPulse])
+
+  useEffect(() => {
+    if (!state.pendingHomeSuccessEffect) return
+    const timer = window.setTimeout(() => {
+      dispatch({ type: 'CONSUME_HOME_SUCCESS_EFFECT', id: state.pendingHomeSuccessEffect })
+    }, 320)
+    return () => window.clearTimeout(timer)
+  }, [dispatch, state.pendingHomeSuccessEffect])
 
   return (
     <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`}>

@@ -4449,7 +4449,7 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage {
-  --home-stage-baseline: min(71%, 408px);
+  --home-stage-baseline: min(88%, 526px);
   position: relative;
   height: min(67dvh, 590px);
   min-height: 430px;
