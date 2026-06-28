@@ -64,6 +64,16 @@ const PATHS = {
     </g>
   ),
 
+  report: (
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 10h26l8 8v36H16zM42 10v10h8" />
+      <path d="M24 45V34M32 45V27M40 45V31" />
+      <path d="M23 24c5 2 9 1 13-4 3-4 7-5 11-2" />
+      <circle cx="23" cy="24" r="2.4" fill="currentColor" stroke="none" />
+      <circle cx="47" cy="18" r="2.4" fill="currentColor" stroke="none" />
+    </g>
+  ),
+
   // ── Currency / tickets（SVG fallback，正常用 IMAGE_ICONS）────────────
   'yellow-star': (
     <>

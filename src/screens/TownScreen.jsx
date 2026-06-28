@@ -9,7 +9,7 @@ import Avatar from '../components/Avatar'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
 
-function IdentityHUD({ profile, onSettingsClick }) {
+function IdentityHUD({ profile }) {
   const title = profile ? getTitle(profile.level) : null
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const playerName = profile?.playerName?.trim() || '新手勇者'
@@ -28,9 +28,6 @@ function IdentityHUD({ profile, onSettingsClick }) {
             <strong>{playerName}</strong>
             <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
           </span>
-          <button className="academy-settings-gate" onClick={onSettingsClick} aria-label="開啟設定">
-            <GameIcon name="settings" />
-          </button>
         </div>
         <div className="academy-exp-track" aria-label={`經驗 ${expInLevel}/${expToNext}`}>
           <div className="academy-exp-track__meta">
@@ -185,7 +182,7 @@ export default function TownScreen() {
       ) : null}
       {/* UI 層（z-10，疊在角色上） */}
       <div className="academy-safe-top relative z-10 px-4">
-        <IdentityHUD profile={profile} onSettingsClick={() => navigate('profile', { tab: 'settings' })} />
+        <IdentityHUD profile={profile} />
       </div>
 
       <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pt-2">
@@ -210,7 +207,7 @@ export function BottomNav({ current, navigate }) {
   const menuItems = [
     { key: 'shop', label: '補給', desc: '商店與兌換', icon: 'shop', target: 'shop' },
     { key: 'quest', label: '公會', desc: '公會帳本', icon: 'guild', target: 'quest' },
-    { key: 'report', label: '月報', desc: '月度戰報', icon: 'map', target: 'map', params: { panel: 'report' } },
+    { key: 'report', label: '月報', desc: '月度戰報', icon: 'report', target: 'map', params: { panel: 'report' } },
     { key: 'settings', label: '設定', desc: '提醒與偏好', icon: 'settings', target: 'profile', params: { tab: 'settings' } },
   ]
 
@@ -242,36 +239,29 @@ export function BottomNav({ current, navigate }) {
         <AnimatePresence>
           {menuOpen && (
             <motion.div
-              className="academy-dock-menu"
+              className="academy-dock-radial"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <button className="academy-dock-menu__backdrop" onClick={() => setMenuOpen(false)} aria-label="關閉選單" />
-              <motion.div
-                className="academy-dock-menu__sheet"
-                initial={{ y: 24, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 24, opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-              >
-                <div className="academy-dock-menu__head">
-                  <div>
-                    <b>選單</b>
-                    <span>補給、公會、月報與設定</span>
-                  </div>
-                  <button onClick={() => setMenuOpen(false)}>完成</button>
-                </div>
-                <div className="academy-dock-menu__grid">
-                  {menuItems.map(item => (
-                    <button key={item.key} onClick={() => selectMenuItem(item)}>
-                      <GameIcon name={item.icon} />
-                      <strong>{item.label}</strong>
-                      <small>{item.desc}</small>
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
+              <button className="academy-dock-radial__backdrop" onClick={() => setMenuOpen(false)} aria-label="關閉選單" />
+              <div className="academy-dock-radial__stack">
+                {menuItems.map((item, index) => (
+                  <motion.button
+                    key={item.key}
+                    className="academy-dock-radial__item"
+                    onClick={() => selectMenuItem(item)}
+                    initial={{ y: 18, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: 12, opacity: 0, scale: 0.92 }}
+                    transition={{ duration: 0.18, ease: 'easeOut', delay: index * 0.035 }}
+                  >
+                    <span><GameIcon name={item.icon} /></span>
+                    <b>{item.label}</b>
+                    <small>{item.desc}</small>
+                  </motion.button>
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>,
