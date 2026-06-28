@@ -4309,7 +4309,7 @@ video.academy-screen-character {
 }
 
 .academy-shop-homefx-demo {
-  --home-stage-baseline: 76px;
+  --home-stage-baseline: 60px;
   position: relative;
   min-height: 118px;
   overflow: hidden;
@@ -4333,8 +4333,13 @@ video.academy-screen-character {
 }
 
 .academy-shop-homefx-demo .home-scene-effects {
-  transform: scale(.82);
+  transform: scale(1);
   transform-origin: center bottom;
+}
+
+.academy-shop-homefx-demo .home-scene-ground {
+  top: 76px;
+  width: 118%;
 }
 
 .academy-shop-homefx-demo .home-scene-success {

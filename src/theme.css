@@ -1240,32 +1240,132 @@
 
 .home-scene-ground {
   position: absolute;
-  top: var(--home-stage-baseline);
+  top: calc(var(--home-stage-baseline) + 14px);
   left: 50%;
-  width: 150px;
-  height: 44px;
+  width: min(91%, 520px);
+  aspect-ratio: 1 / .54;
+  height: auto;
   translate: -50% -50%;
   border-radius: 50%;
+  opacity: .96;
+  transform: perspective(520px) rotateX(58deg);
+  transform-origin: center center;
 }
 
 .home-scene-ground__core,
-.home-scene-ground__ring {
+.home-scene-ground__outer,
+.home-scene-ground__ring,
+.home-scene-ground__inner,
+.home-scene-ground__sigil,
+.home-scene-ground__runes {
   position: absolute;
   inset: 0;
   border-radius: 50%;
 }
 
 .home-scene-ground__core {
-  background: radial-gradient(ellipse, rgba(255,235,164,.22), rgba(118,97,184,.13) 54%, transparent 72%);
-  filter: blur(5px);
+  inset: -8% -4%;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255,244,204,.34), rgba(255,224,148,.16) 46%, transparent 74%),
+    radial-gradient(ellipse at 50% 50%, rgba(145,112,192,.16), transparent 64%);
+  filter: blur(7px);
   animation: home-ground-breathe 4.8s ease-in-out infinite;
 }
 
+.home-scene-ground__outer {
+  inset: 3% 2%;
+  border: 3px solid rgba(255,246,211,.78);
+  box-shadow:
+    0 0 14px rgba(255,232,158,.38),
+    inset 0 0 18px rgba(255,232,158,.18);
+}
+
 .home-scene-ground__ring {
-  border: 1px solid rgba(255,237,166,.42);
-  box-shadow: inset 0 0 15px rgba(255,237,166,.18), 0 0 18px rgba(113,97,184,.13);
-  transform: perspective(180px) rotateX(58deg);
-  animation: home-ground-ring 7.6s linear infinite;
+  inset: 13% 10%;
+  border: 2px solid rgba(255,246,211,.66);
+  box-shadow: inset 0 0 15px rgba(255,237,166,.16);
+  animation: home-ground-pulse 5.4s ease-in-out infinite;
+}
+
+.home-scene-ground__inner {
+  inset: 27% 24%;
+  border: 2px solid rgba(255,246,211,.54);
+  background:
+    radial-gradient(ellipse, rgba(255,248,225,.10), transparent 62%);
+}
+
+.home-scene-ground__sigil {
+  inset: 18% 14%;
+  border-radius: 0;
+  opacity: .86;
+}
+
+.home-scene-ground__sigil::before,
+.home-scene-ground__sigil::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 78%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255,246,211,.78), transparent);
+  box-shadow: 0 0 10px rgba(255,232,158,.28);
+  transform-origin: center center;
+}
+
+.home-scene-ground__sigil::before {
+  translate: -50% -50%;
+  rotate: 0deg;
+}
+
+.home-scene-ground__sigil::after {
+  translate: -50% -50%;
+  rotate: 60deg;
+}
+
+.home-scene-ground__sigil--two { rotate: 120deg; }
+
+.home-scene-ground__sigil--three {
+  inset: 30% 26%;
+  rotate: 30deg;
+  opacity: .62;
+}
+
+.home-scene-ground__runes {
+  inset: 7% 5%;
+  animation: home-ground-runes 18s linear infinite;
+}
+
+.home-scene-ground__glyph {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  color: rgba(255,248,225,.78);
+  font-size: 12px;
+  font-weight: 1000;
+  line-height: 16px;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(255,232,158,.48);
+}
+
+.home-scene-ground__glyph--1 { top: 4%; left: 48%; }
+.home-scene-ground__glyph--2 { top: 17%; right: 17%; rotate: 24deg; }
+.home-scene-ground__glyph--3 { top: 44%; right: 7%; rotate: 78deg; }
+.home-scene-ground__glyph--4 { right: 20%; bottom: 16%; rotate: 132deg; }
+.home-scene-ground__glyph--5 { bottom: 5%; left: 48%; rotate: 180deg; }
+.home-scene-ground__glyph--6 { bottom: 16%; left: 20%; rotate: 228deg; }
+.home-scene-ground__glyph--7 { top: 44%; left: 7%; rotate: 276deg; }
+.home-scene-ground__glyph--8 { top: 17%; left: 17%; rotate: 316deg; }
+
+.home-scene-ground::after {
+  content: '';
+  position: absolute;
+  inset: 38% 36%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,248,225,.32), rgba(255,232,158,.10) 54%, transparent 72%);
+  filter: blur(5px);
+  animation: home-footlight-breathe 3.8s ease-in-out infinite;
 }
 
 .home-scene-ground__spark {
@@ -1285,7 +1385,9 @@
   background: radial-gradient(ellipse, rgba(244,176,137,.24), rgba(128,68,96,.14) 54%, transparent 72%);
 }
 
-.home-scene-ground--sakura_lantern_ring .home-scene-ground__ring {
+.home-scene-ground--sakura_lantern_ring .home-scene-ground__outer,
+.home-scene-ground--sakura_lantern_ring .home-scene-ground__ring,
+.home-scene-ground--sakura_lantern_ring .home-scene-ground__inner {
   border-color: rgba(255,190,168,.48);
   box-shadow: inset 0 0 15px rgba(255,188,160,.16), 0 0 18px rgba(191,110,127,.16);
 }
@@ -1294,30 +1396,20 @@
   background: radial-gradient(ellipse, rgba(255,236,154,.22), rgba(101,83,184,.18) 54%, transparent 72%);
 }
 
-.home-scene-ground--qixi_star_sigil .home-scene-ground__ring {
+.home-scene-ground--qixi_star_sigil .home-scene-ground__outer,
+.home-scene-ground--qixi_star_sigil .home-scene-ground__ring,
+.home-scene-ground--qixi_star_sigil .home-scene-ground__inner {
   border-color: rgba(255,236,154,.50);
   box-shadow: inset 0 0 18px rgba(255,236,154,.18), 0 0 20px rgba(113,97,184,.18);
-}
-
-.home-scene-ground--qixi_star_sigil .home-scene-ground__ring::before,
-.home-scene-ground--qixi_star_sigil .home-scene-ground__ring::after {
-  content: '';
-  position: absolute;
-  inset: 10px 18px;
-  border-radius: 50%;
-  border-top: 1px solid rgba(255,236,154,.34);
-  border-bottom: 1px solid rgba(214,198,255,.24);
-}
-
-.home-scene-ground--qixi_star_sigil .home-scene-ground__ring::after {
-  rotate: 60deg;
 }
 
 .home-scene-ground--rainy_puddle_shimmer .home-scene-ground__core {
   background: radial-gradient(ellipse, rgba(142,226,218,.22), rgba(236,209,142,.10) 52%, transparent 72%);
 }
 
-.home-scene-ground--rainy_puddle_shimmer .home-scene-ground__ring {
+.home-scene-ground--rainy_puddle_shimmer .home-scene-ground__outer,
+.home-scene-ground--rainy_puddle_shimmer .home-scene-ground__ring,
+.home-scene-ground--rainy_puddle_shimmer .home-scene-ground__inner {
   border-color: rgba(174,238,232,.38);
   box-shadow: inset 0 0 14px rgba(174,238,232,.16), 0 0 16px rgba(141,221,211,.14);
   animation-name: home-ground-shimmer;
@@ -1385,8 +1477,10 @@
 @keyframes home-rainy-afterglow { 50% { opacity: .42; transform: scaleX(1.04); } }
 @keyframes home-rainy-shimmer { 50% { opacity: .12; transform: scaleX(.72); } }
 @keyframes home-ground-breathe { 50% { opacity: .62; transform: scaleX(1.08); } }
-@keyframes home-ground-ring { to { rotate: 360deg; } }
-@keyframes home-ground-shimmer { 50% { opacity: .58; transform: perspective(180px) rotateX(58deg) scaleX(1.12); } }
+@keyframes home-ground-pulse { 50% { opacity: .68; transform: scale(.985); } }
+@keyframes home-ground-runes { to { rotate: 360deg; } }
+@keyframes home-footlight-breathe { 50% { opacity: .62; transform: scale(1.16); } }
+@keyframes home-ground-shimmer { 50% { opacity: .58; transform: scaleX(1.04); } }
 @keyframes home-ground-spark { 50% { opacity: .18; transform: scale(.44) translateY(5px); } }
 @keyframes home-success-flash {
   0% { opacity: 0; transform: scale(.42); }

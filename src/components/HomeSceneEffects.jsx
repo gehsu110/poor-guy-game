@@ -14,6 +14,8 @@ const SUCCESS_PARTICLES = {
   star_confetti_burst: ['one', 'two', 'three', 'four', 'five', 'six', 'seven'],
 }
 
+const GROUND_GLYPHS = ['A', 'R', 'M', 'E', 'S', 'Q', 'L', 'V']
+
 export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse }) {
   const effects = getEquippedHomeEffects(equipped, theme)
   const [burstKey, setBurstKey] = useState(null)
@@ -44,7 +46,19 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
 
       <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
         <span className="home-scene-ground__core" />
+        <span className="home-scene-ground__outer" />
         <span className="home-scene-ground__ring" />
+        <span className="home-scene-ground__inner" />
+        <span className="home-scene-ground__sigil home-scene-ground__sigil--one" />
+        <span className="home-scene-ground__sigil home-scene-ground__sigil--two" />
+        <span className="home-scene-ground__sigil home-scene-ground__sigil--three" />
+        <span className="home-scene-ground__runes">
+          {GROUND_GLYPHS.map((glyph, index) => (
+            <b key={`${glyph}-${index}`} className={`home-scene-ground__glyph home-scene-ground__glyph--${index + 1}`}>
+              {glyph}
+            </b>
+          ))}
+        </span>
         <span className="home-scene-ground__spark home-scene-ground__spark--one" />
         <span className="home-scene-ground__spark home-scene-ground__spark--two" />
         <span className="home-scene-ground__spark home-scene-ground__spark--three" />
