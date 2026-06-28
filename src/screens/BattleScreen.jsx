@@ -160,11 +160,12 @@ function BattleRewardPill({ type, value }) {
   )
 }
 
-function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit, showProjectile, showImpact }) {
+function MonsterArea({ monster, currentHp, totalSpent, isHit, damageNumbers, hitKey, isCrit, showProjectile, showImpact }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
   const isAngry = hpPct < 0.3 && !defeated
+  const attackPower = Math.max(0, Math.round(totalSpent / 10))
 
   return (
     <div className="academy-battle-arena">
@@ -175,6 +176,12 @@ function MonsterArea({ monster, currentHp, isHit, damageNumbers, hitKey, isCrit,
             <span>{defeated ? '淨化完成' : '施放記帳攻擊'}</span>
           </div>
           <TierBadge tier={monster.tier} />
+        </div>
+
+        <div className="academy-battle-stage__quickstats">
+          <span>今日 NT${formatMoney(totalSpent)}</span>
+          <span>攻擊 +{attackPower}</span>
+          <span>HP {Math.round(hpPct * 100)}%</span>
         </div>
 
         <div className="academy-battle-stage__hp">
@@ -546,18 +553,6 @@ function ExpenseList({ expenses, onEdit, onDelete, categories }) {
   )
 }
 
-function BattleTopStats({ totalSpent, currentHp, monster }) {
-  const attackPower = Math.max(0, Math.round(totalSpent / 10))
-  const hpPct = monster?.maxHp > 0 ? Math.round((Math.max(0, currentHp) / monster.maxHp) * 100) : 0
-  return (
-    <div className="academy-battle-top-stats">
-      <span>今日 NT${formatMoney(totalSpent)}</span>
-      <span>攻擊 +{attackPower}</span>
-      <span>HP {hpPct}%</span>
-    </div>
-  )
-}
-
 export default function BattleScreen() {
   const { state, navigate, submitExpense, updateExpenseEntry, deleteExpenseEntry } = useApp()
   const { profile, monster, currentHp, totalSpent, damageNumbers, expenses } = state
@@ -630,10 +625,10 @@ export default function BattleScreen() {
       </div>
 
       <div className="academy-battle-content relative z-10 flex-1 overflow-y-auto px-4">
-        <BattleTopStats totalSpent={totalSpent} currentHp={currentHp} monster={monster} />
         <MonsterArea
           monster={monster}
           currentHp={currentHp}
+          totalSpent={totalSpent}
           isHit={isHit}
           damageNumbers={damageNumbers}
           hitKey={hitKey}
@@ -642,7 +637,7 @@ export default function BattleScreen() {
           showImpact={showImpact}
         />
 
-        <div className="academy-card academy-battle-panel">
+        <div className="academy-battle-panel">
           <ExpensePanel
             key={editingExpense?.id ?? 'new-expense'}
             onSubmit={handleSubmit}

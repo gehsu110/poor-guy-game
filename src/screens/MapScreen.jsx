@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, generateDayMonster, formatMoney } from '../gameLogic'
-import { addExpense, getMonthDayRecords, getMonthExpenses, setDayRecord } from '../firebase'
+import { addExpense, calcLevel, getMonthDayRecords, getMonthExpenses, setDayRecord, updateProfile } from '../firebase'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
 import zoneAcademy from '../assets/academy-art/map-zones/week1-academy.webp'
 import zoneMarket from '../assets/academy-art/map-zones/week2-market.webp'
@@ -21,10 +21,10 @@ const NODE_CONFIG = {
 }
 
 const MAP_ZONES = [
-  { key: 'academy', title: '第 1 週｜學院入口', sub: '建立記帳節奏，讓路線亮起來', tag: '啟程區', range: [1, 7], bg: zoneAcademy },
-  { key: 'market', title: '第 2 週｜魔法市集', sub: '誘惑變多，檢查每天是否守住預算', tag: '誘惑區', range: [8, 14], bg: zoneMarket },
-  { key: 'forest', title: '第 3 週｜帳本森林', sub: '花費開始累積，路線會留下戰鬥痕跡', tag: '迷霧區', range: [15, 21], bg: zoneForest },
-  { key: 'boss', title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', tag: '月底壓力區', range: [22, 31], bg: zoneBoss },
+  { key: 'academy', week: 1, title: '第 1 週｜學院入口', sub: '建立記帳節奏，讓路線亮起來', range: [1, 7], bg: zoneAcademy, reward: { exp: 80, yellow: 3, normalTicket: 1 } },
+  { key: 'market', week: 2, title: '第 2 週｜魔法市集', sub: '誘惑變多，檢查每天是否守住預算', range: [8, 14], bg: zoneMarket, reward: { exp: 100, yellow: 4, normalTicket: 1 } },
+  { key: 'forest', week: 3, title: '第 3 週｜帳本森林', sub: '花費開始累積，路線會留下戰鬥痕跡', range: [15, 21], bg: zoneForest, reward: { exp: 120, yellow: 5, purple: 1 } },
+  { key: 'boss', week: 4, title: '第 4 週｜月底魔王城', sub: '月底壓力登場，準備面對大 Boss', range: [22, 31], bg: zoneBoss, reward: { exp: 160, yellow: 6, normalTicket: 2 } },
 ]
 
 const MAP_LEGEND_ITEMS = [
@@ -86,13 +86,56 @@ function buildZones(days) {
   }).filter(zone => zone.days.length)
 }
 
+function rewardText(reward = {}) {
+  const parts = []
+  if (reward.yellow) parts.push(`黃星 ${reward.yellow}`)
+  if (reward.purple) parts.push(`紫星 ${reward.purple}`)
+  if (reward.normalTicket) parts.push(`券 ${reward.normalTicket}`)
+  if (reward.goldTicket) parts.push(`金券 ${reward.goldTicket}`)
+  return parts.join('・') || 'EXP'
+}
+
+function buildWeekRewardState(zone, todayDate, claimedMissions) {
+  const eligibleDays = zone.days.filter(day => day.date <= todayDate)
+  const recorded = zone.days.filter(day => day.date <= todayDate && (day.spent ?? 0) > 0).length
+  const target = zone.days.length
+  const complete = zone.days.length > 0 && zone.days.every(day => day.date <= todayDate && (day.spent ?? 0) > 0)
+  const claimKey = `map-week-${zone.week}-${zone.days[0]?.date ?? zone.key}`
+  const claimed = !!claimedMissions?.[claimKey]
+  const future = eligibleDays.length < target
+  return {
+    claimKey,
+    complete,
+    claimed,
+    disabled: claimed || !complete,
+    status: claimed ? 'claimed' : complete ? 'ready' : future ? 'future' : 'locked',
+    label: claimed ? '已領' : complete ? '可領' : `${recorded}/${target}`,
+    recorded,
+    target,
+  }
+}
+
+function WeekRewardButton({ rewardState, reward, onClaim }) {
+  return (
+    <button
+      type="button"
+      className={`academy-map-week-reward academy-map-week-reward--${rewardState.status}`}
+      onClick={onClaim}
+      disabled={rewardState.disabled}
+      title={`任務獎勵：${rewardText(reward)}`}
+    >
+      <span>任務獎勵</span>
+      <b>{rewardState.label}</b>
+    </button>
+  )
+}
+
 export default function MapScreen() {
-  const { state, navigate } = useApp()
+  const { state, navigate, dispatch } = useApp()
   const { profile, date: todayDate, user } = state
   const budget = profile?.dailyBudget ?? 1000
   const [monthRecords, setMonthRecords] = useState({})
   const [monthExpenses, setMonthExpenses] = useState({})
-  const [monthExpenseItems, setMonthExpenseItems] = useState([])
   const [loadingMonth, setLoadingMonth] = useState(false)
 
   const now = new Date()
@@ -112,7 +155,6 @@ export default function MapScreen() {
         ])
         if (!alive) return
         setMonthRecords(Object.fromEntries(records.map(r => [r.date, r])))
-        setMonthExpenseItems(expenses)
         setMonthExpenses(expenses.reduce((acc, e) => {
           acc[e.date] = (acc[e.date] ?? 0) + Number(e.amount ?? 0)
           return acc
@@ -143,6 +185,8 @@ export default function MapScreen() {
   }), [budget, daysInMonth, month, monthExpenses, monthRecords, todayDate, year])
 
   const zones = buildZones(days)
+  const currentZone = zones.find(zone => zone.days.some(day => day.date === todayDate)) ?? zones[0]
+  const currentWeekReward = currentZone ? buildWeekRewardState(currentZone, todayDate, profile?.claimedMissions ?? {}) : null
 
   const [selected, setSelected] = useState(null)
   const [backfillAmount, setBackfillAmount] = useState('')
@@ -150,27 +194,7 @@ export default function MapScreen() {
   const [backfillNote, setBackfillNote] = useState('')
   const [savingBackfill, setSavingBackfill] = useState(false)
   const [showMapHelp, setShowMapHelp] = useState(false)
-
-  const stats = useMemo(() => {
-    const elapsedDays = days.filter(d => d.date <= todayDate)
-    const recordedDays = elapsedDays.filter(d => (d.spent ?? 0) > 0)
-    const totalSpent = monthExpenseItems.reduce((sum, e) => sum + Number(e.amount ?? 0), 0)
-    const ratingCounts = elapsedDays.reduce((acc, d) => {
-      const rating = d.record?.rating
-      if (rating) acc[rating] = (acc[rating] ?? 0) + 1
-      return acc
-    }, {})
-    return {
-      killed: elapsedDays.filter(d => d.status === 'defeated').length,
-      total: elapsedDays.length,
-      recorded: recordedDays.length,
-      noRecord: elapsedDays.filter(d => d.status === 'no_record').length,
-      underBudget: recordedDays.filter(d => d.spent <= budget).length,
-      totalSpent,
-      avgSpent: recordedDays.length ? Math.round(totalSpent / recordedDays.length) : 0,
-      ratingCounts,
-    }
-  }, [budget, days, monthExpenseItems, todayDate])
+  const [claimingWeek, setClaimingWeek] = useState(null)
 
   async function submitBackfill() {
     if (!user || !selected) return
@@ -184,7 +208,7 @@ export default function MapScreen() {
         category: backfillCategory,
         note: backfillNote.trim() || '補登消費',
       }
-      const ref = await addExpense(user.uid, expense)
+      await addExpense(user.uid, expense)
       await setDayRecord(user.uid, selected.date, {
         settled: true,
         backfilled: true,
@@ -192,8 +216,6 @@ export default function MapScreen() {
         spent: (selected.spent ?? 0) + amount,
         rewards: { yellow: 0, purple: 0, normalTicket: 0, goldTicket: 0, exp: 0 },
       })
-      const nextItem = { ...expense, id: ref.id }
-      setMonthExpenseItems(items => [...items, nextItem])
       setMonthExpenses(expenses => ({
         ...expenses,
         [selected.date]: (expenses[selected.date] ?? 0) + amount,
@@ -209,6 +231,44 @@ export default function MapScreen() {
       console.error(e)
     } finally {
       setSavingBackfill(false)
+    }
+  }
+
+  async function claimWeekReward(zone, rewardState) {
+    if (!profile || rewardState.disabled || claimingWeek) return
+    setClaimingWeek(rewardState.claimKey)
+    const reward = zone.reward ?? {}
+    const exp = (profile?.exp ?? 0) + (reward.exp ?? 0)
+    const levelInfo = calcLevel(exp)
+    const data = {
+      exp,
+      ...levelInfo,
+      stars: {
+        yellow: (profile?.stars?.yellow ?? 0) + (reward.yellow ?? 0),
+        purple: (profile?.stars?.purple ?? 0) + (reward.purple ?? 0),
+      },
+      tickets: {
+        normal: (profile?.tickets?.normal ?? 0) + (reward.normalTicket ?? 0),
+        gold: (profile?.tickets?.gold ?? 0) + (reward.goldTicket ?? 0),
+      },
+      claimedMissions: {
+        ...(profile?.claimedMissions ?? {}),
+        [rewardState.claimKey]: true,
+      },
+    }
+
+    try {
+      if (user) await updateProfile(user.uid, data)
+      dispatch({ type: 'UPDATE_PROFILE', data })
+      dispatch({
+        type: 'SET_NOTIFICATION',
+        notification: { type: 'mission', message: `第 ${zone.week} 週任務獎勵已領取` },
+      })
+      setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2600)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setClaimingWeek(null)
     }
   }
 
@@ -237,30 +297,35 @@ export default function MapScreen() {
         <div className="academy-map-report mb-3">
           <div className="academy-map-report__head">
             <div>
-              <div className="academy-map-report__title">本月戰報</div>
-              <div className="academy-map-report__subtitle">記帳、預算、討伐進度</div>
+              <div className="academy-map-report__title">本週戰報</div>
+              <div className="academy-map-report__subtitle">每日路線、週任務獎勵</div>
             </div>
-            <span className="academy-map-report__stamp">{stats.recorded}/{stats.total} 天</span>
+            <span className="academy-map-report__stamp">{currentWeekReward?.recorded ?? 0}/{currentWeekReward?.target ?? 7} 天</span>
           </div>
           <div className="academy-map-report__stats">
             <div className="academy-map-report__stat">
-              <div>總消費</div>
-              <strong>NT${formatMoney(stats.totalSpent)}</strong>
+              <div>今日位置</div>
+              <strong>{Number(todayDate.slice(-2))} 日</strong>
             </div>
             <div className="academy-map-report__stat">
-              <div>日均</div>
-              <strong>NT${formatMoney(stats.avgSpent)}</strong>
+              <div>本週記帳</div>
+              <strong>{currentWeekReward?.recorded ?? 0} 天</strong>
             </div>
             <div className="academy-map-report__stat academy-map-report__stat--safe">
-              <div>預算內</div>
-              <strong>{stats.underBudget} 天</strong>
+              <div>任務獎勵</div>
+              <strong>{currentWeekReward?.claimed ? '已領' : currentWeekReward?.complete ? '可領' : '進行中'}</strong>
             </div>
           </div>
           <div className="academy-map-report__ratings">
-            {['S', 'A', 'B', 'C'].map(rating => (
-              <div key={rating} className="academy-rating-chip">
-                <b>{rating}</b>
-                <span>{stats.ratingCounts[rating] ?? 0}</span>
+            {[
+              { key: 'week', label: `第 ${currentZone?.week ?? '-'} 週`, value: currentZone?.title?.split('｜')[1] ?? '路線' },
+              { key: 'recorded', label: '已記', value: `${currentWeekReward?.recorded ?? 0} 天` },
+              { key: 'missing', label: '未亮', value: `${Math.max(0, (currentWeekReward?.target ?? 0) - (currentWeekReward?.recorded ?? 0))} 天` },
+              { key: 'reward', label: '獎勵', value: currentWeekReward?.claimed ? '已領' : currentWeekReward?.complete ? '可領' : '待完成' },
+            ].map(item => (
+              <div key={item.key} className="academy-rating-chip">
+                <b>{item.label}</b>
+                <span>{item.value}</span>
               </div>
             ))}
           </div>
@@ -273,6 +338,9 @@ export default function MapScreen() {
             </div>
           )}
           {zones.map(zone => (
+            (() => {
+              const rewardState = buildWeekRewardState(zone, todayDate, profile?.claimedMissions ?? {})
+              return (
             <section
               key={zone.key}
               className={`academy-map-zone academy-map-zone--${zone.key}`}
@@ -291,7 +359,11 @@ export default function MapScreen() {
                   <strong>{zone.title}</strong>
                   <small>{zone.sub}</small>
                 </div>
-                <span>{zone.tag}</span>
+                <WeekRewardButton
+                  rewardState={{ ...rewardState, disabled: rewardState.disabled || claimingWeek === rewardState.claimKey }}
+                  reward={zone.reward}
+                  onClaim={() => claimWeekReward(zone, rewardState)}
+                />
               </div>
               <div className={`academy-map-card academy-map-card--${zone.key} flex flex-col gap-8 py-5`}>
                 {zone.rows.map((row, ri) => (
@@ -312,6 +384,8 @@ export default function MapScreen() {
                 ))}
               </div>
             </section>
+              )
+            })()
           ))}
         </div>
       </div>
