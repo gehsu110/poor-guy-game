@@ -4396,7 +4396,10 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview {
-  width: min(100%, 380px);
+  display: flex;
+  width: min(100%, 420px);
+  max-height: calc(100dvh - 28px);
+  flex-direction: column;
   overflow: hidden;
   border-radius: 28px;
   border: 1px solid rgba(255,255,255,0.58);
@@ -4432,36 +4435,37 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage {
-  --home-stage-baseline: 258px;
+  --home-stage-baseline: min(71%, 408px);
   position: relative;
-  height: 340px;
+  height: min(67dvh, 590px);
+  min-height: 430px;
   overflow: hidden;
   border-radius: 22px;
-  background:
-    radial-gradient(circle at 50% 22%, rgba(255,244,188,0.34), transparent 33%),
-    linear-gradient(180deg, rgba(151,138,208,0.58) 0%, rgba(248,222,194,0.86) 54%, rgba(191,178,165,0.94) 100%);
+  background: #f7dfcf;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45);
 }
 
-.academy-shop-effect-preview__sky {
+.academy-shop-effect-preview__bg {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.18) 10.3%, transparent 10.6%, transparent 50%, rgba(255,255,255,0.14) 50.3%, transparent 50.6%),
-    repeating-linear-gradient(0deg, transparent 0 34px, rgba(117,98,142,0.12) 35px 36px),
-    radial-gradient(ellipse at 50% 70%, rgba(97,82,112,0.18), transparent 46%);
-  opacity: .8;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 58%;
+  transform: scale(1.08);
+  transform-origin: center 64%;
+  pointer-events: none;
 }
 
 .academy-shop-effect-preview__character {
   position: absolute;
   left: 50%;
-  top: 62px;
-  z-index: 3;
-  width: min(54%, 180px);
+  top: min(31%, 182px);
+  z-index: 6;
+  width: min(62%, 250px);
   height: auto;
   translate: -50% 0;
-  filter: drop-shadow(0 12px 16px rgba(74,54,89,0.2));
+  filter: drop-shadow(0 18px 18px rgba(78,61,122,0.22));
   pointer-events: none;
 }
 
@@ -4474,14 +4478,14 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage .home-scene-ground {
-  top: 282px;
+  top: calc(var(--home-stage-baseline) + 24px);
   z-index: 4;
-  width: 118%;
+  width: min(148%, 690px);
 }
 
 .academy-shop-effect-preview__stage .home-scene-success {
   z-index: 5;
-  top: 176px;
+  top: calc(var(--home-stage-baseline) - 78px);
 }
 
 .academy-shop-effect-preview__actions {
@@ -4498,6 +4502,14 @@ video.academy-screen-character {
 }
 
 @media (max-width: 380px) {
+  .academy-shop-effect-preview {
+    width: min(100%, 360px);
+  }
+
+  .academy-shop-effect-preview__stage {
+    min-height: 390px;
+  }
+
   .academy-shop-homefx-preview__grid {
     grid-template-columns: 1fr;
   }

@@ -48,32 +48,45 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
       </div>
 
       {hasGroundEffect && (
-        <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
-          <span className="home-scene-ground__reveal" />
-          <span className="home-scene-ground__core" />
-          <span className="home-scene-ground__outer" />
-          <span className="home-scene-ground__ring" />
-          <span className="home-scene-ground__inner" />
-          <span className="home-scene-ground__sigil home-scene-ground__sigil--one" />
-          <span className="home-scene-ground__sigil home-scene-ground__sigil--two" />
-          <span className="home-scene-ground__sigil home-scene-ground__sigil--three" />
-          <span className="home-scene-ground__runes">
-            {GROUND_GLYPHS.map((glyph, index) => (
-              <b key={`${glyph}-${index}`} className={`home-scene-ground__glyph home-scene-ground__glyph--${index + 1}`}>
-                {glyph}
-              </b>
+        <>
+          <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
+            <span className="home-scene-ground__reveal" />
+            <span className="home-scene-ground__core" />
+            <span className="home-scene-ground__outer" />
+            <span className="home-scene-ground__ring" />
+            <span className="home-scene-ground__inner" />
+            <span className="home-scene-ground__sigil home-scene-ground__sigil--one" />
+            <span className="home-scene-ground__sigil home-scene-ground__sigil--two" />
+            <span className="home-scene-ground__sigil home-scene-ground__sigil--three" />
+            <span className="home-scene-ground__runes">
+              {GROUND_GLYPHS.map((glyph, index) => (
+                <b key={`${glyph}-${index}`} className={`home-scene-ground__glyph home-scene-ground__glyph--${index + 1}`}>
+                  {glyph}
+                </b>
+              ))}
+            </span>
+            <span className="home-scene-ground__sweep" />
+            <span className="home-scene-ground__lift">
+              {GROUND_LIFTS.map(particle => (
+                <i key={particle} className={`home-scene-ground__lift-particle home-scene-ground__lift-particle--${particle}`} />
+              ))}
+            </span>
+            <span className="home-scene-ground__summon-flare" />
+            <span className="home-scene-ground__rise-ring home-scene-ground__rise-ring--one" />
+            <span className="home-scene-ground__rise-ring home-scene-ground__rise-ring--two" />
+            <span className="home-scene-ground__spark home-scene-ground__spark--one" />
+            <span className="home-scene-ground__spark home-scene-ground__spark--two" />
+            <span className="home-scene-ground__spark home-scene-ground__spark--three" />
+          </div>
+          <div className={`home-scene-summon home-scene-summon--${effects.groundEffect}`}>
+            <span className="home-scene-summon__flare" />
+            <span className="home-scene-summon__ring home-scene-summon__ring--one" />
+            <span className="home-scene-summon__ring home-scene-summon__ring--two" />
+            {GROUND_LIFTS.slice(0, 4).map(particle => (
+              <i key={particle} className={`home-scene-summon__spark home-scene-summon__spark--${particle}`} />
             ))}
-          </span>
-          <span className="home-scene-ground__sweep" />
-          <span className="home-scene-ground__lift">
-            {GROUND_LIFTS.map(particle => (
-              <i key={particle} className={`home-scene-ground__lift-particle home-scene-ground__lift-particle--${particle}`} />
-            ))}
-          </span>
-          <span className="home-scene-ground__spark home-scene-ground__spark--one" />
-          <span className="home-scene-ground__spark home-scene-ground__spark--two" />
-          <span className="home-scene-ground__spark home-scene-ground__spark--three" />
-        </div>
+          </div>
+        </>
       )}
 
       {burstKey && hasSuccessEffect && (

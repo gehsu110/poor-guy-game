@@ -502,8 +502,9 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
   const successPulse = item.type === 'successEffect' ? `${item.id}-${replayKey}` : `preview-${replayKey}`
   const label = TYPE_LABELS[item.type] ?? item.source
   const gender = profile?.avatarGender ?? 'girl'
-  const outfitId = profile?.equipped?.outfit ?? 'academy'
-  const characterImage = getOutfitAssets(outfitId, gender).image
+  const academyPreview = getOutfitAssets('academy', gender)
+  const characterImage = academyPreview.image
+  const backgroundImage = academyPreview.bg
 
   return (
     <motion.div
@@ -529,13 +530,13 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
           <button className="academy-back" onClick={onClose}>×</button>
         </div>
         <div className="academy-shop-effect-preview__stage">
-          <div className="academy-shop-effect-preview__sky" />
+          <img className="academy-shop-effect-preview__bg" src={backgroundImage} alt="" draggable="false" />
           <img className="academy-shop-effect-preview__character" src={characterImage} alt="" draggable="false" />
           <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} />
         </div>
         <div className="academy-shop-effect-preview__actions">
           <button className="academy-small-button" onClick={() => setReplayKey(key => key + 1)}>重播</button>
-          <small>此預覽與首頁使用同一套特效層</small>
+          <small>首頁實景預覽</small>
         </div>
       </motion.div>
     </motion.div>
