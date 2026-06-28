@@ -52,6 +52,7 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
           <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
             <span className="home-scene-ground__reveal" />
             <span className="home-scene-ground__core" />
+            <span className="home-scene-ground__art" />
             <span className="home-scene-ground__outer" />
             <span className="home-scene-ground__ring" />
             <span className="home-scene-ground__inner" />
