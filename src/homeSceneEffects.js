@@ -45,7 +45,7 @@ export const HOME_SCENE_EFFECTS = {
       color: '#FFE4A0',
       iconKey: 'star',
       costType: 'yellow',
-      cost: 7,
+      cost: 0,
     },
     sakura_lantern_ring: {
       name: '櫻燈舞台光圈',
@@ -109,28 +109,28 @@ export const HOME_SCENE_EFFECTS = {
 export const DEFAULT_HOME_EFFECTS_BY_THEME = {
   academy: {
     backgroundAura: 'academy_stardust',
-    groundEffect: 'starter_magic_circle',
-    successEffect: 'coin_spark_burst',
+    groundEffect: null,
+    successEffect: null,
   },
   summer: {
     backgroundAura: 'academy_stardust',
-    groundEffect: 'starter_magic_circle',
-    successEffect: 'coin_spark_burst',
+    groundEffect: null,
+    successEffect: null,
   },
   sakura: {
     backgroundAura: 'sakura_petals',
-    groundEffect: 'sakura_lantern_ring',
-    successEffect: 'coin_spark_burst',
+    groundEffect: null,
+    successEffect: null,
   },
   qixi: {
     backgroundAura: 'qixi_star_threads',
-    groundEffect: 'qixi_star_sigil',
-    successEffect: 'star_confetti_burst',
+    groundEffect: null,
+    successEffect: null,
   },
   rainy: {
     backgroundAura: 'rainy_afterglow',
-    groundEffect: 'rainy_puddle_shimmer',
-    successEffect: 'ticket_glow_burst',
+    groundEffect: null,
+    successEffect: null,
   },
 }
 
@@ -152,8 +152,8 @@ export function getEquippedHomeEffects(equipped = {}, theme = 'academy') {
   const defaults = getDefaultHomeEffects(theme)
   return {
     backgroundAura: equipped.backgroundAura ?? defaults.backgroundAura,
-    groundEffect: equipped.groundEffect ?? defaults.groundEffect,
-    successEffect: equipped.successEffect ?? defaults.successEffect,
+    groundEffect: equipped.groundEffect ?? null,
+    successEffect: equipped.successEffect ?? null,
   }
 }
 

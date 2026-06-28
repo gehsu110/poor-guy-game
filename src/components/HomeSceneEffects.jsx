@@ -22,13 +22,15 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
   const [burstKey, setBurstKey] = useState(null)
   const auraParticles = AURA_PARTICLES[effects.backgroundAura] ?? []
   const successParticles = SUCCESS_PARTICLES[effects.successEffect] ?? []
+  const hasGroundEffect = Boolean(effects.groundEffect)
+  const hasSuccessEffect = Boolean(effects.successEffect)
 
   useEffect(() => {
-    if (!successPulse) return
+    if (!successPulse || !hasSuccessEffect) return
     setBurstKey(successPulse)
     const timer = window.setTimeout(() => setBurstKey(null), 1100)
     return () => window.clearTimeout(timer)
-  }, [successPulse])
+  }, [successPulse, hasSuccessEffect])
 
   return (
     <div
@@ -45,34 +47,36 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
         ))}
       </div>
 
-      <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
-        <span className="home-scene-ground__reveal" />
-        <span className="home-scene-ground__core" />
-        <span className="home-scene-ground__outer" />
-        <span className="home-scene-ground__ring" />
-        <span className="home-scene-ground__inner" />
-        <span className="home-scene-ground__sigil home-scene-ground__sigil--one" />
-        <span className="home-scene-ground__sigil home-scene-ground__sigil--two" />
-        <span className="home-scene-ground__sigil home-scene-ground__sigil--three" />
-        <span className="home-scene-ground__runes">
-          {GROUND_GLYPHS.map((glyph, index) => (
-            <b key={`${glyph}-${index}`} className={`home-scene-ground__glyph home-scene-ground__glyph--${index + 1}`}>
-              {glyph}
-            </b>
-          ))}
-        </span>
-        <span className="home-scene-ground__sweep" />
-        <span className="home-scene-ground__lift">
-          {GROUND_LIFTS.map(particle => (
-            <i key={particle} className={`home-scene-ground__lift-particle home-scene-ground__lift-particle--${particle}`} />
-          ))}
-        </span>
-        <span className="home-scene-ground__spark home-scene-ground__spark--one" />
-        <span className="home-scene-ground__spark home-scene-ground__spark--two" />
-        <span className="home-scene-ground__spark home-scene-ground__spark--three" />
-      </div>
+      {hasGroundEffect && (
+        <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
+          <span className="home-scene-ground__reveal" />
+          <span className="home-scene-ground__core" />
+          <span className="home-scene-ground__outer" />
+          <span className="home-scene-ground__ring" />
+          <span className="home-scene-ground__inner" />
+          <span className="home-scene-ground__sigil home-scene-ground__sigil--one" />
+          <span className="home-scene-ground__sigil home-scene-ground__sigil--two" />
+          <span className="home-scene-ground__sigil home-scene-ground__sigil--three" />
+          <span className="home-scene-ground__runes">
+            {GROUND_GLYPHS.map((glyph, index) => (
+              <b key={`${glyph}-${index}`} className={`home-scene-ground__glyph home-scene-ground__glyph--${index + 1}`}>
+                {glyph}
+              </b>
+            ))}
+          </span>
+          <span className="home-scene-ground__sweep" />
+          <span className="home-scene-ground__lift">
+            {GROUND_LIFTS.map(particle => (
+              <i key={particle} className={`home-scene-ground__lift-particle home-scene-ground__lift-particle--${particle}`} />
+            ))}
+          </span>
+          <span className="home-scene-ground__spark home-scene-ground__spark--one" />
+          <span className="home-scene-ground__spark home-scene-ground__spark--two" />
+          <span className="home-scene-ground__spark home-scene-ground__spark--three" />
+        </div>
+      )}
 
-      {burstKey && (
+      {burstKey && hasSuccessEffect && (
         <div key={burstKey} className={`home-scene-success home-scene-success--${effects.successEffect}`}>
           {successParticles.map(particle => (
             <i key={particle} className={`home-scene-success__particle home-scene-success__particle--${particle}`} />

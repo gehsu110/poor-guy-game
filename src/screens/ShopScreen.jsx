@@ -52,6 +52,8 @@ const HOME_EFFECT_EXCHANGE_ITEMS = flattenHomeSceneEffects().map(effect => ({
   iconKey: effect.iconKey,
 }))
 
+const HOME_EFFECT_PRODUCT_TYPES = new Set(['backgroundAura', 'groundEffect', 'successEffect'])
+
 const EXCHANGE_ITEMS = [
   { id: 'normal_ticket_pack', type: 'resource', category: 'utility', name: '一般補給券', source: '補給池抽取', place: '補給池', costType: 'yellow', cost: 3, reward: { normalTicket: 1 }, rarity: 'R', color: '#FFDDE8', iconKey: 'ticket' },
   { id: 'daily_yellow_boost', type: 'boost', category: 'utility', name: '今日黃星祝福', source: '每日加成', place: '主頁 HUD / 今日頁', costType: 'yellow', cost: 2, rarity: 'R', color: '#FFE4A0', iconKey: 'star', disabled: true },
@@ -177,6 +179,22 @@ function ResourceList({ data, compact = false }) {
       ))}
     </span>
   )
+}
+
+function isHomeEffectItem(item) {
+  return HOME_EFFECT_PRODUCT_TYPES.has(item?.type)
+}
+
+function buildHomeEffectPreview(item) {
+  const preview = {
+    backgroundAura: 'academy_stardust',
+    groundEffect: 'starter_magic_circle',
+    successEffect: 'coin_spark_burst',
+  }
+  if (item?.type === 'backgroundAura') preview.backgroundAura = item.id
+  if (item?.type === 'groundEffect') preview.groundEffect = item.id
+  if (item?.type === 'successEffect') preview.successEffect = item.id
+  return preview
 }
 
 function currencyFromState(stars, tickets) {
@@ -478,6 +496,52 @@ function HomeEffectsPresentationPreview() {
   )
 }
 
+function HomeEffectPreviewModal({ item, profile, onClose }) {
+  const [replayKey, setReplayKey] = useState(1)
+  const previewEquipped = buildHomeEffectPreview(item)
+  const successPulse = item.type === 'successEffect' ? `${item.id}-${replayKey}` : `preview-${replayKey}`
+  const label = TYPE_LABELS[item.type] ?? item.source
+  const gender = profile?.avatarGender ?? 'girl'
+  const outfitId = profile?.equipped?.outfit ?? 'academy'
+  const characterImage = getOutfitAssets(outfitId, gender).image
+
+  return (
+    <motion.div
+      className="academy-shop-effect-modal"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="academy-shop-effect-preview"
+        initial={{ y: 20, scale: .96 }}
+        animate={{ y: 0, scale: 1 }}
+        exit={{ y: 16, scale: .98 }}
+        transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+        onClick={event => event.stopPropagation()}
+      >
+        <div className="academy-shop-effect-preview__head">
+          <div>
+            <span>{label}</span>
+            <b>{item.name}</b>
+          </div>
+          <button className="academy-back" onClick={onClose}>×</button>
+        </div>
+        <div className="academy-shop-effect-preview__stage">
+          <div className="academy-shop-effect-preview__sky" />
+          <img className="academy-shop-effect-preview__character" src={characterImage} alt="" draggable="false" />
+          <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} />
+        </div>
+        <div className="academy-shop-effect-preview__actions">
+          <button className="academy-small-button" onClick={() => setReplayKey(key => key + 1)}>重播</button>
+          <small>此預覽與首頁使用同一套特效層</small>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 export default function ShopScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile, user } = state
@@ -485,6 +549,7 @@ export default function ShopScreen() {
   const [tab, setTab] = useState('daily')
   const [exchangeCategory, setExchangeCategory] = useState('all')
   const [isDrawing, setIsDrawing] = useState(false)
+  const [previewHomeEffect, setPreviewHomeEffect] = useState(null)
 
   const tickets = profile?.tickets ?? { normal: 0, gold: 0 }
   const stars = profile?.stars ?? { yellow: 0, purple: 0 }
@@ -627,18 +692,20 @@ export default function ShopScreen() {
       return
     }
     const next = applyResourceDelta(stars, tickets, cost, -1)
+    const autoEquip = item.cost === 0 && isHomeEffectItem(item)
     const data = {
       stars: next.stars,
       tickets: next.tickets,
       collection: [...collection, { id: item.id, rarity: item.rarity, obtainedAt: Date.now(), source: 'exchange' }],
+      ...(autoEquip ? { equipped: { ...equipped, [item.type]: item.id } } : {}),
     }
     dispatch({ type: 'UPDATE_PROFILE', data })
     try {
       if (user) await updateProfile(user.uid, data)
-      notify(`${item.name} 已加入收藏`)
+      notify(autoEquip ? `${item.name} 已加入收藏並裝備` : `${item.name} 已加入收藏`)
     } catch (e) {
       console.error(e)
-      dispatch({ type: 'UPDATE_PROFILE', data: { stars, tickets, collection } })
+      dispatch({ type: 'UPDATE_PROFILE', data: { stars, tickets, collection, equipped } })
       notify('兌換同步失敗，請稍後再試。')
     }
   }
@@ -853,6 +920,7 @@ export default function ShopScreen() {
                   const owned = collection.some(c => c.id === item.id)
                   const rarity = RARITY_CONFIG[item.rarity] ?? RARITY_CONFIG.R
                   const equippedNow = isEquipped(item)
+                  const homeEffectProduct = isHomeEffectItem(item)
                   return (
                     <div key={item.id} className={`academy-shop-product ${item.disabled ? 'is-disabled' : ''} ${equippedNow ? 'is-equipped' : ''}`}>
                       <PrizeIcon item={item} />
@@ -863,17 +931,26 @@ export default function ShopScreen() {
                         </div>
                         <small>{item.source} / {item.place}</small>
                       </div>
-                      <button className="academy-small-button" onClick={() => buyExchange(item)} disabled={equippedNow}>
-                        {item.disabled
-                          ? '設計中'
-                          : equippedNow
-                            ? '使用中'
-                            : owned
-                              ? '裝備'
-                              : item.reward
-                                ? <ResourceList data={item.reward} compact />
-                                : <ResourceAmount type={item.costType} value={item.cost} compact />}
-                      </button>
+                      <div className="academy-shop-product__actions">
+                        {homeEffectProduct && (
+                          <button className="academy-small-button academy-shop-product__preview" onClick={() => setPreviewHomeEffect(item)}>
+                            試看
+                          </button>
+                        )}
+                        <button className="academy-small-button" onClick={() => buyExchange(item)} disabled={equippedNow}>
+                          {item.disabled
+                            ? '設計中'
+                            : equippedNow
+                              ? '使用中'
+                              : owned
+                                ? '裝備'
+                                : item.reward
+                                  ? <ResourceList data={item.reward} compact />
+                                  : item.cost === 0
+                                    ? <span className="academy-resource-free">免費</span>
+                                    : <ResourceAmount type={item.costType} value={item.cost} compact />}
+                        </button>
+                      </div>
                     </div>
                   )
                 })}
@@ -898,6 +975,7 @@ export default function ShopScreen() {
 
       <AnimatePresence>
         {gachaResult && <GachaResult results={gachaResult} onClose={() => setGachaResult(null)} />}
+        {previewHomeEffect && <HomeEffectPreviewModal item={previewHomeEffect} profile={profile} onClose={() => setPreviewHomeEffect(null)} />}
       </AnimatePresence>
 
     </div>
