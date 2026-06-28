@@ -1245,10 +1245,9 @@
   width: min(91%, 520px);
   aspect-ratio: 1 / .54;
   height: auto;
-  translate: -50% -50%;
   border-radius: 50%;
   opacity: .96;
-  transform: perspective(520px) rotateX(58deg);
+  transform: translate(-50%, -50%) perspective(520px) rotateX(58deg);
   transform-origin: center center;
   animation: home-ground-rise-in 1.15s cubic-bezier(.2,.78,.18,1) both;
 }
@@ -1461,8 +1460,7 @@
   left: 50%;
   width: min(94vw, 500px);
   aspect-ratio: 1 / 1;
-  translate: -50% -50%;
-  transform: perspective(660px) rotateX(59deg);
+  transform: translate(-50%, -50%) perspective(660px) rotateX(59deg);
   transform-origin: center center;
 }
 
@@ -1705,9 +1703,9 @@
 @keyframes home-rainy-afterglow { 50% { opacity: .42; transform: scaleX(1.04); } }
 @keyframes home-rainy-shimmer { 50% { opacity: .12; transform: scaleX(.72); } }
 @keyframes home-ground-rise-in {
-  0% { opacity: 0; transform: perspective(520px) rotateX(64deg) translateY(28px) scale(.82); filter: blur(6px); }
+  0% { opacity: 0; filter: blur(6px); }
   58% { opacity: 1; filter: blur(0); }
-  100% { opacity: .96; transform: perspective(520px) rotateX(58deg) translateY(0) scale(1); filter: blur(0); }
+  100% { opacity: .96; filter: blur(0); }
 }
 @keyframes home-ground-reveal {
   0% { opacity: 0; transform: translateY(34px) scale(.52); }
