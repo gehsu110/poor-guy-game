@@ -27,7 +27,7 @@ const SUCCESS_ASSETS = {
   },
 }
 
-export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse, layer = 'all' }) {
+export default function HomeSceneEffects({ theme = 'academy', equipped, entrancePulse, successPulse, layer = 'all' }) {
   const effects = getEquippedHomeEffects(equipped, theme)
   const [summonKey, setSummonKey] = useState(null)
   const auraParticles = AURA_PARTICLES[effects.backgroundAura] ?? []
@@ -38,15 +38,16 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
   const showBackLayer = layer !== 'front'
   const showFrontLayer = layer !== 'back'
   const burstKey = successPulse && hasSuccessEffect ? String(successPulse) : null
+  const entranceKey = entrancePulse ? String(entrancePulse) : (!successPulse ? `entrance-${effects.groundEffect}` : null)
 
   useEffect(() => {
     if (!hasGroundEffect || !showFrontLayer) return
-    if (successPulse && !String(successPulse).startsWith('preview-')) return
-    const key = successPulse ?? `entrance-${effects.groundEffect}`
+    if (!entranceKey) return
+    const key = entranceKey
     setSummonKey(key)
     const timer = window.setTimeout(() => setSummonKey(null), 1650)
     return () => window.clearTimeout(timer)
-  }, [effects.groundEffect, hasGroundEffect, showFrontLayer, successPulse])
+  }, [effects.groundEffect, entranceKey, hasGroundEffect, showFrontLayer])
 
   return (
     <div
@@ -67,7 +68,7 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
 
       {showBackLayer && hasGroundEffect && (
         <>
-          <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
+          <div className={`home-scene-ground home-scene-ground--${effects.groundEffect} ${burstKey ? 'home-scene-ground--success-sync' : ''}`}>
             <span className="home-scene-ground__reveal" />
             <span className="home-scene-ground__core" />
             <span className="home-scene-ground__art" />

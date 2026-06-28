@@ -40,12 +40,16 @@ export const HOME_SCENE_EFFECTS = {
   groundEffect: {
     starter_magic_circle: {
       name: '星砂腳底魔法圈',
-      themes: ['academy', 'hero', 'mint', 'crystal', 'night', 'city'],
+      themes: ['academy'],
       rarity: 'R',
       color: '#FFE4A0',
       iconKey: 'star',
       costType: 'yellow',
       cost: 0,
+      presentation: {
+        stage: 'mediumCircle',
+        segments: ['groundIntro', 'groundIdle', 'groundSuccessSync'],
+      },
     },
     sakura_lantern_ring: {
       name: '櫻燈舞台光圈',
@@ -55,6 +59,10 @@ export const HOME_SCENE_EFFECTS = {
       iconKey: 'ticket',
       costType: 'yellow',
       cost: 7,
+      presentation: {
+        stage: 'softRing',
+        segments: ['groundIntro', 'groundIdle', 'groundSuccessSync'],
+      },
     },
     qixi_star_sigil: {
       name: '星橋願望法陣',
@@ -64,6 +72,10 @@ export const HOME_SCENE_EFFECTS = {
       iconKey: 'star',
       costType: 'purple',
       cost: 3,
+      presentation: {
+        stage: 'mediumCircle',
+        segments: ['groundIntro', 'groundIdle', 'groundSuccessSync'],
+      },
     },
     rainy_puddle_shimmer: {
       name: '雨後地面水光',
@@ -73,6 +85,10 @@ export const HOME_SCENE_EFFECTS = {
       iconKey: 'crystal',
       costType: 'yellow',
       cost: 7,
+      presentation: {
+        stage: 'lowShimmer',
+        segments: ['groundIntro', 'groundIdle', 'groundSuccessSync'],
+      },
     },
   },
   successEffect: {
@@ -84,6 +100,9 @@ export const HOME_SCENE_EFFECTS = {
       iconKey: 'star',
       costType: 'yellow',
       cost: 6,
+      presentation: {
+        segments: ['successBurstBack', 'successBurstFront'],
+      },
     },
     ticket_glow_burst: {
       name: '補給券光束',
@@ -93,6 +112,9 @@ export const HOME_SCENE_EFFECTS = {
       iconKey: 'ticket',
       costType: 'purple',
       cost: 2,
+      presentation: {
+        segments: ['successBurstBack', 'successBurstFront'],
+      },
     },
     star_confetti_burst: {
       name: '星砂彩屑',
@@ -102,6 +124,9 @@ export const HOME_SCENE_EFFECTS = {
       iconKey: 'goldTicket',
       costType: 'purple',
       cost: 3,
+      presentation: {
+        segments: ['successBurstBack', 'successBurstFront'],
+      },
     },
   },
 }
@@ -148,12 +173,28 @@ export function getDefaultHomeEffects(theme = 'academy') {
   return DEFAULT_HOME_EFFECTS_BY_THEME[theme] ?? DEFAULT_HOME_EFFECTS_BY_THEME.academy
 }
 
+function supportsTheme(type, id, theme) {
+  if (!id) return false
+  const effect = getHomeEffect(type, id)
+  return Boolean(effect?.themes?.includes(theme))
+}
+
 export function getEquippedHomeEffects(equipped = {}, theme = 'academy') {
   const defaults = getDefaultHomeEffects(theme)
+  const backgroundAura = supportsTheme('backgroundAura', equipped.backgroundAura, theme)
+    ? equipped.backgroundAura
+    : defaults.backgroundAura
+  const groundEffect = supportsTheme('groundEffect', equipped.groundEffect, theme)
+    ? equipped.groundEffect
+    : null
+  const successEffect = supportsTheme('successEffect', equipped.successEffect, theme)
+    ? equipped.successEffect
+    : null
+
   return {
-    backgroundAura: equipped.backgroundAura ?? defaults.backgroundAura,
-    groundEffect: equipped.groundEffect ?? null,
-    successEffect: equipped.successEffect ?? null,
+    backgroundAura,
+    groundEffect,
+    successEffect,
   }
 }
 

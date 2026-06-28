@@ -498,13 +498,20 @@ function HomeEffectsPresentationPreview() {
 
 function HomeEffectPreviewModal({ item, profile, onClose }) {
   const [replayKey, setReplayKey] = useState(1)
+  const [playbackMode, setPlaybackMode] = useState(item.type === 'successEffect' ? 'success' : 'intro')
   const previewEquipped = buildHomeEffectPreview(item)
-  const successPulse = item.type === 'successEffect' ? `${item.id}-${replayKey}` : `preview-${replayKey}`
+  const entrancePulse = playbackMode === 'intro' ? `${item.id}-intro-${replayKey}` : null
+  const successPulse = playbackMode === 'success' ? `${item.id}-success-${replayKey}` : null
   const label = TYPE_LABELS[item.type] ?? item.source
   const gender = profile?.avatarGender ?? 'girl'
   const academyPreview = getOutfitAssets('academy', gender)
   const characterImage = academyPreview.image
   const backgroundImage = academyPreview.bg
+  const previewModes = [
+    { key: 'intro', label: '裝上' },
+    { key: 'idle', label: '平常' },
+    { key: 'success', label: '記帳' },
+  ]
 
   return (
     <motion.div
@@ -529,15 +536,29 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
           </div>
           <button className="academy-back" onClick={onClose}>×</button>
         </div>
-        <div key={`${item.id}-${replayKey}`} className="academy-shop-effect-preview__stage">
+        <div key={`${item.id}-${playbackMode}-${replayKey}`} className="academy-shop-effect-preview__stage" data-preview-mode={playbackMode}>
           <img className="academy-shop-effect-preview__bg" src={backgroundImage} alt="" draggable="false" />
-          <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} layer="back" />
+          <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
           <img className="academy-shop-effect-preview__character" src={characterImage} alt="" draggable="false" />
-          <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} layer="front" />
+          <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
         </div>
         <div className="academy-shop-effect-preview__actions">
+          <div className="academy-shop-effect-preview__modes" role="group" aria-label="特效預覽模式">
+            {previewModes.map(mode => (
+              <button
+                key={mode.key}
+                type="button"
+                className={playbackMode === mode.key ? 'is-active' : ''}
+                onClick={() => {
+                  setPlaybackMode(mode.key)
+                  setReplayKey(key => key + 1)
+                }}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
           <button className="academy-small-button" onClick={() => setReplayKey(key => key + 1)}>重播</button>
-          <small>首頁實景預覽</small>
         </div>
       </motion.div>
     </motion.div>

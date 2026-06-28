@@ -1469,9 +1469,9 @@
 }
 
 .home-scene-ground--starter_magic_circle {
-  top: calc(var(--home-stage-baseline) - 30px);
+  top: calc(var(--home-stage-baseline) - 18px);
   left: 50%;
-  width: min(78vw, 420px);
+  width: min(56vw, 300px);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%) perspective(660px) rotateX(59deg);
   transform-origin: center center;
@@ -1488,6 +1488,17 @@
 
 .home-scene-ground--starter_magic_circle .home-scene-ground__reveal {
   inset: 22% 16%;
+}
+
+.home-scene-ground--success-sync .home-scene-ground__art {
+  animation:
+    home-ground-success-sync 1.05s ease-out both,
+    home-ground-art-breathe 4.8s ease-in-out 1.05s infinite;
+}
+
+.home-scene-ground--success-sync .home-scene-ground__core,
+.home-scene-ground--success-sync .home-scene-ground__reveal {
+  animation: home-ground-core-success-sync 1.05s ease-out both;
 }
 
 .home-scene-ground--starter_magic_circle .home-scene-ground__outer,
@@ -1576,10 +1587,10 @@
 
 .home-scene-summon {
   position: absolute;
-  top: calc(var(--home-stage-baseline) - 28px);
+  top: calc(var(--home-stage-baseline) - 18px);
   left: 50%;
   z-index: 5;
-  width: min(48%, 260px);
+  width: min(44%, 230px);
   height: 132px;
   translate: -50% -50%;
   pointer-events: none;
@@ -1668,7 +1679,7 @@
 .home-scene-success__asset {
   left: 50%;
   bottom: -28px;
-  width: min(104vw, 520px);
+  width: min(88vw, 430px);
   max-width: none;
   height: auto;
   translate: -50% 0;
@@ -1685,7 +1696,7 @@
 .home-scene-success__asset--front {
   z-index: 3;
   bottom: -20px;
-  width: min(92vw, 440px);
+  width: min(78vw, 370px);
   opacity: 1;
   filter: brightness(1.28) saturate(1.18) drop-shadow(0 0 10px rgba(255,220,96,.78));
 }
@@ -1881,6 +1892,33 @@
 }
 @keyframes home-ground-art-breathe {
   50% { opacity: .46; transform: scale(1.01); }
+}
+@keyframes home-ground-success-sync {
+  0% {
+    opacity: .48;
+    transform: scale(.99);
+    filter: brightness(1) drop-shadow(0 0 8px rgba(255,232,158,.22));
+  }
+  18% {
+    opacity: .88;
+    transform: scale(1.04);
+    filter: brightness(1.55) drop-shadow(0 0 18px rgba(255,232,158,.62));
+  }
+  58% {
+    opacity: .72;
+    transform: scale(1.02);
+    filter: brightness(1.24) drop-shadow(0 0 14px rgba(255,232,158,.44));
+  }
+  100% {
+    opacity: .58;
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 7px rgba(255,232,158,.28));
+  }
+}
+@keyframes home-ground-core-success-sync {
+  0% { opacity: .18; transform: scale(.96); filter: blur(12px); }
+  18% { opacity: .72; transform: scale(1.1); filter: blur(8px); }
+  100% { opacity: .22; transform: scale(1.18); filter: blur(12px); }
 }
 @keyframes home-ground-sweep {
   0%, 46% { opacity: 0; transform: translateX(0); }
