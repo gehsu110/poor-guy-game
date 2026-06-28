@@ -15,6 +15,7 @@ const SUCCESS_PARTICLES = {
 }
 
 const GROUND_GLYPHS = ['A', 'R', 'M', 'E', 'S', 'Q', 'L', 'V']
+const GROUND_LIFTS = ['one', 'two', 'three', 'four', 'five', 'six']
 
 export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse }) {
   const effects = getEquippedHomeEffects(equipped, theme)
@@ -45,6 +46,7 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
       </div>
 
       <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
+        <span className="home-scene-ground__reveal" />
         <span className="home-scene-ground__core" />
         <span className="home-scene-ground__outer" />
         <span className="home-scene-ground__ring" />
@@ -57,6 +59,12 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
             <b key={`${glyph}-${index}`} className={`home-scene-ground__glyph home-scene-ground__glyph--${index + 1}`}>
               {glyph}
             </b>
+          ))}
+        </span>
+        <span className="home-scene-ground__sweep" />
+        <span className="home-scene-ground__lift">
+          {GROUND_LIFTS.map(particle => (
+            <i key={particle} className={`home-scene-ground__lift-particle home-scene-ground__lift-particle--${particle}`} />
           ))}
         </span>
         <span className="home-scene-ground__spark home-scene-ground__spark--one" />
