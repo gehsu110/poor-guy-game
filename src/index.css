@@ -4483,6 +4483,11 @@ video.academy-screen-character {
   width: min(148%, 690px);
 }
 
+.academy-shop-effect-preview__stage .home-scene-ground--starter_magic_circle {
+  top: calc(var(--home-stage-baseline) + 8px);
+  width: min(128%, 590px);
+}
+
 .academy-shop-effect-preview__stage .home-scene-success {
   z-index: 5;
   top: calc(var(--home-stage-baseline) - 78px);

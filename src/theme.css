@@ -1456,6 +1456,29 @@
   display: block;
 }
 
+.home-scene-ground--starter_magic_circle {
+  top: calc(var(--home-stage-baseline) + 8px);
+  left: 50%;
+  width: min(112vw, 590px);
+  aspect-ratio: 1 / 1;
+  translate: -50% -50%;
+  transform: perspective(680px) rotateX(60deg);
+  transform-origin: center center;
+}
+
+.home-scene-ground--starter_magic_circle .home-scene-ground__art {
+  inset: 0;
+  background-size: contain;
+}
+
+.home-scene-ground--starter_magic_circle .home-scene-ground__core {
+  inset: 13% 9%;
+}
+
+.home-scene-ground--starter_magic_circle .home-scene-ground__reveal {
+  inset: 22% 16%;
+}
+
 .home-scene-ground--starter_magic_circle .home-scene-ground__outer,
 .home-scene-ground--starter_magic_circle .home-scene-ground__ring,
 .home-scene-ground--starter_magic_circle .home-scene-ground__inner,
