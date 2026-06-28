@@ -16,10 +16,11 @@ const SUCCESS_PARTICLES = {
 
 const GROUND_GLYPHS = ['A', 'R', 'M', 'E', 'S', 'Q', 'L', 'V']
 const GROUND_LIFTS = ['one', 'two', 'three', 'four', 'five', 'six']
+const SUCCESS_BEAMS = ['one', 'two', 'three', 'four']
+const SUCCESS_REWARDS = ['one', 'two', 'three', 'four', 'five']
 
 export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse, layer = 'all' }) {
   const effects = getEquippedHomeEffects(equipped, theme)
-  const [burstKey, setBurstKey] = useState(null)
   const [summonKey, setSummonKey] = useState(null)
   const auraParticles = AURA_PARTICLES[effects.backgroundAura] ?? []
   const successParticles = SUCCESS_PARTICLES[effects.successEffect] ?? []
@@ -27,16 +28,11 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
   const hasSuccessEffect = Boolean(effects.successEffect)
   const showBackLayer = layer !== 'front'
   const showFrontLayer = layer !== 'back'
-
-  useEffect(() => {
-    if (!successPulse || !hasSuccessEffect || !showFrontLayer) return
-    setBurstKey(successPulse)
-    const timer = window.setTimeout(() => setBurstKey(null), 1100)
-    return () => window.clearTimeout(timer)
-  }, [successPulse, hasSuccessEffect, showFrontLayer])
+  const burstKey = successPulse && hasSuccessEffect ? String(successPulse) : null
 
   useEffect(() => {
     if (!hasGroundEffect || !showFrontLayer) return
+    if (successPulse && !String(successPulse).startsWith('preview-')) return
     const key = successPulse ?? `entrance-${effects.groundEffect}`
     setSummonKey(key)
     const timer = window.setTimeout(() => setSummonKey(null), 1650)
@@ -106,10 +102,23 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
         </div>
       )}
 
+      {showBackLayer && burstKey && (
+        <div key={`back-${burstKey}`} className={`home-scene-success home-scene-success--backplane home-scene-success--${effects.successEffect}`}>
+          <span className="home-scene-success__ground-flare" />
+          <span className="home-scene-success__halo" />
+          {SUCCESS_BEAMS.map(beam => (
+            <span key={beam} className={`home-scene-success__beam home-scene-success__beam--${beam}`} />
+          ))}
+        </div>
+      )}
+
       {showFrontLayer && burstKey && hasSuccessEffect && (
-        <div key={burstKey} className={`home-scene-success home-scene-success--${effects.successEffect}`}>
+        <div key={`front-${burstKey}`} className={`home-scene-success home-scene-success--frontburst home-scene-success--${effects.successEffect}`}>
           {successParticles.map(particle => (
             <i key={particle} className={`home-scene-success__particle home-scene-success__particle--${particle}`} />
+          ))}
+          {SUCCESS_REWARDS.map(reward => (
+            <span key={reward} className={`home-scene-success__reward home-scene-success__reward--${reward}`} />
           ))}
         </div>
       )}

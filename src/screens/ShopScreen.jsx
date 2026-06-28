@@ -529,7 +529,7 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
           </div>
           <button className="academy-back" onClick={onClose}>×</button>
         </div>
-        <div className="academy-shop-effect-preview__stage">
+        <div key={`${item.id}-${replayKey}`} className="academy-shop-effect-preview__stage">
           <img className="academy-shop-effect-preview__bg" src={backgroundImage} alt="" draggable="false" />
           <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} layer="back" />
           <img className="academy-shop-effect-preview__character" src={characterImage} alt="" draggable="false" />

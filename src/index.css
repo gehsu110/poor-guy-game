@@ -4511,8 +4511,8 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage .home-scene-success {
-  z-index: 5;
-  top: calc(var(--home-stage-baseline) - 78px);
+  z-index: 8;
+  top: calc(var(--home-stage-baseline) + 6px);
 }
 
 .academy-shop-effect-preview__actions {
