@@ -569,7 +569,10 @@ export default function BattleScreen() {
   const remaining = budget - totalSpent
 
   useEffect(() => {
-    return setScreenChrome('#b9d5ff')
+    return setScreenChrome({
+      color: '#b5d2ff',
+      background: 'linear-gradient(180deg, #9fc3f5 0%, #b9d5ff 58%, #d8dcfb 100%)',
+    })
   }, [])
 
   async function handleSubmit(data) {

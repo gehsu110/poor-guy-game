@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, generateDayMonster, formatMoney } from '../gameLogic'
 import { addExpense, calcLevel, getMonthDayRecords, getMonthExpenses, setDayRecord, updateProfile } from '../firebase'
+import { setScreenChrome } from '../screenChrome'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
 import zoneAcademy from '../assets/academy-art/map-zones/week1-academy.webp'
 import zoneMarket from '../assets/academy-art/map-zones/week2-market.webp'
@@ -198,6 +199,13 @@ export default function MapScreen() {
   const routeScrollRef = useRef(null)
   const zoneRefs = useRef({})
   const autoScrolledKeyRef = useRef(null)
+
+  useEffect(() => {
+    return setScreenChrome({
+      color: '#e6f7ff',
+      background: 'linear-gradient(180deg, #dff4ff 0%, #edf9ff 52%, #fff7ec 100%)',
+    })
+  }, [])
 
   useEffect(() => {
     if (!currentZone || loadingMonth) return

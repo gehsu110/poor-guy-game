@@ -1,4 +1,6 @@
-export function setScreenChrome(color) {
+export function setScreenChrome(theme) {
+  const color = typeof theme === 'string' ? theme : theme.color
+  const background = typeof theme === 'string' ? theme : theme.background ?? theme.color
   const meta = document.querySelector('meta[name="theme-color"]')
   const previous = {
     meta: meta?.getAttribute('content'),
@@ -8,10 +10,10 @@ export function setScreenChrome(color) {
   }
 
   if (meta) meta.setAttribute('content', color)
-  document.documentElement.style.background = color
-  document.body.style.background = color
+  document.documentElement.style.background = background
+  document.body.style.background = background
   const root = document.getElementById('root')
-  if (root) root.style.background = color
+  if (root) root.style.background = background
 
   return () => {
     if (meta && previous.meta) meta.setAttribute('content', previous.meta)

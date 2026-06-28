@@ -11,11 +11,26 @@ import SpriteCharacter from '../components/SpriteCharacter'
 import { setScreenChrome } from '../screenChrome'
 
 const HOME_THEME_COLORS = {
-  academy: '#f8d9c8',
-  summer: '#d7f0f5',
-  sakura: '#e8d7ef',
-  qixi: '#232a56',
-  rainy: '#25325f',
+  academy: {
+    color: '#f8d9c8',
+    background: 'linear-gradient(180deg, #f4cdb9 0%, #f8d9c8 58%, #fff2e8 100%)',
+  },
+  summer: {
+    color: '#d7f0f5',
+    background: 'linear-gradient(180deg, #c7eef8 0%, #d7f0f5 58%, #f0fbff 100%)',
+  },
+  sakura: {
+    color: '#f2d1c2',
+    background: 'linear-gradient(180deg, #f0cdbd 0%, #f4d9cf 56%, #efd7ef 100%)',
+  },
+  qixi: {
+    color: '#232a56',
+    background: 'linear-gradient(180deg, #171f4a 0%, #232a56 58%, #596397 100%)',
+  },
+  rainy: {
+    color: '#25325f',
+    background: 'linear-gradient(180deg, #18244e 0%, #25325f 58%, #56678f 100%)',
+  },
 }
 
 function IdentityHUD({ profile }) {
