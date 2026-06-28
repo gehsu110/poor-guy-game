@@ -39,6 +39,7 @@ const init = {
   screenParams: {},
   damageNumbers: [],
   notification: null,
+  homeEffectPulse: null,
 }
 
 const DEMO_PROFILE = {
@@ -126,6 +127,8 @@ function reducer(state, action) {
       return { ...state, damageNumbers: state.damageNumbers.filter(d => d.id !== action.id) }
     case 'SET_NOTIFICATION':
       return { ...state, notification: action.notification }
+    case 'TRIGGER_HOME_SUCCESS_EFFECT':
+      return { ...state, homeEffectPulse: action.id ?? Date.now() }
     case 'UPDATE_PROFILE':
       return { ...state, profile: { ...state.profile, ...action.data } }
     default:
@@ -286,6 +289,7 @@ export function AppProvider({ children }) {
     const { damage, mult } = calcDamage(numericAmount, state.totalSpent, budget)
     const nextExpenses = [...state.expenses, expenseWithId]
     dispatch({ type: 'RECALC_DAY', expenses: nextExpenses, dayRecord: { defeated: Math.max(0, state.currentHp - damage) <= 0 } })
+    dispatch({ type: 'TRIGGER_HOME_SUCCESS_EFFECT', id: Date.now() + Math.random() })
 
     const damageId = Date.now() + Math.random()
     dispatch({

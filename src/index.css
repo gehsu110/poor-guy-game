@@ -4296,12 +4296,80 @@ video.academy-screen-character {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.58);
 }
 
+.academy-shop-homefx-preview {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,211,95,0.16), transparent 35%),
+    linear-gradient(135deg, rgba(255,255,255,0.78), rgba(244,249,255,0.76));
+}
+
+.academy-shop-homefx-preview__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.academy-shop-homefx-demo {
+  --home-stage-baseline: 76px;
+  position: relative;
+  min-height: 118px;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,238,169,.24), transparent 36%),
+    linear-gradient(180deg, rgba(252,244,232,.92), rgba(232,225,255,.72));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.56);
+}
+
+.academy-shop-homefx-demo--sakura {
+  background:
+    radial-gradient(circle at 50% 14%, rgba(255,220,178,.18), transparent 34%),
+    linear-gradient(180deg, rgba(58,42,86,.88), rgba(143,78,100,.62));
+}
+
+.academy-shop-homefx-demo--rainy {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(255,220,142,.18), transparent 34%),
+    linear-gradient(180deg, rgba(34,48,91,.88), rgba(48,102,108,.62));
+}
+
+.academy-shop-homefx-demo .home-scene-effects {
+  transform: scale(.82);
+  transform-origin: center bottom;
+}
+
+.academy-shop-homefx-demo .home-scene-success {
+  top: calc(var(--home-stage-baseline) - 16px);
+}
+
+.academy-shop-homefx-demo > span {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  z-index: 3;
+  overflow: hidden;
+  border-radius: 999px;
+  padding: 5px 7px;
+  color: #27304a;
+  background: rgba(255,252,245,.78);
+  font-size: 10px;
+  font-weight: 1000;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.48);
+}
+
 .academy-small-button .academy-resource-amount {
   border-color: rgba(255,255,255,0.34);
   background: rgba(255,255,255,0.34);
 }
 
 @media (max-width: 380px) {
+  .academy-shop-homefx-preview__grid {
+    grid-template-columns: 1fr;
+  }
+
   .academy-shop-wallet {
     grid-template-columns: 1fr;
   }

@@ -4,7 +4,9 @@ import { useApp } from '../useAppStore'
 import { updateProfile } from '../firebase'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
+import HomeSceneEffects from '../components/HomeSceneEffects'
 import { getOutfitAssets } from '../outfitAssets'
+import { HOME_EFFECT_TYPE_LABELS, flattenHomeSceneEffects } from '../homeSceneEffects'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
 
@@ -27,9 +29,28 @@ const GACHA_POOL = [
 const EXCHANGE_CATEGORIES = [
   { key: 'all', label: '全部' },
   { key: 'utility', label: '功能' },
+  { key: 'homefx', label: '主頁特效' },
   { key: 'collection', label: '收藏' },
   { key: 'identity', label: '身份' },
 ]
+
+const HOME_EFFECT_EXCHANGE_ITEMS = flattenHomeSceneEffects().map(effect => ({
+  id: effect.id,
+  type: effect.type,
+  category: 'homefx',
+  name: effect.name,
+  source: HOME_EFFECT_TYPE_LABELS[effect.type],
+  place: effect.type === 'backgroundAura'
+    ? '主頁背景氛圍'
+    : effect.type === 'groundEffect'
+      ? '主頁角色腳下'
+      : '記帳成功觸發',
+  costType: effect.costType,
+  cost: effect.cost,
+  rarity: effect.rarity,
+  color: effect.color,
+  iconKey: effect.iconKey,
+}))
 
 const EXCHANGE_ITEMS = [
   { id: 'normal_ticket_pack', type: 'resource', category: 'utility', name: '一般補給券', source: '補給池抽取', place: '補給池', costType: 'yellow', cost: 3, reward: { normalTicket: 1 }, rarity: 'R', color: '#FFDDE8', iconKey: 'ticket' },
@@ -39,7 +60,7 @@ const EXCHANGE_ITEMS = [
   { id: 'bg_mint', type: 'background', category: 'collection', name: '薄荷晨光背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'bg_ribbon', type: 'background', category: 'collection', name: '緞帶學園背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'fx_slash_direct', type: 'effect', category: 'collection', name: '星軌斬擊特效', source: '攻擊特效', place: '戰鬥 / 記帳攻擊', costType: 'yellow', cost: 5, rarity: 'R', color: '#A8D8EA', iconKey: 'crystal' },
-  { id: 'circle_starter', type: 'magicCircle', category: 'collection', name: '星砂腳底魔法圈', source: '角色舞台特效', place: '主頁角色腳下', costType: 'yellow', cost: 7, rarity: 'R', color: '#FFE4A0', iconKey: 'star', disabled: true },
+  ...HOME_EFFECT_EXCHANGE_ITEMS,
   { id: 'badge_budget_clear', type: 'settlementBadge', category: 'collection', name: '預算達成徽章', source: '結算徽章', place: '每日結算 / 地圖戰報', costType: 'purple', cost: 2, rarity: 'SR', color: '#A8E6CF', iconKey: 'coin', disabled: true },
   { id: 'mint_supply_set', type: 'set', category: 'collection', name: '薄荷補給套裝', source: '普通商店套裝', place: '造型收藏', costType: 'yellow', cost: 12, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'pink_magic_set', type: 'set', category: 'collection', name: '粉晶魔法套裝', source: '普通商店套裝', place: '造型收藏', costType: 'purple', cost: 6, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
@@ -97,6 +118,9 @@ const TYPE_LABELS = {
   magicCircle: '腳底魔法圈',
   settlementBadge: '結算徽章',
   playerBadge: '玩家徽章',
+  backgroundAura: '背景氛圍',
+  groundEffect: '地面舞台',
+  successEffect: '記帳成功',
 }
 
 const RESOURCE_ICON = {
@@ -397,6 +421,58 @@ function UtilityPresentationPreview() {
             <small>消費 NT$320 / 預算 NT$1,000</small>
           </div>
         </div>
+      </div>
+    </section>
+  )
+}
+
+function HomeEffectsPresentationPreview() {
+  const demos = [
+    {
+      key: 'academy',
+      label: '學院展示',
+      equipped: {
+        backgroundAura: 'academy_stardust',
+        groundEffect: 'starter_magic_circle',
+        successEffect: 'coin_spark_burst',
+      },
+    },
+    {
+      key: 'sakura',
+      label: '櫻燈祭典',
+      equipped: {
+        backgroundAura: 'sakura_petals',
+        groundEffect: 'sakura_lantern_ring',
+        successEffect: 'coin_spark_burst',
+      },
+    },
+    {
+      key: 'rainy',
+      label: '雨後偵探',
+      equipped: {
+        backgroundAura: 'rainy_afterglow',
+        groundEffect: 'rainy_puddle_shimmer',
+        successEffect: 'ticket_glow_burst',
+      },
+    },
+  ]
+
+  return (
+    <section className="academy-shop-section academy-shop-homefx-preview">
+      <div className="academy-shop-section__head">
+        <div>
+          <b>主頁特效樣張</b>
+          <small>兌換後可裝備到首頁展示層</small>
+        </div>
+        <span className="academy-status">可裝備</span>
+      </div>
+      <div className="academy-shop-homefx-preview__grid">
+        {demos.map(demo => (
+          <div key={demo.key} className={`academy-shop-homefx-demo academy-shop-homefx-demo--${demo.key}`}>
+            <HomeSceneEffects theme={demo.key} equipped={demo.equipped} successPulse={`shop-${demo.key}`} />
+            <span>{demo.label}</span>
+          </div>
+        ))}
       </div>
     </section>
   )
@@ -753,6 +829,7 @@ export default function ShopScreen() {
           <div className="flex flex-col gap-2">
             <RewardPreview />
             {exchangeCategory === 'utility' && <UtilityPresentationPreview />}
+            {exchangeCategory === 'homefx' && <HomeEffectsPresentationPreview />}
             <section className="academy-shop-section">
               <div className="academy-shop-section__head">
                 <div>

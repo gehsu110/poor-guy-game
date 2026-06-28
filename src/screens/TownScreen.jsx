@@ -8,6 +8,7 @@ import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
+import HomeSceneEffects from '../components/HomeSceneEffects'
 import { setScreenChrome } from '../screenChrome'
 
 const HOME_THEME_COLORS = {
@@ -101,48 +102,7 @@ export default function TownScreen() {
       {/* 全螢幕背景 */}
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
-      {bgTheme === 'summer' && (
-        <div className="summer-scene" aria-hidden="true">
-          <span className="summer-cloud summer-cloud--one" />
-          <span className="summer-cloud summer-cloud--two" />
-          <span className="summer-sun-glow" />
-          <i className="summer-spark summer-spark--one" />
-          <i className="summer-spark summer-spark--two" />
-          <i className="summer-spark summer-spark--three" />
-        </div>
-      )}
-      {bgTheme === 'sakura' && (
-        <div className="sakura-scene" aria-hidden="true">
-          <span className="sakura-moon-glow" />
-          <span className="sakura-ground-shadow" />
-          <i className="sakura-petal sakura-petal--one" />
-          <i className="sakura-petal sakura-petal--two" />
-          <i className="sakura-petal sakura-petal--three" />
-          <i className="sakura-petal sakura-petal--four" />
-        </div>
-      )}
-      {bgTheme === 'qixi' && (
-        <div className="qixi-scene" aria-hidden="true">
-          <span className="qixi-galaxy-glow" />
-          <span className="qixi-ground-shadow" />
-          <i className="qixi-star qixi-star--one" />
-          <i className="qixi-star qixi-star--two" />
-          <i className="qixi-star qixi-star--three" />
-          <i className="qixi-thread qixi-thread--one" />
-          <i className="qixi-thread qixi-thread--two" />
-        </div>
-      )}
-      {bgTheme === 'rainy' && (
-        <div className="rainy-scene" aria-hidden="true">
-          <span className="rainy-lantern-glow" />
-          <span className="rainy-ground-shadow" />
-          <i className="rainy-drop rainy-drop--one" />
-          <i className="rainy-drop rainy-drop--two" />
-          <i className="rainy-drop rainy-drop--three" />
-          <i className="rainy-drop rainy-drop--four" />
-          <i className="rainy-drop rainy-drop--five" />
-        </div>
-      )}
+      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} />
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
       {video ? (
         <ChromaKeyCanvas
