@@ -1448,8 +1448,8 @@ video.academy-screen-character {
   display: flex;
   position: relative;
   z-index: 3;
-  width: min(98vw, 392px);
-  height: 386px;
+  width: min(106vw, 430px);
+  height: 432px;
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 14px 18px rgba(93,72,130,0.2));
@@ -1488,14 +1488,14 @@ video.academy-screen-character {
 }
 
 .academy-category--compact {
-  min-width: 66px;
-  min-height: 48px;
-  border-radius: 16px;
+  min-width: 60px;
+  min-height: 42px;
+  border-radius: 15px;
 }
 
 .academy-category--compact .academy-category-symbol {
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
   border-radius: 8px;
 }
 
@@ -1525,7 +1525,7 @@ video.academy-screen-character {
 .academy-battle-arena {
   position: relative;
   display: flex;
-  height: 430px;
+  height: 496px;
   flex-direction: column;
   justify-content: stretch;
   padding-top: 0;
@@ -1718,8 +1718,8 @@ video.academy-screen-character {
 
 .academy-battle-monster-art {
   display: block;
-  width: min(98vw, 392px);
-  height: 386px;
+  width: min(106vw, 430px);
+  height: 432px;
   object-fit: contain;
   object-position: center bottom;
   filter: drop-shadow(0 12px 12px rgba(86,74,130,0.2));
@@ -1893,9 +1893,9 @@ video.academy-screen-character {
 .academy-battle-panel {
   position: relative;
   z-index: 6;
-  margin-top: -8px;
-  padding: 8px;
-  border-radius: 24px;
+  margin-top: -28px;
+  padding: 7px;
+  border-radius: 22px;
   border: 1px solid rgba(255,255,255,0.72);
   background: rgba(255,250,246,0.90);
   box-shadow: 0 14px 34px rgba(86,74,130,0.16);
@@ -1905,7 +1905,7 @@ video.academy-screen-character {
 .academy-battle-pad {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .academy-battle-panel-head {
@@ -1922,14 +1922,14 @@ video.academy-screen-character {
 
 .academy-battle-panel-head b {
   color: #26324a;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 1000;
 }
 
 .academy-battle-panel-head small {
   margin-top: 1px;
   color: #8e87a8;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 850;
 }
 
@@ -1950,7 +1950,7 @@ video.academy-screen-character {
 
 @media (max-height: 760px) {
   .academy-battle-arena {
-    height: 348px;
+    height: 392px;
   }
 
   .academy-battle-stage__title {
@@ -1962,18 +1962,18 @@ video.academy-screen-character {
   }
 
   .academy-battle-monster {
-    width: min(94vw, 338px);
-    height: 318px;
+    width: min(102vw, 374px);
+    height: 356px;
   }
 
   .academy-battle-monster-art {
-    width: min(94vw, 330px);
-    height: 318px;
+    width: min(102vw, 366px);
+    height: 356px;
   }
 
   .academy-category--compact {
-    min-width: 58px;
-    min-height: 42px;
+    min-width: 56px;
+    min-height: 38px;
   }
 
   .academy-key {
@@ -1984,16 +1984,16 @@ video.academy-screen-character {
 .academy-battle-entry-row {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  gap: 7px;
+  gap: 6px;
   align-items: stretch;
 }
 
 .academy-battle-amount {
   min-width: 0;
-  border-radius: 18px;
+  border-radius: 16px;
   border: 1px solid #eadff7;
   background: rgba(255,255,255,0.78);
-  padding: 5px 9px;
+  padding: 4px 8px;
   text-align: right;
 }
 
@@ -2009,7 +2009,7 @@ video.academy-screen-character {
   width: min(100%, 112px);
   background: transparent;
   color: #26324a;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 1000;
   text-align: right;
   outline: none;
@@ -2018,13 +2018,13 @@ video.academy-screen-character {
 .academy-battle-actions {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: 7px;
+  gap: 6px;
 }
 
 .academy-calculator-toggle,
 .academy-battle-submit {
-  min-height: 40px;
-  border-radius: 16px;
+  min-height: 36px;
+  border-radius: 15px;
   font-size: 12px;
   font-weight: 1000;
 }

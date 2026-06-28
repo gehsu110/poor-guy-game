@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, generateDayMonster, formatMoney } from '../gameLogic'
@@ -195,6 +195,27 @@ export default function MapScreen() {
   const [savingBackfill, setSavingBackfill] = useState(false)
   const [showMapHelp, setShowMapHelp] = useState(false)
   const [claimingWeek, setClaimingWeek] = useState(null)
+  const routeScrollRef = useRef(null)
+  const zoneRefs = useRef({})
+  const autoScrolledKeyRef = useRef(null)
+
+  useEffect(() => {
+    if (!currentZone || loadingMonth) return
+    const key = `${year}-${month}-${currentZone.key}`
+    if (autoScrolledKeyRef.current === key) return
+    autoScrolledKeyRef.current = key
+    window.setTimeout(() => {
+      const container = routeScrollRef.current
+      const target = zoneRefs.current[currentZone.key]
+      if (!container || !target) return
+      const containerTop = container.getBoundingClientRect().top
+      const targetTop = target.getBoundingClientRect().top
+      container.scrollTo({
+        top: container.scrollTop + targetTop - containerTop - 12,
+        behavior: 'smooth',
+      })
+    }, 180)
+  }, [currentZone, loadingMonth, month, year])
 
   async function submitBackfill() {
     if (!user || !selected) return
@@ -293,7 +314,7 @@ export default function MapScreen() {
       </div>
 
       {/* 地圖主體 */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
+      <div ref={routeScrollRef} className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
         <div className="academy-map-report mb-3">
           <div className="academy-map-report__head">
             <div>
@@ -343,6 +364,9 @@ export default function MapScreen() {
               return (
             <section
               key={zone.key}
+              ref={node => {
+                if (node) zoneRefs.current[zone.key] = node
+              }}
               className={`academy-map-zone academy-map-zone--${zone.key}`}
               style={{ '--zone-image': `url(${zone.bg})` }}
             >
