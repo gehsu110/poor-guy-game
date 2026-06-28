@@ -4484,8 +4484,8 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage .home-scene-ground--starter_magic_circle {
-  top: calc(var(--home-stage-baseline) + 8px);
-  width: min(128%, 590px);
+  top: calc(var(--home-stage-baseline) - 34px);
+  width: min(112%, 500px);
 }
 
 .academy-shop-effect-preview__stage .home-scene-success {
