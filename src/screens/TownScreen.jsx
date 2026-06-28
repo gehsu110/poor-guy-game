@@ -8,6 +8,7 @@ import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
+import { setScreenChrome } from '../screenChrome'
 
 const HOME_THEME_COLORS = {
   academy: '#f8d9c8',
@@ -77,13 +78,7 @@ export default function TownScreen() {
   const { bg, frames, blink, image, video, bgTheme } = getOutfitAssets(outfitId, gender)
 
   useEffect(() => {
-    const meta = document.querySelector('meta[name="theme-color"]')
-    if (!meta) return undefined
-    const previous = meta.getAttribute('content')
-    meta.setAttribute('content', HOME_THEME_COLORS[bgTheme] ?? HOME_THEME_COLORS.academy)
-    return () => {
-      if (previous) meta.setAttribute('content', previous)
-    }
+    return setScreenChrome(HOME_THEME_COLORS[bgTheme] ?? HOME_THEME_COLORS.academy)
   }, [bgTheme])
 
   return (

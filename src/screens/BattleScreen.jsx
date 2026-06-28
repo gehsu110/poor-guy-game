@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
@@ -13,6 +13,7 @@ import monsterCat from '../assets/academy-art/generated/monster-cat.png'
 import monsterWeekend from '../assets/academy-art/generated/monster-weekend.png'
 import monsterSunday from '../assets/academy-art/generated/monster-sunday.png'
 import monsterMonth from '../assets/academy-art/generated/monster-month.png'
+import { setScreenChrome } from '../screenChrome'
 
 const MONSTER_ART = {
   slime: monsterSlime,
@@ -566,6 +567,10 @@ export default function BattleScreen() {
   const budget = profile?.dailyBudget ?? 1000
   const categories = [...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])]
   const remaining = budget - totalSpent
+
+  useEffect(() => {
+    return setScreenChrome('#b9d5ff')
+  }, [])
 
   async function handleSubmit(data) {
     const spentBase = editingExpense ? totalSpent - Number(editingExpense.amount ?? 0) : totalSpent
