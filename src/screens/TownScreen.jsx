@@ -1,13 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
+import { COLLECTIBLE_TITLES, getTitle } from '../gameLogic'
 import { getOutfitAssets } from '../outfitAssets'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
+
+const HOME_THEME_COLORS = {
+  academy: '#f8d9c8',
+  summer: '#d7f0f5',
+  sakura: '#e8d7ef',
+  qixi: '#232a56',
+  rainy: '#25325f',
+}
 
 function IdentityHUD({ profile }) {
   const title = profile ? getTitle(profile.level) : null
@@ -61,46 +69,23 @@ function HeroShowcase({ hasVideo, onWardrobeClick }) {
   )
 }
 
-function AttackEntry({ spent, budget, onClick }) {
-  const remaining = budget - spent
-  const attackPower = Math.max(0, Math.round(spent / 10))
-  return (
-    <motion.button
-      className="academy-attack-panel"
-      onClick={onClick}
-      whileTap={{ scale: 0.985 }}
-      initial={{ y: 18, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-    >
-      <div className="academy-attack-summary">
-        <div>
-          <small>今日消費</small>
-          <strong>NT${formatMoney(spent)}</strong>
-        </div>
-        <div className="academy-attack-summary__power">
-          <small>今日攻擊力</small>
-          <strong>+{attackPower}</strong>
-        </div>
-        <div className={remaining < 0 ? 'is-danger' : 'is-safe'}>
-          <small>{remaining < 0 ? '今日已超支' : '今日可用預算'}</small>
-          <strong>NT${formatMoney(Math.abs(remaining))}</strong>
-        </div>
-      </div>
-      <div className="academy-attack-hint">記下一筆消費，轉化為今日攻擊力</div>
-      <div className="academy-primary-cta mt-2 px-4 py-3 text-center text-sm font-black">
-        立即記帳
-      </div>
-    </motion.button>
-  )
-}
-
 export default function TownScreen() {
   const { state, navigate } = useApp()
-  const { profile, totalSpent } = state
-  const budget   = profile?.dailyBudget ?? 1000
+  const { profile } = state
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
   const { bg, frames, blink, image, video, bgTheme } = getOutfitAssets(outfitId, gender)
+
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (!meta) return undefined
+    const previous = meta.getAttribute('content')
+    meta.setAttribute('content', HOME_THEME_COLORS[bgTheme] ?? HOME_THEME_COLORS.academy)
+    return () => {
+      if (previous) meta.setAttribute('content', previous)
+    }
+  }, [bgTheme])
+
   return (
     <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`}>
       {/* 全螢幕背景 */}
@@ -187,7 +172,6 @@ export default function TownScreen() {
 
       <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pt-2">
         <HeroShowcase onWardrobeClick={() => navigate('profile', { tab: 'wardrobe' })} />
-        <AttackEntry spent={totalSpent} budget={budget} onClick={() => navigate('battle')} />
       </div>
 
       <BottomNav current="town" navigate={navigate} />
@@ -205,8 +189,8 @@ export function BottomNav({ current, navigate }) {
     { key: 'menu', label: '選單', icon: 'tab-menu', menu: true, activeKeys: ['shop', 'quest'] },
   ]
   const menuItems = [
-    { key: 'shop', label: '補給', desc: '商店與兌換', icon: 'shop', target: 'shop' },
-    { key: 'quest', label: '公會', desc: '公會帳本', icon: 'guild', target: 'quest' },
+    { key: 'shop', label: '商店', desc: '道具與兌換', icon: 'tab-supply', target: 'shop' },
+    { key: 'quest', label: '公會', desc: '公會帳本', icon: 'tab-guild', target: 'quest' },
     { key: 'report', label: '月報', desc: '月度戰報', icon: 'report', target: 'map', params: { panel: 'report' } },
     { key: 'settings', label: '設定', desc: '提醒與偏好', icon: 'settings', target: 'profile', params: { tab: 'settings' } },
   ]

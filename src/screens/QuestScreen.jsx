@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { calcLevel, updateProfile } from '../firebase'
-import { BottomNav } from './TownScreen'
 import guildBg from '../assets/academy-art/guild-bg.webp'
 import { formatMoney, getTitle } from '../gameLogic'
 
@@ -452,7 +451,6 @@ export default function QuestScreen() {
         </div>
       </div>
 
-      <BottomNav current="quest" navigate={navigate} />
     </div>
   )
 }

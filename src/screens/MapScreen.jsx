@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, generateDayMonster, formatMoney } from '../gameLogic'
 import { addExpense, getMonthDayRecords, getMonthExpenses, setDayRecord } from '../firebase'
-import { BottomNav } from './TownScreen'
 import monsterSprites from '../assets/academy-art/monster-sprites.png'
 import zoneAcademy from '../assets/academy-art/map-zones/week1-academy.webp'
 import zoneMarket from '../assets/academy-art/map-zones/week2-market.webp'
@@ -438,7 +437,6 @@ export default function MapScreen() {
         </motion.div>
       )}
 
-      <BottomNav current="map" navigate={navigate} />
     </div>
   )
 }

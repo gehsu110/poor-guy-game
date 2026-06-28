@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
-import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
 import battleBg from '../assets/academy-art/home-bg.webp'
 import monsterSlime from '../assets/academy-art/generated/monster-slime.png'
@@ -669,7 +668,6 @@ export default function BattleScreen() {
         onDelete={deleteExpenseEntry}
       />
 
-      <BottomNav current="battle" navigate={navigate} />
     </div>
   )
 }

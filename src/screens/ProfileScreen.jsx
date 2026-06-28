@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, getTitle, TITLES, formatMoney } from '../gameLogic'
 import { loginWithGoogle, updateProfile } from '../firebase'
-import { BottomNav } from './TownScreen'
 import Avatar from '../components/Avatar'
 import { OUTFIT_CONFIG, getOutfitAssets } from '../outfitAssets'
 import profileBg from '../assets/academy-art/profile-bg.webp'
@@ -122,7 +121,7 @@ const WARDROBE_SETS = [
     frame: 'crystal',
     owned: false,
     rarity: 'R',
-    series: '補給商店',
+    series: '商店',
     source: '黃星兌換',
     tags: ['locked'],
   },
@@ -691,7 +690,7 @@ export default function ProfileScreen() {
               />
               <SettingRow
                 label="新手教學"
-                note="重新查看今日、地圖、任務、補給、公會與設定入口說明。"
+                note="重新查看今日、地圖、任務、商店、公會與設定入口說明。"
                 action={<button className="academy-inline-action" onClick={replayOnboarding}>重看</button>}
               />
             </SettingSection>
@@ -699,7 +698,6 @@ export default function ProfileScreen() {
         )}
       </div>
 
-      <BottomNav current="profile" navigate={navigate} />
     </div>
   )
 }

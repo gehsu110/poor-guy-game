@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { updateProfile, calcLevel } from '../firebase'
-import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
 import missionBg from '../assets/academy-art/profile-bg.webp'
 import { buildQixiActivityMissions } from '../events/qixi2026'
@@ -379,7 +378,6 @@ export default function MissionScreen() {
         </section>
       </div>
 
-      <BottomNav current="missions" navigate={navigate} />
     </div>
   )
 }

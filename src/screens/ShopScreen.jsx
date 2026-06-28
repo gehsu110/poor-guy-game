@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { updateProfile } from '../firebase'
-import { BottomNav } from './TownScreen'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import { getOutfitAssets } from '../outfitAssets'
@@ -512,7 +511,7 @@ export default function ShopScreen() {
     } catch (e) {
       console.error(e)
       dispatch({ type: 'UPDATE_PROFILE', data: { stars, tickets, shop: shopState } })
-      notify('每日補給同步失敗，請稍後再試。')
+      notify('每日商品同步失敗，請稍後再試。')
     }
   }
 
@@ -589,7 +588,7 @@ export default function ShopScreen() {
 
       <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
         <button className="academy-back" onClick={() => navigate('town')}>←</button>
-        <div className="flex-1 text-center text-sm font-black text-[#26324A]">補給商店</div>
+        <div className="flex-1 text-center text-sm font-black text-[#26324A]">商店</div>
         <div className="w-10" />
       </div>
 
@@ -605,7 +604,7 @@ export default function ShopScreen() {
         </div>
         <div className="academy-tabs academy-shop-tabs mb-3">
           <button className={tab === 'daily' ? 'is-active' : ''} onClick={() => setTab('daily')}>每日</button>
-          <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>補給</button>
+          <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>抽獎</button>
           <button className={tab === 'exchange' ? 'is-active' : ''} onClick={() => setTab('exchange')}>兌換</button>
           <button className={tab === 'collection' ? 'is-active' : ''} onClick={() => setTab('collection')}>收藏</button>
         </div>
@@ -618,9 +617,9 @@ export default function ShopScreen() {
               <div className="academy-shop-hero">
                 <ShopSprite name="keeper" />
                 <div>
-                  <div className="text-base font-black text-[#26324A]">學院補給櫃台</div>
+                  <div className="text-base font-black text-[#26324A]">學院商店櫃台</div>
                   <div className="mt-1 text-xs font-bold leading-5 text-[#8E87A8]">
-                    每日補給只提供資源與抽獎券；完整節日套裝保留給活動任務線。
+                    每日商品只提供資源與抽獎券；完整節日套裝保留給活動任務線。
                   </div>
                 </div>
               </div>
@@ -629,7 +628,7 @@ export default function ShopScreen() {
             <section className="academy-shop-section">
               <div className="academy-shop-section__head">
                 <div>
-                  <b>每日補給</b>
+                  <b>每日商品</b>
                   <small>{today}</small>
                 </div>
                 <span className="academy-status">{dailyClaims.length}/{DAILY_SUPPLIES.length}</span>
@@ -667,8 +666,8 @@ export default function ShopScreen() {
                 <ShopSprite name="box" />
                 <div>
                   <b>一般補給箱</b>
-                  <p>用任務與每日補給拿到的一般券抽常駐特效、稱號、頭像框與普通套裝。</p>
-                  <button className="academy-small-button" onClick={() => setTab('gacha')}>前往補給</button>
+                  <p>用任務與每日商品拿到的一般券抽常駐特效、稱號、頭像框與普通套裝。</p>
+                  <button className="academy-small-button" onClick={() => setTab('gacha')}>前往抽獎</button>
                 </div>
               </div>
             </section>
@@ -824,7 +823,6 @@ export default function ShopScreen() {
         {gachaResult && <GachaResult results={gachaResult} onClose={() => setGachaResult(null)} />}
       </AnimatePresence>
 
-      <BottomNav current="shop" navigate={navigate} />
     </div>
   )
 }
