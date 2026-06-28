@@ -17,37 +17,41 @@ const SUCCESS_PARTICLES = {
 const GROUND_GLYPHS = ['A', 'R', 'M', 'E', 'S', 'Q', 'L', 'V']
 const GROUND_LIFTS = ['one', 'two', 'three', 'four', 'five', 'six']
 
-export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse }) {
+export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse, layer = 'all' }) {
   const effects = getEquippedHomeEffects(equipped, theme)
   const [burstKey, setBurstKey] = useState(null)
   const auraParticles = AURA_PARTICLES[effects.backgroundAura] ?? []
   const successParticles = SUCCESS_PARTICLES[effects.successEffect] ?? []
   const hasGroundEffect = Boolean(effects.groundEffect)
   const hasSuccessEffect = Boolean(effects.successEffect)
+  const showBackLayer = layer !== 'front'
+  const showFrontLayer = layer !== 'back'
 
   useEffect(() => {
-    if (!successPulse || !hasSuccessEffect) return
+    if (!successPulse || !hasSuccessEffect || !showFrontLayer) return
     setBurstKey(successPulse)
     const timer = window.setTimeout(() => setBurstKey(null), 1100)
     return () => window.clearTimeout(timer)
-  }, [successPulse, hasSuccessEffect])
+  }, [successPulse, hasSuccessEffect, showFrontLayer])
 
   return (
     <div
-      className="home-scene-effects"
+      className={`home-scene-effects home-scene-effects--${layer}`}
       data-theme={theme}
       data-background-aura={effects.backgroundAura}
       data-ground-effect={effects.groundEffect}
       data-success-effect={effects.successEffect}
       aria-hidden="true"
     >
-      <div className={`home-scene-aura home-scene-aura--${effects.backgroundAura}`}>
-        {auraParticles.map(particle => (
-          <i key={particle} className={`home-scene-aura__particle home-scene-aura__particle--${particle}`} />
-        ))}
-      </div>
+      {showBackLayer && (
+        <div className={`home-scene-aura home-scene-aura--${effects.backgroundAura}`}>
+          {auraParticles.map(particle => (
+            <i key={particle} className={`home-scene-aura__particle home-scene-aura__particle--${particle}`} />
+          ))}
+        </div>
+      )}
 
-      {hasGroundEffect && (
+      {showBackLayer && hasGroundEffect && (
         <>
           <div className={`home-scene-ground home-scene-ground--${effects.groundEffect}`}>
             <span className="home-scene-ground__reveal" />
@@ -79,18 +83,21 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
             <span className="home-scene-ground__spark home-scene-ground__spark--two" />
             <span className="home-scene-ground__spark home-scene-ground__spark--three" />
           </div>
-          <div className={`home-scene-summon home-scene-summon--${effects.groundEffect}`}>
-            <span className="home-scene-summon__flare" />
-            <span className="home-scene-summon__ring home-scene-summon__ring--one" />
-            <span className="home-scene-summon__ring home-scene-summon__ring--two" />
-            {GROUND_LIFTS.slice(0, 4).map(particle => (
-              <i key={particle} className={`home-scene-summon__spark home-scene-summon__spark--${particle}`} />
-            ))}
-          </div>
         </>
       )}
 
-      {burstKey && hasSuccessEffect && (
+      {showFrontLayer && hasGroundEffect && (
+        <div className={`home-scene-summon home-scene-summon--${effects.groundEffect}`}>
+          <span className="home-scene-summon__flare" />
+          <span className="home-scene-summon__ring home-scene-summon__ring--one" />
+          <span className="home-scene-summon__ring home-scene-summon__ring--two" />
+          {GROUND_LIFTS.slice(0, 4).map(particle => (
+            <i key={particle} className={`home-scene-summon__spark home-scene-summon__spark--${particle}`} />
+          ))}
+        </div>
+      )}
+
+      {showFrontLayer && burstKey && hasSuccessEffect && (
         <div key={burstKey} className={`home-scene-success home-scene-success--${effects.successEffect}`}>
           {successParticles.map(particle => (
             <i key={particle} className={`home-scene-success__particle home-scene-success__particle--${particle}`} />

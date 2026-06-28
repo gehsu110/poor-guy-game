@@ -89,27 +89,42 @@ function HeroShowcase({ hasVideo, onWardrobeClick }) {
 export default function TownScreen() {
   const { state, navigate } = useApp()
   const { profile } = state
+  const [characterCue, setCharacterCue] = useState(null)
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
   const { bg, frames, blink, image, video, bgTheme } = getOutfitAssets(outfitId, gender)
+  const hasGroundEffect = Boolean(profile?.equipped?.groundEffect)
+  const characterClass = [
+    'academy-screen-character',
+    'academy-screen-character--tap',
+    hasGroundEffect ? 'academy-screen-character--grounded' : '',
+    characterCue ? 'academy-screen-character--celebrate' : '',
+  ].filter(Boolean).join(' ')
 
   useEffect(() => {
     return setScreenChrome(HOME_THEME_COLORS[bgTheme] ?? HOME_THEME_COLORS.academy)
   }, [bgTheme])
+
+  useEffect(() => {
+    if (!state.homeEffectPulse) return
+    setCharacterCue(state.homeEffectPulse)
+    const timer = window.setTimeout(() => setCharacterCue(null), 900)
+    return () => window.clearTimeout(timer)
+  }, [state.homeEffectPulse])
 
   return (
     <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`}>
       {/* 全螢幕背景 */}
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
-      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} />
+      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="back" />
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
       {video ? (
         <ChromaKeyCanvas
           src={video}
           keyColor={[0, 255, 0]}
           threshold={130}
-          className="academy-screen-character academy-screen-character--tap"
+          className={characterClass}
         />
       ) : frames?.length > 0 ? (
         <SpriteCharacter
@@ -117,7 +132,7 @@ export default function TownScreen() {
           blink={blink ?? []}
           fps={4}
           blinkInterval={3500}
-          className="academy-screen-character academy-screen-character--tap"
+          className={characterClass}
         />
       ) : image ? (
         <motion.img
@@ -125,16 +140,17 @@ export default function TownScreen() {
           src={image}
           alt=""
           draggable="false"
-          className="academy-screen-character academy-screen-character--tap"
+          className={characterClass}
           initial={{ opacity: 0, x: '-50%', y: 24, scale: 0.92 }}
-          animate={{ opacity: 1, x: '-50%', y: 0, scale: 1 }}
+          animate={{ opacity: 1, x: '-50%', y: characterCue ? -8 : 0, scale: characterCue ? 1.035 : 1 }}
           transition={{
             opacity: { duration: 0.5 },
-            scale:   { duration: 0.5 },
-            y: { duration: 0.5, ease: 'easeOut' },
+            scale:   { duration: characterCue ? 0.18 : 0.45 },
+            y: { duration: characterCue ? 0.18 : 0.45, ease: 'easeOut' },
           }}
         />
       ) : null}
+      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="front" />
       {/* UI 層（z-10，疊在角色上） */}
       <div className="academy-safe-top relative z-10 px-4">
         <IdentityHUD profile={profile} />

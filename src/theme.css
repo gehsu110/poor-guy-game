@@ -466,13 +466,13 @@
 }
 
 .academy-screen--academy .academy-screen-character {
-  top: 238px;
+  top: 262px;
   width: 66vw;
   max-width: 260px;
 }
 
 .academy-screen--academy img.academy-screen-character[src*="home-hero-boy-v2"] {
-  top: 158px;
+  top: 182px;
   width: 48vw;
   max-width: 190px;
 }
@@ -1088,7 +1088,7 @@
   --home-stage-baseline: min(71vh, 572px);
 }
 
-.academy-screen--academy { --home-stage-baseline: min(70vh, 570px); }
+.academy-screen--academy { --home-stage-baseline: min(73vh, 594px); }
 .academy-screen--summer { --home-stage-baseline: min(70vh, 572px); }
 .academy-screen--sakura,
 .academy-screen--qixi,
@@ -1100,6 +1100,14 @@
   z-index: 2;
   overflow: hidden;
   pointer-events: none;
+}
+
+.home-scene-effects--back {
+  z-index: 2;
+}
+
+.home-scene-effects--front {
+  z-index: 21;
 }
 
 .home-scene-aura {

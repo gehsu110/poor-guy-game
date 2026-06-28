@@ -531,8 +531,9 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
         </div>
         <div className="academy-shop-effect-preview__stage">
           <img className="academy-shop-effect-preview__bg" src={backgroundImage} alt="" draggable="false" />
+          <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} layer="back" />
           <img className="academy-shop-effect-preview__character" src={characterImage} alt="" draggable="false" />
-          <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} />
+          <HomeSceneEffects theme="academy" equipped={previewEquipped} successPulse={successPulse} layer="front" />
         </div>
         <div className="academy-shop-effect-preview__actions">
           <button className="academy-small-button" onClick={() => setReplayKey(key => key + 1)}>重播</button>
