@@ -200,9 +200,9 @@ export function BottomNav({ current, navigate }) {
   const tabs = [
     { key: 'town', label: '今日', icon: 'tab-today' },
     { key: 'map', label: '地圖', icon: 'tab-map' },
+    { key: 'battle', label: '記帳', icon: 'battle', primary: true },
     { key: 'missions', label: '任務', icon: 'tab-quest' },
     { key: 'shop', label: '補給', icon: 'tab-supply' },
-    { key: 'quest', label: '公會', icon: 'tab-guild' },
   ]
 
   return (
@@ -210,8 +210,9 @@ export function BottomNav({ current, navigate }) {
       {tabs.map(tab => (
         <button
           key={tab.key}
-          className={`academy-dock-item ${current === tab.key ? 'is-active' : ''}`}
+          className={`academy-dock-item ${tab.primary ? 'academy-dock-item--primary' : ''} ${current === tab.key ? 'is-active' : ''}`}
           onClick={() => navigate(tab.key)}
+          aria-label={tab.primary ? '記帳攻擊' : tab.label}
         >
           <span><GameIcon name={tab.icon} /></span>
           <b>{tab.label}</b>

@@ -669,7 +669,7 @@ export default function BattleScreen() {
         onDelete={deleteExpenseEntry}
       />
 
-      <BottomNav current="town" navigate={navigate} />
+      <BottomNav current="battle" navigate={navigate} />
     </div>
   )
 }
