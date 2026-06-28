@@ -1,4 +1,6 @@
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, formatMoney, getTitle } from '../gameLogic'
 import { getOutfitAssets } from '../outfitAssets'
@@ -197,27 +199,84 @@ export default function TownScreen() {
 }
 
 export function BottomNav({ current, navigate }) {
+  const [menuOpen, setMenuOpen] = useState(false)
   const tabs = [
     { key: 'town', label: '今日', icon: 'tab-today' },
     { key: 'map', label: '地圖', icon: 'tab-map' },
-    { key: 'battle', label: '記帳', icon: 'battle', primary: true },
+    { key: 'battle', label: '記帳', icon: 'tab-record', primary: true },
     { key: 'missions', label: '任務', icon: 'tab-quest' },
-    { key: 'shop', label: '補給', icon: 'tab-supply' },
+    { key: 'menu', label: '選單', icon: 'tab-menu', menu: true, activeKeys: ['shop', 'quest'] },
+  ]
+  const menuItems = [
+    { key: 'shop', label: '補給', desc: '商店與兌換', icon: 'shop', target: 'shop' },
+    { key: 'quest', label: '公會', desc: '公會帳本', icon: 'guild', target: 'quest' },
+    { key: 'report', label: '月報', desc: '月度戰報', icon: 'map', target: 'map', params: { panel: 'report' } },
+    { key: 'settings', label: '設定', desc: '提醒與偏好', icon: 'settings', target: 'profile', params: { tab: 'settings' } },
   ]
 
+  function selectMenuItem(item) {
+    setMenuOpen(false)
+    navigate(item.target, item.params)
+  }
+
   return (
-    <div className="academy-dock">
-      {tabs.map(tab => (
-        <button
-          key={tab.key}
-          className={`academy-dock-item ${tab.primary ? 'academy-dock-item--primary' : ''} ${current === tab.key ? 'is-active' : ''}`}
-          onClick={() => navigate(tab.key)}
-          aria-label={tab.primary ? '記帳攻擊' : tab.label}
-        >
-          <span><GameIcon name={tab.icon} /></span>
-          <b>{tab.label}</b>
-        </button>
-      ))}
-    </div>
+    <>
+      <div className="academy-dock">
+        {tabs.map(tab => {
+          const isActive = current === tab.key || tab.activeKeys?.includes(current)
+          return (
+            <button
+              key={tab.key}
+              className={`academy-dock-item ${tab.primary ? 'academy-dock-item--primary' : ''} ${isActive ? 'is-active' : ''}`}
+              onClick={() => tab.menu ? setMenuOpen(true) : navigate(tab.key)}
+              aria-label={tab.primary ? '記帳攻擊' : tab.label}
+            >
+              <span><GameIcon name={tab.icon} /></span>
+              <b>{tab.label}</b>
+            </button>
+          )
+        })}
+      </div>
+
+      {createPortal(
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              className="academy-dock-menu"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <button className="academy-dock-menu__backdrop" onClick={() => setMenuOpen(false)} aria-label="關閉選單" />
+              <motion.div
+                className="academy-dock-menu__sheet"
+                initial={{ y: 24, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 24, opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
+                <div className="academy-dock-menu__head">
+                  <div>
+                    <b>選單</b>
+                    <span>補給、公會、月報與設定</span>
+                  </div>
+                  <button onClick={() => setMenuOpen(false)}>完成</button>
+                </div>
+                <div className="academy-dock-menu__grid">
+                  {menuItems.map(item => (
+                    <button key={item.key} onClick={() => selectMenuItem(item)}>
+                      <GameIcon name={item.icon} />
+                      <strong>{item.label}</strong>
+                      <small>{item.desc}</small>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
+    </>
   )
 }

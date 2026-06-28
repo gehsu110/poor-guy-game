@@ -47,6 +47,23 @@ const PATHS = {
     </g>
   ),
 
+  'tab-record': (
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 10h24l8 8v36H17zM41 10v10h8M24 29h14M24 39h10" />
+      <path d="M38 44l8-8 5 5-8 8-7 2z" />
+      <path d="M25 49l2.2 4.2 4.8.7-3.5 3.4.8 4.7-4.3-2.3-4.3 2.3.8-4.7-3.5-3.4 4.8-.7z" fill="currentColor" stroke="none" />
+    </g>
+  ),
+
+  'tab-menu': (
+    <g fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="13" y="13" width="15" height="15" rx="4" />
+      <rect x="36" y="13" width="15" height="15" rx="4" />
+      <rect x="13" y="36" width="15" height="15" rx="4" />
+      <rect x="36" y="36" width="15" height="15" rx="4" />
+    </g>
+  ),
+
   // ── Currency / tickets（SVG fallback，正常用 IMAGE_ICONS）────────────
   'yellow-star': (
     <>
