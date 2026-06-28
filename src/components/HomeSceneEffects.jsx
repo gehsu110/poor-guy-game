@@ -20,6 +20,7 @@ const GROUND_LIFTS = ['one', 'two', 'three', 'four', 'five', 'six']
 export default function HomeSceneEffects({ theme = 'academy', equipped, successPulse, layer = 'all' }) {
   const effects = getEquippedHomeEffects(equipped, theme)
   const [burstKey, setBurstKey] = useState(null)
+  const [summonKey, setSummonKey] = useState(null)
   const auraParticles = AURA_PARTICLES[effects.backgroundAura] ?? []
   const successParticles = SUCCESS_PARTICLES[effects.successEffect] ?? []
   const hasGroundEffect = Boolean(effects.groundEffect)
@@ -33,6 +34,14 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
     const timer = window.setTimeout(() => setBurstKey(null), 1100)
     return () => window.clearTimeout(timer)
   }, [successPulse, hasSuccessEffect, showFrontLayer])
+
+  useEffect(() => {
+    if (!hasGroundEffect || !showFrontLayer) return
+    const key = successPulse ?? `entrance-${effects.groundEffect}`
+    setSummonKey(key)
+    const timer = window.setTimeout(() => setSummonKey(null), 1650)
+    return () => window.clearTimeout(timer)
+  }, [effects.groundEffect, hasGroundEffect, showFrontLayer, successPulse])
 
   return (
     <div
@@ -86,8 +95,8 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, successP
         </>
       )}
 
-      {showFrontLayer && hasGroundEffect && (
-        <div className={`home-scene-summon home-scene-summon--${effects.groundEffect}`}>
+      {showFrontLayer && hasGroundEffect && summonKey && (
+        <div key={summonKey} className={`home-scene-summon home-scene-summon--${effects.groundEffect}`}>
           <span className="home-scene-summon__flare" />
           <span className="home-scene-summon__ring home-scene-summon__ring--one" />
           <span className="home-scene-summon__ring home-scene-summon__ring--two" />
