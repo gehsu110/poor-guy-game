@@ -159,6 +159,8 @@ function reducer(state, action) {
       return { ...state, homeEffectPulse: action.id ?? Date.now() }
     case 'CONSUME_HOME_SUCCESS_EFFECT':
       return { ...state, pendingHomeSuccessEffect: null, homeEffectPulse: action.id ?? state.pendingHomeSuccessEffect ?? Date.now() }
+    case 'CLEAR_HOME_SUCCESS_EFFECT':
+      return { ...state, homeEffectPulse: null }
     case 'UPDATE_PROFILE':
       return { ...state, profile: { ...state.profile, ...action.data } }
     default:

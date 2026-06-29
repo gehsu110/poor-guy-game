@@ -108,9 +108,15 @@ export default function TownScreen() {
   useEffect(() => {
     if (!state.homeEffectPulse) return
     setCharacterCue(state.homeEffectPulse)
-    const timer = window.setTimeout(() => setCharacterCue(null), 900)
-    return () => window.clearTimeout(timer)
-  }, [state.homeEffectPulse])
+    const cueTimer = window.setTimeout(() => setCharacterCue(null), 900)
+    const clearTimer = window.setTimeout(() => {
+      dispatch({ type: 'CLEAR_HOME_SUCCESS_EFFECT' })
+    }, 1550)
+    return () => {
+      window.clearTimeout(cueTimer)
+      window.clearTimeout(clearTimer)
+    }
+  }, [dispatch, state.homeEffectPulse])
 
   useEffect(() => {
     if (!state.pendingHomeSuccessEffect) return

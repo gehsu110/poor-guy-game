@@ -38,6 +38,11 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, entrance
   const showBackLayer = layer !== 'front'
   const showFrontLayer = layer !== 'back'
   const burstKey = successPulse && hasSuccessEffect ? String(successPulse) : null
+  const withReplayKey = src => {
+    if (!src || !burstKey) return src
+    const separator = src.includes('?') ? '&' : '?'
+    return `${src}${separator}pulse=${encodeURIComponent(burstKey)}`
+  }
   const entranceKey = entrancePulse ? String(entrancePulse) : (!successPulse ? `entrance-${effects.groundEffect}` : null)
 
   useEffect(() => {
@@ -115,7 +120,7 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, entrance
       {showBackLayer && burstKey && (
         <div key={`back-${burstKey}`} className={`home-scene-success home-scene-success--backplane home-scene-success--${effects.successEffect}`}>
           {successAsset?.back && (
-            <img className="home-scene-success__asset home-scene-success__asset--back" src={successAsset.back} alt="" draggable="false" />
+            <img className="home-scene-success__asset home-scene-success__asset--back" src={withReplayKey(successAsset.back)} alt="" draggable="false" />
           )}
           <span className="home-scene-success__ground-flare" />
           <span className="home-scene-success__halo" />
@@ -128,7 +133,7 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, entrance
       {showFrontLayer && burstKey && hasSuccessEffect && (
         <div key={`front-${burstKey}`} className={`home-scene-success home-scene-success--frontburst home-scene-success--${effects.successEffect}`}>
           {successAsset?.front && (
-            <img className="home-scene-success__asset home-scene-success__asset--front" src={successAsset.front} alt="" draggable="false" />
+            <img className="home-scene-success__asset home-scene-success__asset--front" src={withReplayKey(successAsset.front)} alt="" draggable="false" />
           )}
           {successParticles.map(particle => (
             <i key={particle} className={`home-scene-success__particle home-scene-success__particle--${particle}`} />
