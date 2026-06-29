@@ -537,10 +537,12 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
           <button className="academy-back" onClick={onClose}>×</button>
         </div>
         <div key={`${item.id}-${playbackMode}-${replayKey}`} className="academy-shop-effect-preview__stage" data-preview-mode={playbackMode}>
-          <img className="academy-shop-effect-preview__bg" src={backgroundImage} alt="" draggable="false" />
-          <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
-          <img className="academy-shop-effect-preview__character" src={characterImage} alt="" draggable="false" />
-          <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
+          <div className="academy-shop-effect-preview__scene academy-screen academy-screen--academy">
+            <img className="academy-bg" src={backgroundImage} alt="" draggable="false" />
+            <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
+            <img className="academy-screen-character" src={characterImage} alt="" draggable="false" />
+            <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
+          </div>
         </div>
         <div className="academy-shop-effect-preview__actions">
           <div className="academy-shop-effect-preview__modes" role="group" aria-label="特效預覽模式">

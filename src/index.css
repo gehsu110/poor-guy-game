@@ -4449,7 +4449,6 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage {
-  --home-stage-baseline: min(87%, 520px);
   position: relative;
   height: min(67dvh, 590px);
   min-height: 430px;
@@ -4459,28 +4458,25 @@ video.academy-screen-character {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45);
 }
 
-.academy-shop-effect-preview__bg {
+.academy-shop-effect-preview__scene {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: 430px;
+  height: 814px;
+  min-height: 0;
+  max-height: none;
+  transform: translateX(-50%) scale(.916);
+  transform-origin: top center;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.academy-shop-effect-preview__scene .academy-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center 58%;
-  transform: scale(1.08);
-  transform-origin: center 64%;
-  pointer-events: none;
-}
-
-.academy-shop-effect-preview__character {
-  position: absolute;
-  left: 50%;
-  top: min(31%, 182px);
-  z-index: 6;
-  width: min(62%, 250px);
-  height: auto;
-  translate: -50% 0;
-  filter: drop-shadow(0 18px 18px rgba(78,61,122,0.22));
-  pointer-events: none;
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects {
@@ -4497,22 +4493,6 @@ video.academy-screen-character {
 
 .academy-shop-effect-preview__stage .home-scene-aura {
   z-index: 1;
-}
-
-.academy-shop-effect-preview__stage .home-scene-ground {
-  top: calc(var(--home-stage-baseline) + 24px);
-  z-index: 4;
-  width: min(100%, 420px);
-}
-
-.academy-shop-effect-preview__stage .home-scene-ground--starter_magic_circle {
-  top: calc(var(--home-stage-baseline) - 18px);
-  width: min(70%, 300px);
-}
-
-.academy-shop-effect-preview__stage .home-scene-success {
-  z-index: 8;
-  top: calc(var(--home-stage-baseline) + 6px);
 }
 
 .academy-shop-effect-preview__actions {
@@ -4561,6 +4541,11 @@ video.academy-screen-character {
 
   .academy-shop-effect-preview__stage {
     min-height: 390px;
+  }
+
+  .academy-shop-effect-preview__scene {
+    top: -18px;
+    transform: translateX(-50%) scale(.837);
   }
 
   .academy-shop-homefx-preview__grid {

@@ -1800,6 +1800,20 @@
   filter: drop-shadow(0 0 8px rgba(255,229,140,.68));
 }
 
+.home-scene-success--coin_spark_burst .home-scene-success__beam,
+.home-scene-success--coin_spark_burst .home-scene-success__particle,
+.home-scene-success--coin_spark_burst .home-scene-success__reward {
+  display: none;
+}
+
+.home-scene-success--coin_spark_burst .home-scene-success__ground-flare {
+  opacity: .58;
+}
+
+.home-scene-success--coin_spark_burst .home-scene-success__halo {
+  opacity: .48;
+}
+
 .home-scene-success--ticket_glow_burst::before {
   background: radial-gradient(circle at 50% 76%, rgba(244,238,255,.78), rgba(214,198,255,.30) 38%, rgba(168,216,234,.12) 60%, transparent 74%);
 }
