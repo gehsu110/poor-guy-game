@@ -51,6 +51,19 @@ export const HOME_SCENE_EFFECTS = {
         segments: ['groundIntro', 'groundIdle', 'groundSuccessSync'],
       },
     },
+    ledger_coin_ring: {
+      name: '金幣帳本光環',
+      themes: ['academy', 'summer', 'sakura', 'qixi', 'rainy'],
+      rarity: 'R',
+      color: '#FFD35F',
+      iconKey: 'coin',
+      costType: 'yellow',
+      cost: 0,
+      presentation: {
+        stage: 'compactRewardRing',
+        segments: ['groundIntro', 'groundIdle', 'groundSuccessSync'],
+      },
+    },
     sakura_lantern_ring: {
       name: '櫻燈舞台光圈',
       themes: ['sakura'],

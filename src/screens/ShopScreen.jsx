@@ -456,6 +456,16 @@ function HomeEffectsPresentationPreview() {
       },
     },
     {
+      key: 'ledger',
+      theme: 'academy',
+      label: '帳本光環',
+      equipped: {
+        backgroundAura: 'academy_stardust',
+        groundEffect: 'ledger_coin_ring',
+        successEffect: 'coin_spark_burst',
+      },
+    },
+    {
       key: 'sakura',
       label: '櫻燈祭典',
       equipped: {
@@ -487,7 +497,7 @@ function HomeEffectsPresentationPreview() {
       <div className="academy-shop-homefx-preview__grid">
         {demos.map(demo => (
           <div key={demo.key} className={`academy-shop-homefx-demo academy-shop-homefx-demo--${demo.key}`}>
-            <HomeSceneEffects theme={demo.key} equipped={demo.equipped} successPulse={`shop-${demo.key}`} />
+            <HomeSceneEffects theme={demo.theme ?? demo.key} equipped={demo.equipped} successPulse={`shop-${demo.key}`} />
             <span>{demo.label}</span>
           </div>
         ))}

@@ -4337,7 +4337,7 @@ video.academy-screen-character {
 
 .academy-shop-homefx-preview__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -4357,6 +4357,12 @@ video.academy-screen-character {
   background:
     radial-gradient(circle at 50% 14%, rgba(255,220,178,.18), transparent 34%),
     linear-gradient(180deg, rgba(58,42,86,.88), rgba(143,78,100,.62));
+}
+
+.academy-shop-homefx-demo--ledger {
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255,211,95,.18), transparent 35%),
+    linear-gradient(180deg, rgba(252,244,232,.94), rgba(222,218,255,.68));
 }
 
 .academy-shop-homefx-demo--rainy {
@@ -4549,7 +4555,7 @@ video.academy-screen-character {
   }
 
   .academy-shop-homefx-preview__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .academy-shop-wallet {
