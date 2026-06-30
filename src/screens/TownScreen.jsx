@@ -132,13 +132,11 @@ export default function TownScreen() {
     <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'} ${showHiggHomeConcept ? 'academy-screen--higg-home-concept' : ''}`}>
       {/* 全螢幕背景 */}
       {showHiggHomeConcept ? (
-        <video
-          className="academy-higg-home-concept-video"
-          src={HIGG_CONCEPT_DEMOS.homeShowcaseVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
+        <img
+          className="academy-higg-home-concept-media"
+          src={HIGG_CONCEPT_DEMOS.homeShowcaseWebp}
+          alt=""
+          draggable="false"
         />
       ) : (
         <img src={bg} alt="" className="academy-bg" draggable="false" />

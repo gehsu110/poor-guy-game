@@ -15,7 +15,6 @@ import monsterSunday from '../assets/academy-art/generated/monster-sunday.png'
 import monsterMonth from '../assets/academy-art/generated/monster-month.png'
 import { setScreenChrome } from '../screenChrome'
 import { DEFAULT_BATTLE_ATTACK_EFFECT, getBattleAttackEffect } from '../battleEffects'
-import { HIGG_CONCEPT_DEMO_ENABLED, HIGG_CONCEPT_DEMOS } from '../conceptDemos'
 
 const MONSTER_ART = {
   slime: monsterSlime,
@@ -173,9 +172,6 @@ function MonsterArea({
   showProjectile,
   showImpact,
   attackEffectId,
-  showConceptAttack,
-  conceptAttackKey,
-  onConceptAttackEnd,
 }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
@@ -187,18 +183,7 @@ function MonsterArea({
 
   return (
     <div className="academy-battle-arena">
-      <div className={`academy-battle-stage ${isHit ? 'is-casting' : ''} ${showConceptAttack ? 'is-higg-concept-playing' : ''}`}>
-        {showConceptAttack && (
-          <video
-            key={`higg-battle-${conceptAttackKey}`}
-            className="academy-higg-battle-concept-video"
-            src={HIGG_CONCEPT_DEMOS.battleAttackVideo}
-            autoPlay
-            muted
-            playsInline
-            onEnded={onConceptAttackEnd}
-          />
-        )}
+      <div className={`academy-battle-stage ${isHit ? 'is-casting' : ''}`}>
         <div className="academy-battle-stage__title">
           <div>
             <strong>{monster.name}</strong>
@@ -591,8 +576,6 @@ export default function BattleScreen() {
   const [showProjectile, setShowProjectile] = useState(false)
   const [showImpact, setShowImpact] = useState(false)
   const [hitKey, setHitKey] = useState(0)
-  const [conceptAttackKey, setConceptAttackKey] = useState(0)
-  const [showConceptAttack, setShowConceptAttack] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
   const [logOpen, setLogOpen] = useState(false)
   const budget = profile?.dailyBudget ?? 1000
@@ -615,11 +598,6 @@ export default function BattleScreen() {
     setIsCrit(crit)
     setHitKey(k => k + 1)
     setShowProjectile(true)
-    if (HIGG_CONCEPT_DEMO_ENABLED) {
-      setConceptAttackKey(k => k + 1)
-      setShowConceptAttack(true)
-      window.setTimeout(() => setShowConceptAttack(false), 10300)
-    }
 
     // 投射物飛行後命中
     setTimeout(() => {
@@ -681,9 +659,6 @@ export default function BattleScreen() {
           showProjectile={showProjectile}
           showImpact={showImpact}
           attackEffectId={attackEffectId}
-          showConceptAttack={showConceptAttack}
-          conceptAttackKey={conceptAttackKey}
-          onConceptAttackEnd={() => setShowConceptAttack(false)}
         />
 
         <div className="academy-battle-panel">
