@@ -21,6 +21,7 @@ import {
   todayStr,
   getTitle,
 } from './gameLogic'
+import { DEFAULT_BATTLE_ATTACK_EFFECT } from './battleEffects'
 
 const Ctx = createContext(null)
 
@@ -66,6 +67,7 @@ const DEMO_PROFILE = {
     frame: 'soft_gold',
     groundEffect: 'starter_magic_circle',
     successEffect: 'coin_spark_burst',
+    attackEffect: DEFAULT_BATTLE_ATTACK_EFFECT,
   },
   claimedMissions: {},
   guildChallengeClaims: {},
@@ -106,6 +108,7 @@ function withStarterHomeEffects(profile) {
     ...(profile.equipped ?? {}),
     groundEffect: profile.equipped?.groundEffect ?? 'starter_magic_circle',
     successEffect: profile.equipped?.successEffect ?? 'coin_spark_burst',
+    attackEffect: profile.equipped?.attackEffect ?? DEFAULT_BATTLE_ATTACK_EFFECT,
   }
   const collection = [...(profile.collection ?? [])]
   const owned = new Set(collection.map(item => item.id))
@@ -114,6 +117,9 @@ function withStarterHomeEffects(profile) {
   }
   if (!owned.has('coin_spark_burst')) {
     collection.push({ id: 'coin_spark_burst', rarity: 'R', obtainedAt: Date.now(), source: 'starter' })
+  }
+  if (!owned.has(DEFAULT_BATTLE_ATTACK_EFFECT)) {
+    collection.push({ id: DEFAULT_BATTLE_ATTACK_EFFECT, rarity: 'R', obtainedAt: Date.now(), source: 'starter' })
   }
   return { ...profile, equipped, collection }
 }
@@ -293,6 +299,7 @@ export function AppProvider({ children }) {
         const needsStarterUpdate = (
           starterProfile?.equipped?.groundEffect !== profile?.equipped?.groundEffect ||
           starterProfile?.equipped?.successEffect !== profile?.equipped?.successEffect ||
+          starterProfile?.equipped?.attackEffect !== profile?.equipped?.attackEffect ||
           (starterProfile?.collection?.length ?? 0) !== (profile?.collection?.length ?? 0)
         )
         if (needsStarterUpdate) {

@@ -14,6 +14,7 @@ import monsterWeekend from '../assets/academy-art/generated/monster-weekend.png'
 import monsterSunday from '../assets/academy-art/generated/monster-sunday.png'
 import monsterMonth from '../assets/academy-art/generated/monster-month.png'
 import { setScreenChrome } from '../screenChrome'
+import { DEFAULT_BATTLE_ATTACK_EFFECT, getBattleAttackEffect } from '../battleEffects'
 
 const MONSTER_ART = {
   slime: monsterSlime,
@@ -26,30 +27,35 @@ const MONSTER_ART = {
   month: monsterMonth,
 }
 
-// ─── 攻擊特效：投射物 ────────────────────────────────────────────────────────
-function AttackProjectile({ isCrit }) {
+// ─── 攻擊特效：帳本印章蓄力與飛行 ───────────────────────────────────────────
+function BattleAttackCharge({ effectId, isCrit }) {
+  const effect = getBattleAttackEffect(effectId)
   return (
     <motion.div
-      className="academy-first-person-projectile pointer-events-none absolute z-50"
-      initial={{ x: '-50%', y: 0, opacity: 0, scale: 0.4 }}
-      animate={{ x: '-50%', y: -116, opacity: [0, 1, 1, 0], scale: [0.4, 1, 0.75] }}
-      transition={{ duration: 0.34, ease: 'easeIn' }}
+      className={`academy-battle-attack-effect academy-battle-attack-effect--${effectId} ${isCrit ? 'is-crit' : ''}`}
+      style={{ '--attack-effect-color': effect.color }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 1, 1, 0] }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1.15, ease: 'easeOut' }}
     >
-      <div style={{
-        width: isCrit ? 22 : 14,
-        height: isCrit ? 22 : 14,
-        borderRadius: '50%',
-        background: isCrit
-          ? 'radial-gradient(circle, #fff 10%, #FFD166 50%, #FF7FA3)'
-          : 'radial-gradient(circle, #fff 10%, #C8A8E9 50%, #7B63D8)',
-        boxShadow: isCrit ? '0 0 16px 6px #FFD166' : '0 0 10px 4px #C8A8E9',
-      }} />
+      <span className="academy-battle-attack-effect__origin" />
+      <span className="academy-battle-attack-effect__track" />
+      <span className="academy-battle-attack-effect__seal" />
+      <span className="academy-battle-attack-effect__stamp" />
+      <span className="academy-battle-attack-effect__paper academy-battle-attack-effect__paper--one" />
+      <span className="academy-battle-attack-effect__paper academy-battle-attack-effect__paper--two" />
+      <span className="academy-battle-attack-effect__paper academy-battle-attack-effect__paper--three" />
+      <span className="academy-battle-attack-effect__star academy-battle-attack-effect__star--one" />
+      <span className="academy-battle-attack-effect__star academy-battle-attack-effect__star--two" />
+      <span className="academy-battle-attack-effect__star academy-battle-attack-effect__star--three" />
     </motion.div>
   )
 }
 
-// ─── 攻擊特效：命中爆炸粒子 ──────────────────────────────────────────────────
-function ImpactBurst({ isCrit }) {
+// ─── 攻擊特效：命中爆光與收尾 ───────────────────────────────────────────────
+function BattleAttackImpact({ effectId, isCrit }) {
+  const effect = getBattleAttackEffect(effectId)
   const count = isCrit ? 14 : 9
   const colors = isCrit
     ? ['#FFD166', '#FFFFFF', '#FF7FA3', '#FFE99A', '#C8A8E9']
@@ -72,68 +78,62 @@ function ImpactBurst({ isCrit }) {
   }) : [], [isCrit])
 
   return (
-    <div className="pointer-events-none absolute z-50" style={{ left: '50%', top: '43%' }}>
-      {/* 中央閃光 */}
+    <div
+      className={`academy-battle-impact academy-battle-impact--${effectId} ${isCrit ? 'is-crit' : ''}`}
+      style={{ '--attack-effect-color': effect.color }}
+    >
+      <span className="academy-battle-impact__seal" />
+      <span className="academy-battle-impact__slash academy-battle-impact__slash--one" />
+      <span className="academy-battle-impact__slash academy-battle-impact__slash--two" />
       <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: isCrit ? 56 : 36,
-          height: isCrit ? 56 : 36,
-          background: isCrit
-            ? 'radial-gradient(circle, #FFFFFF 0%, #FFD166 40%, transparent 70%)'
-            : 'radial-gradient(circle, #FFFFFF 0%, #C8A8E9 40%, transparent 70%)',
-          left: '50%', top: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
+        className="academy-battle-impact__flash"
         initial={{ scale: 0, opacity: 1 }}
         animate={{ scale: isCrit ? 3.5 : 2.5, opacity: 0 }}
-        transition={{ duration: 0.42, ease: 'easeOut' }}
+        transition={{ duration: 0.85, ease: 'easeOut' }}
       />
-      {/* 粒子 */}
       {particles.map(({ i, rad, dist, size, color }) => (
         <motion.div
           key={i}
-          className="absolute rounded-full"
+          className="academy-battle-impact__particle"
           style={{
             width: size, height: size,
             background: color,
-            left: '50%', top: '50%',
             marginLeft: -size / 2, marginTop: -size / 2,
             boxShadow: `0 0 ${size + 2}px ${color}`,
           }}
           initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
           animate={{ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, opacity: 0, scale: 0.2 }}
-          transition={{ duration: 0.55, ease: 'easeOut', delay: 0.015 * (i % 4) }}
+          transition={{ duration: 0.95, ease: 'easeOut', delay: 0.025 * (i % 4) }}
         />
       ))}
-      {/* 爆擊星星 */}
       {stars.map(({ i, rad }) => (
         <motion.div
           key={`star-${i}`}
-          className="absolute text-base"
-          style={{ left: '50%', top: '50%', marginLeft: -10, marginTop: -10 }}
+          className="academy-battle-impact__crit-star"
+          style={{ marginLeft: -10, marginTop: -10 }}
           initial={{ x: 0, y: 0, opacity: 1, rotate: 0, scale: 0.5 }}
           animate={{ x: Math.cos(rad) * 68, y: Math.sin(rad) * 68, opacity: 0, rotate: 360, scale: 0 }}
-          transition={{ duration: 0.72, ease: 'easeOut' }}
+          transition={{ duration: 1.05, ease: 'easeOut' }}
         ><span className="academy-impact-star" /></motion.div>
       ))}
     </div>
   )
 }
 
-// ─── 攻擊特效：畫面閃光 ──────────────────────────────────────────────────────
-function ScreenFlash({ isCrit }) {
+// ─── 攻擊特效：舞台閃光 ──────────────────────────────────────────────────────
+function ScreenFlash({ effectId, isCrit }) {
+  const effect = getBattleAttackEffect(effectId)
   return (
     <motion.div
       className="pointer-events-none absolute inset-0 z-40 rounded-[inherit]"
       style={{
         background: isCrit
-          ? 'radial-gradient(ellipse at 50% 45%, rgba(255,209,102,0.50) 0%, transparent 65%)'
-          : 'radial-gradient(ellipse at 50% 45%, rgba(200,168,233,0.40) 0%, transparent 65%)',
+          ? 'radial-gradient(ellipse at 50% 45%, rgba(255,209,102,0.12) 0%, transparent 58%)'
+          : `radial-gradient(ellipse at 50% 45%, color-mix(in srgb, ${effect.color} 10%, transparent) 0%, transparent 58%)`,
       }}
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.9 }}
     />
   )
 }
@@ -161,12 +161,14 @@ function BattleRewardPill({ type, value }) {
   )
 }
 
-function MonsterArea({ monster, currentHp, totalSpent, isHit, damageNumbers, hitKey, isCrit, showProjectile, showImpact }) {
+function MonsterArea({ monster, currentHp, totalSpent, isHit, damageNumbers, hitKey, isCrit, showProjectile, showImpact, attackEffectId }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
   const isAngry = hpPct < 0.3 && !defeated
   const attackPower = Math.max(0, Math.round(totalSpent / 10))
+  const attackEffect = getBattleAttackEffect(attackEffectId)
+  const drop = getBattleDrop(monster.tier)
 
   return (
     <div className="academy-battle-arena">
@@ -182,6 +184,7 @@ function MonsterArea({ monster, currentHp, totalSpent, isHit, damageNumbers, hit
         <div className="academy-battle-stage__quickstats">
           <span>今日 NT${formatMoney(totalSpent)}</span>
           <span>攻擊 +{attackPower}</span>
+          <span>{attackEffect.name}</span>
           <span>HP {Math.round(hpPct * 100)}%</span>
         </div>
 
@@ -219,13 +222,13 @@ function MonsterArea({ monster, currentHp, totalSpent, isHit, damageNumbers, hit
 
         {/* 攻擊特效層 */}
         <AnimatePresence>
-          {showProjectile && <AttackProjectile key={`proj-${hitKey}`} isCrit={isCrit} />}
+          {showProjectile && <BattleAttackCharge key={`proj-${hitKey}`} effectId={attackEffectId} isCrit={isCrit} />}
         </AnimatePresence>
         <AnimatePresence>
-          {showImpact && <ImpactBurst key={`burst-${hitKey}`} isCrit={isCrit} />}
+          {showImpact && <BattleAttackImpact key={`burst-${hitKey}`} effectId={attackEffectId} isCrit={isCrit} />}
         </AnimatePresence>
         <AnimatePresence>
-          {showImpact && <ScreenFlash key={`flash-${hitKey}`} isCrit={isCrit} />}
+          {showImpact && <ScreenFlash key={`flash-${hitKey}`} effectId={attackEffectId} isCrit={isCrit} />}
         </AnimatePresence>
 
         {damageNumbers.map(dn => (
@@ -567,6 +570,7 @@ export default function BattleScreen() {
   const budget = profile?.dailyBudget ?? 1000
   const categories = [...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])]
   const remaining = budget - totalSpent
+  const attackEffectId = profile?.equipped?.attackEffect ?? DEFAULT_BATTLE_ATTACK_EFFECT
 
   useEffect(() => {
     return setScreenChrome({
@@ -589,13 +593,13 @@ export default function BattleScreen() {
       setShowProjectile(false)
       setIsHit(true)
       setShowImpact(true)
-    }, 280)
+    }, 900)
 
     // 清除命中狀態
     setTimeout(() => {
       setIsHit(false)
       setShowImpact(false)
-    }, 950)
+    }, 2400)
 
     if (editingExpense) {
       await updateExpenseEntry(editingExpense.id, data)
@@ -643,6 +647,7 @@ export default function BattleScreen() {
           isCrit={isCrit}
           showProjectile={showProjectile}
           showImpact={showImpact}
+          attackEffectId={attackEffectId}
         />
 
         <div className="academy-battle-panel">

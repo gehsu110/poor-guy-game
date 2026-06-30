@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar'
 import HomeSceneEffects from '../components/HomeSceneEffects'
 import { getOutfitAssets } from '../outfitAssets'
 import { HOME_EFFECT_TYPE_LABELS, flattenHomeSceneEffects } from '../homeSceneEffects'
+import { flattenBattleAttackEffects } from '../battleEffects'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
 
@@ -30,6 +31,7 @@ const EXCHANGE_CATEGORIES = [
   { key: 'all', label: '全部' },
   { key: 'utility', label: '功能' },
   { key: 'homefx', label: '主頁特效' },
+  { key: 'battlefx', label: '戰鬥特效' },
   { key: 'collection', label: '收藏' },
   { key: 'identity', label: '身份' },
 ]
@@ -54,6 +56,21 @@ const HOME_EFFECT_EXCHANGE_ITEMS = flattenHomeSceneEffects().map(effect => ({
 
 const HOME_EFFECT_PRODUCT_TYPES = new Set(['backgroundAura', 'groundEffect', 'successEffect'])
 
+const BATTLE_EFFECT_EXCHANGE_ITEMS = flattenBattleAttackEffects().map(effect => ({
+  id: effect.id,
+  type: effect.type,
+  category: 'battlefx',
+  name: effect.name,
+  source: '攻擊特效',
+  place: '戰鬥 / 記帳攻擊',
+  costType: effect.costType,
+  cost: effect.cost,
+  rarity: effect.rarity,
+  color: effect.color,
+  iconKey: effect.iconKey,
+  description: effect.description,
+}))
+
 const EXCHANGE_ITEMS = [
   { id: 'normal_ticket_pack', type: 'resource', category: 'utility', name: '一般補給券', source: '補給池抽取', place: '補給池', costType: 'yellow', cost: 3, reward: { normalTicket: 1 }, rarity: 'R', color: '#FFDDE8', iconKey: 'ticket' },
   { id: 'daily_yellow_boost', type: 'boost', category: 'utility', name: '今日黃星祝福', source: '每日加成', place: '主頁 HUD / 今日頁', costType: 'yellow', cost: 2, rarity: 'R', color: '#FFE4A0', iconKey: 'star', disabled: true },
@@ -61,8 +78,8 @@ const EXCHANGE_ITEMS = [
   { id: 'quest_refresh_ticket', type: 'questRefresh', category: 'utility', name: '任務刷新券', source: '每日任務工具', place: '任務頁右上角', costType: 'purple', cost: 1, rarity: 'SR', color: '#C8A8E9', iconKey: 'goldTicket', disabled: true },
   { id: 'bg_mint', type: 'background', category: 'collection', name: '薄荷晨光背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'bg_ribbon', type: 'background', category: 'collection', name: '緞帶學園背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
-  { id: 'fx_slash_direct', type: 'effect', category: 'collection', name: '星軌斬擊特效', source: '攻擊特效', place: '戰鬥 / 記帳攻擊', costType: 'yellow', cost: 5, rarity: 'R', color: '#A8D8EA', iconKey: 'crystal' },
   ...HOME_EFFECT_EXCHANGE_ITEMS,
+  ...BATTLE_EFFECT_EXCHANGE_ITEMS,
   { id: 'badge_budget_clear', type: 'settlementBadge', category: 'collection', name: '預算達成徽章', source: '結算徽章', place: '每日結算 / 地圖戰報', costType: 'purple', cost: 2, rarity: 'SR', color: '#A8E6CF', iconKey: 'coin', disabled: true },
   { id: 'mint_supply_set', type: 'set', category: 'collection', name: '薄荷補給套裝', source: '普通商店套裝', place: '造型收藏', costType: 'yellow', cost: 12, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'pink_magic_set', type: 'set', category: 'collection', name: '粉晶魔法套裝', source: '普通商店套裝', place: '造型收藏', costType: 'purple', cost: 6, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
@@ -108,6 +125,7 @@ const RARITY_CONFIG = {
 const TYPE_LABELS = {
   background: '背景',
   effect: '攻擊特效',
+  attackEffect: '攻擊特效',
   title: '稱號',
   frame: '頭像框',
   outfit: '服裝',
@@ -506,6 +524,36 @@ function HomeEffectsPresentationPreview() {
   )
 }
 
+function BattleEffectsPresentationPreview() {
+  const demos = BATTLE_EFFECT_EXCHANGE_ITEMS
+  return (
+    <section className="academy-shop-section academy-shop-battlefx-preview">
+      <div className="academy-shop-section__head">
+        <div>
+          <b>戰鬥攻擊樣張</b>
+          <small>記帳完成後在怪物舞台播放，不跳回主頁</small>
+        </div>
+        <span className="academy-status">可裝備</span>
+      </div>
+      <div className="academy-shop-battlefx-preview__grid">
+        {demos.map(demo => (
+          <div key={demo.id} className={`academy-shop-battlefx-demo academy-shop-battlefx-demo--${demo.id}`}>
+            <div className="academy-shop-battlefx-demo__monster">
+              <span className="academy-shop-battlefx-demo__face" />
+            </div>
+            <div className="academy-shop-battlefx-demo__effect">
+              <span className="academy-shop-battlefx-demo__seal" />
+              <span className="academy-shop-battlefx-demo__track" />
+              <span className="academy-shop-battlefx-demo__stamp" />
+            </div>
+            <span>{demo.name}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function HomeEffectPreviewModal({ item, profile, onClose }) {
   const [replayKey, setReplayKey] = useState(1)
   const [playbackMode, setPlaybackMode] = useState(item.type === 'successEffect' ? 'success' : 'intro')
@@ -727,7 +775,7 @@ export default function ShopScreen() {
       return
     }
     const next = applyResourceDelta(stars, tickets, cost, -1)
-    const autoEquip = item.cost === 0 && isHomeEffectItem(item)
+    const autoEquip = item.cost === 0 && (isHomeEffectItem(item) || item.type === 'attackEffect')
     const data = {
       stars: next.stars,
       tickets: next.tickets,
@@ -932,6 +980,7 @@ export default function ShopScreen() {
             <RewardPreview />
             {exchangeCategory === 'utility' && <UtilityPresentationPreview />}
             {exchangeCategory === 'homefx' && <HomeEffectsPresentationPreview />}
+            {exchangeCategory === 'battlefx' && <BattleEffectsPresentationPreview />}
             <section className="academy-shop-section">
               <div className="academy-shop-section__head">
                 <div>
