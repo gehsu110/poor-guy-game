@@ -10,7 +10,6 @@ import { HOME_EFFECT_TYPE_LABELS, flattenHomeSceneEffects } from '../homeSceneEf
 import { flattenBattleAttackEffects } from '../battleEffects'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
-import academyHomeShowcase from '../assets/academy-art/showcases/academy-home-showcase.webp'
 
 const GACHA_POOL = [
   { id: 'fx_slash', type: 'effect', name: '星軌斬擊', rarity: 'R', color: '#A8D8EA', iconKey: 'crystal' },
@@ -566,7 +565,6 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
   const academyPreview = getOutfitAssets('academy', gender)
   const characterImage = academyPreview.image
   const backgroundImage = academyPreview.bg
-  const showAcademyShowcase = true
   const previewModes = [
     { key: 'intro', label: '裝上' },
     { key: 'idle', label: '平常' },
@@ -598,16 +596,10 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
         </div>
         <div key={`${item.id}-${playbackMode}-${replayKey}`} className="academy-shop-effect-preview__stage" data-preview-mode={playbackMode}>
           <div className="academy-shop-effect-preview__scene academy-screen academy-screen--academy">
-            {showAcademyShowcase ? (
-              <img className="academy-showcase-media" src={academyHomeShowcase} alt="" draggable="false" />
-            ) : (
-              <>
-                <img className="academy-bg" src={backgroundImage} alt="" draggable="false" />
-                <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
-                <img className="academy-screen-character" src={characterImage} alt="" draggable="false" />
-                <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
-              </>
-            )}
+            <img className="academy-bg" src={backgroundImage} alt="" draggable="false" />
+            <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
+            <img className="academy-screen-character" src={characterImage} alt="" draggable="false" />
+            <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
           </div>
         </div>
         <div className="academy-shop-effect-preview__actions">

@@ -454,11 +454,6 @@
   background: linear-gradient(180deg, rgba(255,248,236,.02), rgba(255,248,236,.12) 58%, rgba(82,63,120,.22));
 }
 
-.academy-screen--showcase .academy-bg-soft {
-  background:
-    linear-gradient(180deg, rgba(255,248,236,.03), rgba(255,248,236,.02) 48%, rgba(36,26,62,.08));
-}
-
 .academy-screen--academy {
   --screen-safe-bg: linear-gradient(180deg, #f8d9c8 0%, rgba(248,217,200,0) 100%);
 }

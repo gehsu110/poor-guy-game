@@ -768,19 +768,6 @@ body {
   pointer-events: none;
 }
 
-.academy-showcase-media {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  user-select: none;
-  pointer-events: none;
-  background: #f4d3c4;
-}
-
 .academy-screen--battle .academy-bg-soft {
   background:
     radial-gradient(circle at 50% 30%, rgba(255,245,201,0.28), transparent 34%),
