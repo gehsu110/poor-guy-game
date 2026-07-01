@@ -4883,15 +4883,23 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects {
-  z-index: 4;
+  z-index: 2;
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects--back {
-  z-index: 4;
+  z-index: 2;
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects--front {
-  z-index: 7;
+  z-index: 21;
+}
+
+.academy-shop-effect-preview__stage .home-showcase-stage--back {
+  z-index: 3;
+}
+
+.academy-shop-effect-preview__stage .home-showcase-stage--front {
+  z-index: 22;
 }
 
 .academy-shop-effect-preview__stage .home-scene-aura {

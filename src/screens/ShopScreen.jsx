@@ -5,6 +5,7 @@ import { updateProfile } from '../firebase'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import HomeSceneEffects from '../components/HomeSceneEffects'
+import HomeShowcaseStage from '../components/HomeShowcaseStage'
 import { getOutfitAssets } from '../outfitAssets'
 import { HOME_EFFECT_TYPE_LABELS, flattenHomeSceneEffects } from '../homeSceneEffects'
 import { flattenBattleAttackEffects } from '../battleEffects'
@@ -598,8 +599,10 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
           <div className="academy-shop-effect-preview__scene academy-screen academy-screen--academy">
             <img className="academy-bg" src={backgroundImage} alt="" draggable="false" />
             <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
+            <HomeShowcaseStage theme="academy" layer="back" compact />
             <img className="academy-screen-character" src={characterImage} alt="" draggable="false" />
             <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
+            <HomeShowcaseStage theme="academy" layer="front" compact />
           </div>
         </div>
         <div className="academy-shop-effect-preview__actions">

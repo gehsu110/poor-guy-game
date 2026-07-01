@@ -9,6 +9,7 @@ import Avatar from '../components/Avatar'
 import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
 import HomeSceneEffects from '../components/HomeSceneEffects'
+import HomeShowcaseStage from '../components/HomeShowcaseStage'
 import { setScreenChrome } from '../screenChrome'
 
 const HOME_THEME_COLORS = {
@@ -132,6 +133,7 @@ export default function TownScreen() {
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
       <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="back" />
+      <HomeShowcaseStage theme={bgTheme ?? 'academy'} layer="back" />
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
       {video ? (
         <ChromaKeyCanvas
@@ -165,6 +167,7 @@ export default function TownScreen() {
         />
       ) : null}
       <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="front" />
+      <HomeShowcaseStage theme={bgTheme ?? 'academy'} layer="front" />
       {/* UI 層（z-10，疊在角色上） */}
       <div className="academy-safe-top relative z-10 px-4">
         <IdentityHUD profile={profile} />
