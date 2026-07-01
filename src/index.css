@@ -768,6 +768,19 @@ body {
   pointer-events: none;
 }
 
+.academy-showcase-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  pointer-events: none;
+  background: #f4d3c4;
+}
+
 .academy-screen--battle .academy-bg-soft {
   background:
     radial-gradient(circle at 50% 30%, rgba(255,245,201,0.28), transparent 34%),
@@ -4883,23 +4896,15 @@ video.academy-screen-character {
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects {
-  z-index: 2;
+  z-index: 4;
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects--back {
-  z-index: 2;
+  z-index: 4;
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects--front {
-  z-index: 21;
-}
-
-.academy-shop-effect-preview__stage .home-showcase-stage--back {
-  z-index: 3;
-}
-
-.academy-shop-effect-preview__stage .home-showcase-stage--front {
-  z-index: 22;
+  z-index: 7;
 }
 
 .academy-shop-effect-preview__stage .home-scene-aura {
