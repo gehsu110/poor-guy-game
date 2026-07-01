@@ -10,7 +10,6 @@ import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
 import SpriteCharacter from '../components/SpriteCharacter'
 import HomeSceneEffects from '../components/HomeSceneEffects'
 import { setScreenChrome } from '../screenChrome'
-import { HIGG_CONCEPT_DEMO_ENABLED, HIGG_CONCEPT_DEMOS } from '../conceptDemos'
 
 const HOME_THEME_COLORS = {
   academy: {
@@ -95,7 +94,6 @@ export default function TownScreen() {
   const outfitId = profile?.equipped?.outfit ?? 'academy'
   const { bg, frames, blink, image, video, bgTheme } = getOutfitAssets(outfitId, gender)
   const hasGroundEffect = Boolean(profile?.equipped?.groundEffect)
-  const showHiggHomeConcept = HIGG_CONCEPT_DEMO_ENABLED && outfitId === 'academy'
   const characterClass = [
     'academy-screen-character',
     'academy-screen-character--tap',
@@ -129,29 +127,20 @@ export default function TownScreen() {
   }, [dispatch, state.pendingHomeSuccessEffect])
 
   return (
-    <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'} ${showHiggHomeConcept ? 'academy-screen--higg-home-concept' : ''}`}>
+    <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`}>
       {/* 全螢幕背景 */}
-      {showHiggHomeConcept ? (
-        <img
-          className="academy-higg-home-concept-media"
-          src={HIGG_CONCEPT_DEMOS.homeShowcaseWebp}
-          alt=""
-          draggable="false"
-        />
-      ) : (
-        <img src={bg} alt="" className="academy-bg" draggable="false" />
-      )}
+      <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
-      {!showHiggHomeConcept && <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="back" />}
+      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="back" />
       {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
-      {!showHiggHomeConcept && video ? (
+      {video ? (
         <ChromaKeyCanvas
           src={video}
           keyColor={[0, 255, 0]}
           threshold={130}
           className={characterClass}
         />
-      ) : !showHiggHomeConcept && frames?.length > 0 ? (
+      ) : frames?.length > 0 ? (
         <SpriteCharacter
           frames={frames}
           blink={blink ?? []}
@@ -159,7 +148,7 @@ export default function TownScreen() {
           blinkInterval={3500}
           className={characterClass}
         />
-      ) : !showHiggHomeConcept && image ? (
+      ) : image ? (
         <motion.img
           key={image}
           src={image}
@@ -175,7 +164,7 @@ export default function TownScreen() {
           }}
         />
       ) : null}
-      {!showHiggHomeConcept && <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="front" />}
+      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="front" />
       {/* UI 層（z-10，疊在角色上） */}
       <div className="academy-safe-top relative z-10 px-4">
         <IdentityHUD profile={profile} />

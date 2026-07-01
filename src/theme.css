@@ -458,42 +458,6 @@
   --screen-safe-bg: linear-gradient(180deg, #f8d9c8 0%, rgba(248,217,200,0) 100%);
 }
 
-.academy-screen--higg-home-concept {
-  --screen-safe-bg: linear-gradient(180deg, #17213f 0%, rgba(23,33,63,0) 100%);
-  --scene-hud-panel: rgba(23, 27, 48, 0.58);
-  --scene-hud-panel-strong: rgba(255, 248, 235, 0.78);
-  --scene-hud-line: rgba(255, 224, 154, 0.32);
-  --scene-hud-text: #fff5d8;
-  --scene-hud-muted: rgba(255, 245, 216, 0.72);
-  --scene-hud-accent: #e7c96f;
-  --scene-hud-primary: linear-gradient(135deg, #f6d36f 0%, #ff9f4a 100%);
-  --scene-hud-primary-text: #31200a;
-  --scene-hud-shadow: 0 16px 34px rgba(9, 8, 24, 0.32), inset 0 1px rgba(255,255,255,0.13);
-}
-
-.academy-screen--higg-home-concept .academy-status-board {
-  background:
-    linear-gradient(135deg, rgba(20, 24, 45, 0.72), rgba(47, 42, 75, 0.55) 52%, rgba(142, 101, 63, 0.34)),
-    radial-gradient(circle at 84% 14%, rgba(246, 211, 111, 0.22), transparent 38%);
-}
-
-.academy-screen--higg-home-concept .academy-mini-currency {
-  color: #5f557a;
-}
-
-.academy-screen--higg-home-concept .academy-dock {
-  background: rgba(255, 248, 235, 0.9);
-  border-color: rgba(255, 224, 154, 0.42);
-}
-
-.academy-screen--higg-home-concept .academy-dock-item {
-  color: #706987;
-}
-
-.academy-screen--higg-home-concept .academy-dock-item.is-active {
-  color: #403764;
-}
-
 .academy-screen--academy .academy-home-hero {
   border-color: transparent;
   background: transparent;
