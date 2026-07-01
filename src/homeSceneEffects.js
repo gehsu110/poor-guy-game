@@ -2,7 +2,7 @@ export const HOME_SCENE_EFFECTS = {
   backgroundAura: {
     academy_stardust: {
       name: '學院星塵',
-      themes: ['academy', 'hero', 'mint', 'crystal', 'night', 'city'],
+      themes: ['academy', 'ledger', 'hero', 'mint', 'crystal', 'night', 'city'],
       rarity: 'R',
       color: '#FFE4A0',
       iconKey: 'star',
@@ -40,7 +40,7 @@ export const HOME_SCENE_EFFECTS = {
   groundEffect: {
     starter_magic_circle: {
       name: '星砂腳底魔法圈',
-      themes: ['academy'],
+      themes: ['academy', 'ledger'],
       rarity: 'R',
       color: '#FFE4A0',
       iconKey: 'star',
@@ -53,7 +53,7 @@ export const HOME_SCENE_EFFECTS = {
     },
     ledger_coin_ring: {
       name: '金幣帳本光環',
-      themes: ['academy', 'summer', 'sakura', 'qixi', 'rainy'],
+      themes: ['academy', 'ledger', 'summer', 'sakura', 'qixi', 'rainy'],
       rarity: 'R',
       color: '#FFD35F',
       iconKey: 'coin',
@@ -107,7 +107,7 @@ export const HOME_SCENE_EFFECTS = {
   successEffect: {
     coin_spark_burst: {
       name: '金幣小爆光',
-      themes: ['academy', 'summer', 'sakura', 'qixi', 'rainy', 'hero', 'mint', 'crystal', 'night', 'city'],
+      themes: ['academy', 'ledger', 'summer', 'sakura', 'qixi', 'rainy', 'hero', 'mint', 'crystal', 'night', 'city'],
       rarity: 'R',
       color: '#FFE4A0',
       iconKey: 'star',
@@ -119,7 +119,7 @@ export const HOME_SCENE_EFFECTS = {
     },
     ticket_glow_burst: {
       name: '補給券光束',
-      themes: ['academy', 'summer', 'sakura', 'qixi', 'rainy', 'hero', 'mint', 'crystal', 'night', 'city'],
+      themes: ['academy', 'ledger', 'summer', 'sakura', 'qixi', 'rainy', 'hero', 'mint', 'crystal', 'night', 'city'],
       rarity: 'SR',
       color: '#C8A8E9',
       iconKey: 'ticket',
@@ -131,7 +131,7 @@ export const HOME_SCENE_EFFECTS = {
     },
     star_confetti_burst: {
       name: '星砂彩屑',
-      themes: ['academy', 'summer', 'sakura', 'qixi', 'rainy', 'hero', 'mint', 'crystal', 'night', 'city'],
+      themes: ['academy', 'ledger', 'summer', 'sakura', 'qixi', 'rainy', 'hero', 'mint', 'crystal', 'night', 'city'],
       rarity: 'SR',
       color: '#FFD35F',
       iconKey: 'goldTicket',
@@ -146,6 +146,11 @@ export const HOME_SCENE_EFFECTS = {
 
 export const DEFAULT_HOME_EFFECTS_BY_THEME = {
   academy: {
+    backgroundAura: 'academy_stardust',
+    groundEffect: null,
+    successEffect: null,
+  },
+  ledger: {
     backgroundAura: 'academy_stardust',
     groundEffect: null,
     successEffect: null,

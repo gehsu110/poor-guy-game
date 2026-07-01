@@ -504,6 +504,41 @@
   background: linear-gradient(135deg, #ffd875, #e7ad36 62%, #c98921);
 }
 
+.academy-screen--ledger .academy-bg-soft {
+  background:
+    radial-gradient(circle at 50% 33%, rgba(255, 221, 145, .08), transparent 34%),
+    linear-gradient(180deg, rgba(18, 22, 45, .18), rgba(18, 22, 45, .02) 46%, rgba(28, 23, 49, .20));
+}
+
+.academy-screen--ledger .academy-home-hero {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.academy-screen--ledger .academy-home-hero::before,
+.academy-screen--ledger .academy-home-hero__shine {
+  content: none;
+  display: none;
+}
+
+.academy-screen--ledger .academy-status-board {
+  border-color: rgba(255,226,166,.46);
+  background:
+    linear-gradient(135deg, rgba(255,248,232,.70), rgba(226,219,255,.46)),
+    radial-gradient(circle at 90% 0%, rgba(255,222,128,.28), transparent 40%);
+  box-shadow: 0 18px 40px rgba(20,18,42,.28), inset 0 1px rgba(255,255,255,.24);
+}
+
+.academy-screen--ledger .academy-mini-currency,
+.academy-screen--ledger .academy-wardrobe-fab {
+  background: rgba(255,248,232,.62);
+}
+
+.academy-screen--ledger .academy-dock {
+  background: rgba(255,248,232,.90);
+}
+
 /* Complete summer collection: scene, props, motion, and UI palette travel together. */
 .academy-screen--summer .academy-bg-soft {
   background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(24,133,168,.04) 48%, rgba(255,244,215,.34));
@@ -1102,6 +1137,18 @@
 .academy-screen--sakura,
 .academy-screen--qixi,
 .academy-screen--rainy { --home-stage-baseline: min(71vh, 572px); }
+.academy-screen--ledger {
+  --home-stage-baseline: min(73vh, 594px);
+  --scene-hud-panel: rgba(37, 35, 56, 0.50);
+  --scene-hud-panel-strong: rgba(255, 247, 228, 0.76);
+  --scene-hud-line: rgba(255, 226, 166, 0.36);
+  --scene-hud-text: #26304a;
+  --scene-hud-muted: #6f6888;
+  --scene-hud-accent: #e7ad36;
+  --scene-hud-primary: linear-gradient(135deg, #ffe08a 0%, #e7ad36 56%, #b4771f 100%);
+  --scene-hud-primary-text: #2e243e;
+  --scene-hud-shadow: 0 18px 42px rgba(25, 22, 47, 0.32);
+}
 
 .home-scene-effects {
   position: absolute;
@@ -1262,9 +1309,9 @@
 
 .home-scene-ground {
   position: absolute;
-  top: calc(var(--home-stage-baseline) + 14px);
+  top: calc(var(--home-stage-baseline) + 14px + var(--home-ground-offset-y, 0px));
   left: 50%;
-  width: min(91%, 520px);
+  width: var(--home-ground-width, min(91%, 520px));
   aspect-ratio: 1 / .54;
   height: auto;
   border-radius: 50%;

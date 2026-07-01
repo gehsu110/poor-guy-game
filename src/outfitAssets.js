@@ -29,6 +29,8 @@ import girlQixiStarBridge from './assets/academy-art/qixi-set/girl-qixi-star-bri
 import boyQixiStarBridge from './assets/academy-art/qixi-set/boy-qixi-star-bridge.webp'
 import rainyDetectiveBg from './assets/academy-art/rainy-detective-set/rainy-bg.webp'
 import girlRainyDetective from './assets/academy-art/rainy-detective-set/girl-rainy-detective.webp'
+import ledgerCaptainBg from './assets/academy-art/ledger-captain-set/ledger-captain-bg.webp'
+import girlLedgerCaptain from './assets/academy-art/ledger-captain-set/ledger-captain-character.webp'
 
 // ── 幀動畫 imports（從影片抽幀 + 黑底去背，4fps × 12幀 = 3s loop）──
 
@@ -137,6 +139,36 @@ export const OUTFIT_CONFIG = {
     boyVideo:   null,
     bg:         academyBg,
     bgTheme:    'academy',
+  },
+  ledger_captain: {
+    name: '星院帳本長套裝',
+    desc: '學院公告欄、帳本魔法與星術長袍主題展示套裝',
+    girlImage: girlLedgerCaptain,
+    boyImage: null,
+    girlFrames: null,
+    boyFrames: null,
+    girlBlink: null,
+    boyBlink: null,
+    girlVideo: null,
+    boyVideo: null,
+    bg: ledgerCaptainBg,
+    bgTheme: 'ledger',
+    stageProfile: {
+      '--home-stage-baseline': 'min(73vh, 594px)',
+      '--home-character-top': '232px',
+      '--home-character-width': '62vw',
+      '--home-character-max-width': '268px',
+      '--home-ground-width': 'min(70%, 340px)',
+      '--home-ground-offset-y': '0px',
+    },
+    previewStageProfile: {
+      '--home-stage-baseline': '604px',
+      '--home-character-top': '244px',
+      '--home-character-width': '268px',
+      '--home-character-max-width': '268px',
+      '--home-ground-width': '328px',
+      '--home-ground-offset-y': '0px',
+    },
   },
   saving_hero: {
     name: '省錢勇者套裝',
@@ -268,5 +300,14 @@ export function getOutfitAssets(outfitId, gender = 'girl') {
   const video = gender === 'boy'
     ? (c.boyVideo  ?? c.girlVideo)
     : (c.girlVideo ?? c.boyVideo)
-  return { frames, blink, image, video, bg: c.bg, bgTheme: c.bgTheme }
+  return {
+    frames,
+    blink,
+    image,
+    video,
+    bg: c.bg,
+    bgTheme: c.bgTheme,
+    stageProfile: c.stageProfile ?? null,
+    previewStageProfile: c.previewStageProfile ?? c.stageProfile ?? null,
+  }
 }

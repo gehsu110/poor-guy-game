@@ -78,6 +78,7 @@ const EXCHANGE_ITEMS = [
   { id: 'quest_refresh_ticket', type: 'questRefresh', category: 'utility', name: '任務刷新券', source: '每日任務工具', place: '任務頁右上角', costType: 'purple', cost: 1, rarity: 'SR', color: '#C8A8E9', iconKey: 'goldTicket', disabled: true },
   { id: 'bg_mint', type: 'background', category: 'collection', name: '薄荷晨光背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'bg_ribbon', type: 'background', category: 'collection', name: '緞帶學園背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
+  { id: 'ledger_captain_set', type: 'set', category: 'collection', name: '星院帳本長套裝', source: '學院展示商品頁樣品', place: '主頁 / 造型收藏', costType: 'yellow', cost: 0, rarity: 'SSR', color: '#FFD35F', iconKey: 'goldTicket' },
   ...HOME_EFFECT_EXCHANGE_ITEMS,
   ...BATTLE_EFFECT_EXCHANGE_ITEMS,
   { id: 'badge_budget_clear', type: 'settlementBadge', category: 'collection', name: '預算達成徽章', source: '結算徽章', place: '每日結算 / 地圖戰報', costType: 'purple', cost: 2, rarity: 'SR', color: '#A8E6CF', iconKey: 'coin', disabled: true },
@@ -239,6 +240,20 @@ function applyResourceDelta(stars, tickets, delta = {}, direction = 1) {
       gold: (tickets.gold ?? 0) + direction * (delta.goldTicket ?? 0),
     },
   }
+}
+
+const SET_EQUIP = {
+  mint_supply_set: { outfit: 'mint_coat', accessory: 'star_pin', frame: 'crystal' },
+  pink_magic_set: { outfit: 'pink_robe', accessory: 'ribbon', frame: 'frame_ribbon' },
+  night_cape_set: { outfit: 'night_cape', accessory: 'crown', frame: 'moon' },
+  ledger_captain_set: { outfit: 'ledger_captain', accessory: 'none', frame: 'moon' },
+}
+
+function buildEquippedItem(equipped, item) {
+  if (item.type === 'set') {
+    return { ...equipped, ...SET_EQUIP[item.id], set: item.id }
+  }
+  return { ...equipped, [item.type]: item.id }
 }
 
 function drawGacha(count = 1, gold = false) {
@@ -562,9 +577,11 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
   const successPulse = playbackMode === 'success' ? `${item.id}-success-${replayKey}` : null
   const label = TYPE_LABELS[item.type] ?? item.source
   const gender = profile?.avatarGender ?? 'girl'
-  const academyPreview = getOutfitAssets('academy', gender)
-  const characterImage = academyPreview.image
-  const backgroundImage = academyPreview.bg
+  const previewOutfit = getOutfitAssets(profile?.equipped?.outfit ?? 'academy', gender)
+  const characterImage = previewOutfit.image
+  const backgroundImage = previewOutfit.bg
+  const previewTheme = previewOutfit.bgTheme ?? 'academy'
+  const previewStageProfile = previewOutfit.previewStageProfile ?? previewOutfit.stageProfile
   const previewModes = [
     { key: 'intro', label: '裝上' },
     { key: 'idle', label: '平常' },
@@ -595,11 +612,14 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
           <button className="academy-back" onClick={onClose}>×</button>
         </div>
         <div key={`${item.id}-${playbackMode}-${replayKey}`} className="academy-shop-effect-preview__stage" data-preview-mode={playbackMode}>
-          <div className="academy-shop-effect-preview__scene academy-screen academy-screen--academy">
+          <div
+            className={`academy-shop-effect-preview__scene academy-screen academy-screen--${previewTheme}`}
+            style={previewStageProfile ?? undefined}
+          >
             <img className="academy-bg" src={backgroundImage} alt="" draggable="false" />
-            <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
+            <HomeSceneEffects theme={previewTheme} equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
             <img className="academy-screen-character" src={characterImage} alt="" draggable="false" />
-            <HomeSceneEffects theme="academy" equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
+            <HomeSceneEffects theme={previewTheme} equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
           </div>
         </div>
         <div className="academy-shop-effect-preview__actions">
@@ -775,12 +795,12 @@ export default function ShopScreen() {
       return
     }
     const next = applyResourceDelta(stars, tickets, cost, -1)
-    const autoEquip = item.cost === 0 && (isHomeEffectItem(item) || item.type === 'attackEffect')
+    const autoEquip = item.cost === 0 && (isHomeEffectItem(item) || item.type === 'attackEffect' || item.type === 'set')
     const data = {
       stars: next.stars,
       tickets: next.tickets,
       collection: [...collection, { id: item.id, rarity: item.rarity, obtainedAt: Date.now(), source: 'exchange' }],
-      ...(autoEquip ? { equipped: { ...equipped, [item.type]: item.id } } : {}),
+      ...(autoEquip ? { equipped: buildEquippedItem(equipped, item) } : {}),
     }
     dispatch({ type: 'UPDATE_PROFILE', data })
     try {
@@ -794,14 +814,7 @@ export default function ShopScreen() {
   }
 
   async function equipItem(item) {
-    const SET_EQUIP = {
-      mint_supply_set: { outfit: 'mint_coat', accessory: 'star_pin', frame: 'crystal' },
-      pink_magic_set: { outfit: 'pink_robe', accessory: 'ribbon', frame: 'frame_ribbon' },
-      night_cape_set: { outfit: 'night_cape', accessory: 'crown', frame: 'moon' },
-    }
-    const data = item.type === 'set'
-      ? { equipped: { ...equipped, ...SET_EQUIP[item.id], set: item.id } }
-      : { equipped: { ...equipped, [item.type]: item.id } }
+    const data = { equipped: buildEquippedItem(equipped, item) }
     dispatch({ type: 'UPDATE_PROFILE', data })
     notify(`${item.name} 已裝備`)
     if (user) await updateProfile(user.uid, data)

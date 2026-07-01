@@ -22,6 +22,19 @@ const WARDROBE_SETS = [
     tags: ['owned', 'achievement'],
   },
   {
+    id: 'ledger_captain_set',
+    name: '星院帳本長套裝',
+    desc: '公告欄前的帳本魔法長袍、專屬學院夜景與展示舞台',
+    outfit: 'ledger_captain',
+    accessory: 'none',
+    frame: 'moon',
+    owned: true,
+    rarity: 'SSR',
+    series: '學院展示',
+    source: '商店展示樣品',
+    tags: ['owned', 'achievement'],
+  },
+  {
     id: 'pink_magic_set',
     name: '粉晶禮服套裝',
     desc: '紫星直購造型',
@@ -146,9 +159,12 @@ function OutfitPreview({ gender, outfitId, className }) {
 }
 
 function OutfitStage({ gender, outfitId, className = '' }) {
-  const { bg, bgTheme } = getOutfitAssets(outfitId, gender)
+  const { bg, bgTheme, stageProfile } = getOutfitAssets(outfitId, gender)
   return (
-    <div className={`academy-outfit-stage academy-outfit-stage--${bgTheme ?? 'academy'} ${className}`}>
+    <div
+      className={`academy-outfit-stage academy-outfit-stage--${bgTheme ?? 'academy'} ${className}`}
+      style={stageProfile ?? undefined}
+    >
       <img src={bg} alt="" className="academy-outfit-stage__bg" draggable="false" />
       <span className="academy-outfit-stage__fx academy-outfit-stage__fx--one" />
       <span className="academy-outfit-stage__fx academy-outfit-stage__fx--two" />

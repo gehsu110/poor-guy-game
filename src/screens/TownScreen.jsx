@@ -32,6 +32,10 @@ const HOME_THEME_COLORS = {
     color: '#25325f',
     background: 'linear-gradient(180deg, #18244e 0%, #25325f 58%, #56678f 100%)',
   },
+  ledger: {
+    color: '#1f2649',
+    background: 'linear-gradient(180deg, #172047 0%, #283058 54%, #f1d1b7 100%)',
+  },
 }
 
 function IdentityHUD({ profile }) {
@@ -92,7 +96,7 @@ export default function TownScreen() {
   const [characterCue, setCharacterCue] = useState(null)
   const gender   = profile?.avatarGender ?? 'girl'
   const outfitId = profile?.equipped?.outfit ?? 'academy'
-  const { bg, frames, blink, image, video, bgTheme } = getOutfitAssets(outfitId, gender)
+  const { bg, frames, blink, image, video, bgTheme, stageProfile } = getOutfitAssets(outfitId, gender)
   const hasGroundEffect = Boolean(profile?.equipped?.groundEffect)
   const characterClass = [
     'academy-screen-character',
@@ -127,7 +131,7 @@ export default function TownScreen() {
   }, [dispatch, state.pendingHomeSuccessEffect])
 
   return (
-    <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`}>
+    <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`} style={stageProfile ?? undefined}>
       {/* 全螢幕背景 */}
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />

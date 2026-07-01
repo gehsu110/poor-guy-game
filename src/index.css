@@ -722,7 +722,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: var(--home-bg-position, center);
   user-select: none;
 }
 
@@ -1104,9 +1104,9 @@ video.academy-home-hero__character {
   left: 50%;
   transform: translateX(-50%);
   /* width 固定為 vw，height: auto 維持比例 → 不依賴 object-fit，不會觸邊 */
-  top: 80px;
-  width: 54vw;              /* 375px 螢幕 ≈ 202px，同前版比例 */
-  max-width: 210px;         /* 大螢幕上限 */
+  top: var(--home-character-top, 80px);
+  width: var(--home-character-width, 54vw);              /* 375px 螢幕 ≈ 202px，同前版比例 */
+  max-width: var(--home-character-max-width, 210px);         /* 大螢幕上限 */
   height: auto;             /* 依寬度等比縮放 */
   filter: drop-shadow(0 18px 18px rgba(78, 61, 122, 0.22));
   pointer-events: none; /* 讓卡片按鈕可點擊（角色覆蓋範圍不阻擋） */
@@ -3102,6 +3102,44 @@ video.academy-screen-character {
 .academy-outfit-stage--summer .academy-outfit-stage__fx--two { right: 10%; bottom: 26%; animation-delay: -1.3s; }
 .academy-outfit-stage--summer .academy-outfit-stage__fx--three { left: 42%; bottom: 11%; animation-delay: -2.4s; }
 
+.academy-outfit-stage--ledger .academy-outfit-stage__bg {
+  object-position: center;
+  transform: scale(1.04);
+}
+
+.academy-outfit-stage--ledger .academy-outfit-stage__fx {
+  border-radius: 999px;
+  background: radial-gradient(ellipse, rgba(255,228,160,0.52), transparent 70%);
+  opacity: .52;
+  filter: blur(.4px);
+  animation: outfit-star-twinkle 3.8s ease-in-out infinite;
+}
+
+.academy-outfit-stage--ledger .academy-outfit-stage__fx--one {
+  left: 16%;
+  bottom: 20%;
+  width: 58%;
+  height: 9px;
+}
+
+.academy-outfit-stage--ledger .academy-outfit-stage__fx--two {
+  right: 14%;
+  top: 30%;
+  width: 5px;
+  height: 5px;
+  box-shadow: 0 0 12px rgba(255,232,160,.82);
+  animation-delay: -1.4s;
+}
+
+.academy-outfit-stage--ledger .academy-outfit-stage__fx--three {
+  left: 22%;
+  top: 22%;
+  width: 4px;
+  height: 4px;
+  box-shadow: 0 0 10px rgba(255,232,160,.72);
+  animation-delay: -2.5s;
+}
+
 @keyframes outfit-star-twinkle { 50% { opacity: .22; transform: scale(.52); } }
 @keyframes outfit-thread-flow { to { translate: 42px 0; opacity: .08; } }
 @keyframes outfit-rainy-shimmer { 50% { opacity: .16; transform: scaleX(.72); } }
@@ -3119,6 +3157,12 @@ video.academy-screen-character {
   object-fit: contain;
   object-position: center bottom;
   filter: drop-shadow(0 14px 18px rgba(38,48,74,0.22));
+}
+
+.academy-outfit-stage--ledger .academy-outfit-stage__avatar {
+  bottom: 5px;
+  width: 54%;
+  height: 82%;
 }
 
 .academy-style-hero__info {
