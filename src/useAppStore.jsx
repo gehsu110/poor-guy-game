@@ -61,10 +61,10 @@ const DEMO_PROFILE = {
   guildLedger: [],
   customCategories: [],
   equipped: {
-    set: 'academy_set',
-    outfit: 'academy',
-    accessory: 'star_pin',
-    frame: 'soft_gold',
+    set: 'ledger_captain_set',
+    outfit: 'ledger_captain',
+    accessory: 'none',
+    frame: 'moon',
     groundEffect: 'starter_magic_circle',
     successEffect: 'coin_spark_burst',
     attackEffect: DEFAULT_BATTLE_ATTACK_EFFECT,
@@ -104,14 +104,25 @@ function getKillTicketReward(tier) {
 
 function withStarterHomeEffects(profile) {
   if (!profile) return profile
+  const currentEquipped = profile.equipped ?? {}
+  const shouldShowLedgerDemo = !currentEquipped.outfit || (
+    currentEquipped.outfit === 'academy' &&
+    (!currentEquipped.set || currentEquipped.set === 'academy_set')
+  )
   const equipped = {
-    ...(profile.equipped ?? {}),
-    groundEffect: profile.equipped?.groundEffect ?? 'starter_magic_circle',
-    successEffect: profile.equipped?.successEffect ?? 'coin_spark_burst',
-    attackEffect: profile.equipped?.attackEffect ?? DEFAULT_BATTLE_ATTACK_EFFECT,
+    ...currentEquipped,
+    ...(shouldShowLedgerDemo
+      ? { set: 'ledger_captain_set', outfit: 'ledger_captain', accessory: 'none', frame: 'moon' }
+      : {}),
+    groundEffect: currentEquipped.groundEffect ?? 'starter_magic_circle',
+    successEffect: currentEquipped.successEffect ?? 'coin_spark_burst',
+    attackEffect: currentEquipped.attackEffect ?? DEFAULT_BATTLE_ATTACK_EFFECT,
   }
   const collection = [...(profile.collection ?? [])]
   const owned = new Set(collection.map(item => item.id))
+  if (!owned.has('ledger_captain_set')) {
+    collection.push({ id: 'ledger_captain_set', rarity: 'SSR', obtainedAt: Date.now(), source: 'demo' })
+  }
   if (!owned.has('starter_magic_circle')) {
     collection.push({ id: 'starter_magic_circle', rarity: 'R', obtainedAt: Date.now(), source: 'starter' })
   }
