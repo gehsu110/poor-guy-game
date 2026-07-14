@@ -4,10 +4,11 @@ import { useApp } from '../useAppStore'
 import { updateProfile } from '../firebase'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
+import PaperDollFigure from '../components/PaperDollFigure'
 import HomeSceneEffects from '../components/HomeSceneEffects'
-import { getOutfitAssets } from '../outfitAssets'
 import { HOME_EFFECT_TYPE_LABELS, flattenHomeSceneEffects } from '../homeSceneEffects'
 import { flattenBattleAttackEffects } from '../battleEffects'
+import { findPartById, normalizeAppearance, getPaperDollAssets } from '../paperDoll'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
 
@@ -21,10 +22,6 @@ const GACHA_POOL = [
   { id: 'title_legend', type: 'title', name: '理財賢者', rarity: 'SSR', color: '#FFE4A0', iconKey: 'star' },
   { id: 'frame_stars', type: 'frame', name: '星砂邊框', rarity: 'R', color: '#FFE4A0', iconKey: 'ticket' },
   { id: 'frame_ribbon', type: 'frame', name: '緞帶邊框', rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
-  { id: 'night_cape', type: 'outfit', name: '星夜斗篷', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
-  { id: 'night_cape_set', type: 'set', name: '星夜斗篷套裝', rarity: 'SR', color: '#C8A8E9', iconKey: 'heart' },
-  { id: 'ribbon', type: 'accessory', name: '粉色緞帶', rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
-  { id: 'crown', type: 'accessory', name: '勇者小冠', rarity: 'SSR', color: '#FFE4A0', iconKey: 'goldTicket' },
 ]
 
 const EXCHANGE_CATEGORIES = [
@@ -78,12 +75,20 @@ const EXCHANGE_ITEMS = [
   { id: 'quest_refresh_ticket', type: 'questRefresh', category: 'utility', name: '任務刷新券', source: '每日任務工具', place: '任務頁右上角', costType: 'purple', cost: 1, rarity: 'SR', color: '#C8A8E9', iconKey: 'goldTicket', disabled: true },
   { id: 'bg_mint', type: 'background', category: 'collection', name: '薄荷晨光背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
   { id: 'bg_ribbon', type: 'background', category: 'collection', name: '緞帶學園背景', source: '常駐背景', place: '主頁背景氛圍', costType: 'yellow', cost: 6, rarity: 'R', color: '#FFB3C6', iconKey: 'ticket' },
-  { id: 'ledger_captain_set', type: 'set', category: 'collection', name: '星院帳本長套裝', source: '學院展示商品頁樣品', place: '主頁 / 造型收藏', costType: 'yellow', cost: 0, rarity: 'SSR', color: '#FFD35F', iconKey: 'goldTicket' },
   ...HOME_EFFECT_EXCHANGE_ITEMS,
   ...BATTLE_EFFECT_EXCHANGE_ITEMS,
   { id: 'badge_budget_clear', type: 'settlementBadge', category: 'collection', name: '預算達成徽章', source: '結算徽章', place: '每日結算 / 地圖戰報', costType: 'purple', cost: 2, rarity: 'SR', color: '#A8E6CF', iconKey: 'coin', disabled: true },
-  { id: 'mint_supply_set', type: 'set', category: 'collection', name: '薄荷補給套裝', source: '普通商店套裝', place: '造型收藏', costType: 'yellow', cost: 12, rarity: 'R', color: '#A8E6CF', iconKey: 'crystal' },
-  { id: 'pink_magic_set', type: 'set', category: 'collection', name: '粉晶魔法套裝', source: '普通商店套裝', place: '造型收藏', costType: 'purple', cost: 6, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
+  { id: 'pd_hair_pink', type: 'paperPart', category: 'collection', name: '粉長捲髮', source: '造型部件・髮型', place: '造型衣櫃', costType: 'yellow', cost: 0, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
+  { id: 'pd_outfit_dress', type: 'paperPart', category: 'collection', name: '公主紗裙', source: '造型部件・服裝', place: '造型衣櫃', costType: 'yellow', cost: 0, rarity: 'SR', color: '#FFB3C6', iconKey: 'heart' },
+  { id: 'pd_prop_book', type: 'paperPart', category: 'collection', name: '魔法書', source: '造型部件・道具', place: '造型衣櫃', costType: 'yellow', cost: 0, rarity: 'R', color: '#C8A8E9', iconKey: 'crystal' },
+  { id: 'pd_action_cast', type: 'paperPart', category: 'collection', name: '施法動作', source: '造型部件・動作', place: '造型衣櫃', costType: 'purple', cost: 0, rarity: 'SR', color: '#B79BFF', iconKey: 'star' },
+  { id: 'pd_prop_crystal', type: 'paperPart', category: 'collection', name: '發光水晶杖', source: '造型部件・道具', place: '造型衣櫃', costType: 'purple', cost: 0, rarity: 'SR', color: '#C8A8E9', iconKey: 'goldTicket' },
+  { id: 'pd_headwear_star_beret', type: 'paperPart', category: 'collection', name: '星院畫家帽', source: '造型部件・帽子髮飾', place: '角色頭部', costType: 'yellow', cost: 0, rarity: 'R', color: '#8D7BC9', iconKey: 'star' },
+  { id: 'pd_face_moon_glasses', type: 'paperPart', category: 'collection', name: '月讀圓框眼鏡', source: '造型部件・臉部配件', place: '角色臉部', costType: 'yellow', cost: 0, rarity: 'R', color: '#E7AD36', iconKey: 'coin' },
+  { id: 'pd_companion_coin_sprite', type: 'paperPart', category: 'collection', name: '金幣精靈', source: '造型部件・寵物夥伴', place: '角色身旁', costType: 'yellow', cost: 0, rarity: 'R', color: '#E7AD36', iconKey: 'coin' },
+  { id: 'pd_headwear_saving_crown', type: 'paperPart', category: 'collection', name: '守財小王冠', source: '造型部件・帽子髮飾', place: '角色頭部', costType: 'yellow', cost: 4, rarity: 'SR', color: '#FFE4A0', iconKey: 'star' },
+  { id: 'pd_back_budget_wings', type: 'paperPart', category: 'collection', name: '預算守護翼', source: '造型部件・背部配件', place: '角色背後', costType: 'purple', cost: 2, rarity: 'SR', color: '#A8E6CF', iconKey: 'crystal' },
+  { id: 'pd_companion_ledger_owl', type: 'paperPart', category: 'collection', name: '帳本貓頭鷹', source: '造型部件・寵物夥伴', place: '角色身旁', costType: 'yellow', cost: 6, rarity: 'SR', color: '#7161B8', iconKey: 'goldTicket' },
   { id: 'frame_gold', type: 'frame', category: 'identity', name: '星砂金邊頭像框', source: '頭像框', place: '商店頭像 / 個人頁', costType: 'yellow', cost: 5, rarity: 'R', color: '#FFE4A0', iconKey: 'star' },
   { id: 'frame_ribbon', type: 'frame', category: 'identity', name: '緞帶頭像框', source: '頭像框', place: '商店頭像 / 個人頁', costType: 'purple', cost: 2, rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'title_budget', type: 'title', category: 'identity', name: '預算守門人', source: '稱號', place: '主頁名稱下方', costType: 'purple', cost: 3, rarity: 'SR', color: '#A8D8EA', iconKey: 'coin' },
@@ -132,6 +137,7 @@ const TYPE_LABELS = {
   outfit: '服裝',
   accessory: '頭飾',
   set: '套裝',
+  paperPart: '造型部件',
   resource: '資源',
   boost: '每日加成',
   reminderSkin: '提醒外觀',
@@ -242,16 +248,14 @@ function applyResourceDelta(stars, tickets, delta = {}, direction = 1) {
   }
 }
 
-const SET_EQUIP = {
-  mint_supply_set: { outfit: 'mint_coat', accessory: 'star_pin', frame: 'crystal' },
-  pink_magic_set: { outfit: 'pink_robe', accessory: 'ribbon', frame: 'frame_ribbon' },
-  night_cape_set: { outfit: 'night_cape', accessory: 'crown', frame: 'moon' },
-  ledger_captain_set: { outfit: 'ledger_captain', accessory: 'none', frame: 'moon' },
-}
-
 function buildEquippedItem(equipped, item) {
-  if (item.type === 'set') {
-    return { ...equipped, ...SET_EQUIP[item.id], set: item.id }
+  if (item.type === 'paperPart') {
+    const part = findPartById(item.id)
+    if (!part) return equipped
+    return {
+      ...equipped,
+      appearance: { ...normalizeAppearance(equipped.appearance), [part.slot]: part.key },
+    }
   }
   return { ...equipped, [item.type]: item.id }
 }
@@ -280,11 +284,11 @@ function ShopPlayerCard({ profile }) {
   const frame = profile?.equipped?.frame ?? 'soft_gold'
   const gender = profile?.avatarGender ?? 'girl'
   const name = profile?.playerName?.trim() || '新手勇者'
-  const portraitImage = getOutfitAssets(profile?.equipped?.outfit ?? 'academy', gender).image
+  const portraitAssets = getPaperDollAssets(profile?.equipped?.appearance)
   return (
     <div className="academy-shop-player-card">
       <div className={`academy-shop-player-avatar academy-avatar-frame--${frame}`}>
-        <Avatar gender={gender} variant="portrait" frame={frame} src={portraitImage} />
+        <Avatar gender={gender} variant="portrait" frame={frame} src={portraitAssets.staticImage} layers={portraitAssets.layers} />
       </div>
       <div>
         <b>{name}</b>
@@ -576,12 +580,10 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
   const entrancePulse = playbackMode === 'intro' ? `${item.id}-intro-${replayKey}` : null
   const successPulse = playbackMode === 'success' ? `${item.id}-success-${replayKey}` : null
   const label = TYPE_LABELS[item.type] ?? item.source
-  const gender = profile?.avatarGender ?? 'girl'
-  const previewOutfit = getOutfitAssets(profile?.equipped?.outfit ?? 'academy', gender)
-  const characterImage = previewOutfit.image
+  const previewOutfit = getPaperDollAssets(profile?.equipped?.appearance)
   const backgroundImage = previewOutfit.bg
-  const previewTheme = previewOutfit.bgTheme ?? 'academy'
-  const previewStageProfile = previewOutfit.previewStageProfile ?? previewOutfit.stageProfile
+  const previewTheme = previewOutfit.bgTheme ?? 'plain'
+  const previewStageProfile = null
   const previewModes = [
     { key: 'intro', label: '裝上' },
     { key: 'idle', label: '平常' },
@@ -618,7 +620,7 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
           >
             <img className="academy-bg" src={backgroundImage} alt="" draggable="false" />
             <HomeSceneEffects theme={previewTheme} equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="back" />
-            <img className="academy-screen-character" src={characterImage} alt="" draggable="false" />
+            <PaperDollFigure assets={previewOutfit} className="academy-screen-character" />
             <HomeSceneEffects theme={previewTheme} equipped={previewEquipped} entrancePulse={entrancePulse} successPulse={successPulse} layer="front" />
           </div>
         </div>
@@ -645,6 +647,46 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
   )
 }
 
+function PaperPartPreviewModal({ item, profile, onClose }) {
+  const part = findPartById(item.id)
+  if (!part) return null
+  const current = normalizeAppearance(profile?.equipped?.appearance)
+  const previewAssets = getPaperDollAssets({ ...current, [part.slot]: part.key })
+
+  return (
+    <motion.div
+      className="academy-shop-effect-modal"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="academy-shop-effect-preview"
+        initial={{ y: 20, scale: .96 }}
+        animate={{ y: 0, scale: 1 }}
+        exit={{ y: 16, scale: .98 }}
+        onClick={event => event.stopPropagation()}
+      >
+        <div className="academy-shop-effect-preview__head">
+          <div>
+            <span>{part.slot === 'headwear' ? '帽子・髮飾' : part.slot === 'faceAccessory' ? '臉部配件' : part.slot === 'backAccessory' ? '背部配件' : part.slot === 'companion' ? '寵物夥伴' : '造型部件'}</span>
+            <b>{item.name}</b>
+          </div>
+          <button className="academy-back" onClick={onClose}>×</button>
+        </div>
+        <div className="academy-shop-effect-preview__stage">
+          <div className={`academy-shop-effect-preview__scene academy-screen academy-screen--${previewAssets.bgTheme ?? 'plain'}`}>
+            <img className="academy-bg" src={previewAssets.bg} alt="" draggable="false" />
+            <PaperDollFigure assets={previewAssets} className="academy-screen-character" />
+          </div>
+        </div>
+        <p className="academy-shop-paper-preview__note">使用目前角色與背景試穿；購買後可在「造型」自由裝卸。</p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 export default function ShopScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile, user } = state
@@ -653,6 +695,7 @@ export default function ShopScreen() {
   const [exchangeCategory, setExchangeCategory] = useState('all')
   const [isDrawing, setIsDrawing] = useState(false)
   const [previewHomeEffect, setPreviewHomeEffect] = useState(null)
+  const [previewPaperPart, setPreviewPaperPart] = useState(null)
 
   const tickets = profile?.tickets ?? { normal: 0, gold: 0 }
   const stars = profile?.stars ?? { yellow: 0, purple: 0 }
@@ -665,7 +708,11 @@ export default function ShopScreen() {
   const visibleExchangeItems = EXCHANGE_ITEMS.filter(item => exchangeCategory === 'all' || item.category === exchangeCategory)
 
   function isEquipped(item) {
-    return equipped?.[item.type] === item.id || equipped?.set === item.id || equipped?.frame === item.id
+    if (item.type === 'paperPart') {
+      const part = findPartById(item.id)
+      return part ? normalizeAppearance(equipped?.appearance)[part.slot] === part.key : false
+    }
+    return equipped?.[item.type] === item.id || equipped?.frame === item.id
   }
 
   function notify(message) {
@@ -795,7 +842,7 @@ export default function ShopScreen() {
       return
     }
     const next = applyResourceDelta(stars, tickets, cost, -1)
-    const autoEquip = item.cost === 0 && (isHomeEffectItem(item) || item.type === 'attackEffect' || item.type === 'set')
+    const autoEquip = item.cost === 0 && (isHomeEffectItem(item) || item.type === 'attackEffect' || item.type === 'paperPart')
     const data = {
       stars: next.stars,
       tickets: next.tickets,
@@ -1018,6 +1065,7 @@ export default function ShopScreen() {
                   const rarity = RARITY_CONFIG[item.rarity] ?? RARITY_CONFIG.R
                   const equippedNow = isEquipped(item)
                   const homeEffectProduct = isHomeEffectItem(item)
+                  const paperPartProduct = item.type === 'paperPart'
                   return (
                     <div key={item.id} className={`academy-shop-product ${item.disabled ? 'is-disabled' : ''} ${equippedNow ? 'is-equipped' : ''}`}>
                       <PrizeIcon item={item} />
@@ -1032,6 +1080,11 @@ export default function ShopScreen() {
                         {homeEffectProduct && (
                           <button className="academy-small-button academy-shop-product__preview" onClick={() => setPreviewHomeEffect(item)}>
                             試看
+                          </button>
+                        )}
+                        {paperPartProduct && (
+                          <button className="academy-small-button academy-shop-product__preview" onClick={() => setPreviewPaperPart(item)}>
+                            試穿
                           </button>
                         )}
                         <button className="academy-small-button" onClick={() => buyExchange(item)} disabled={equippedNow}>
@@ -1073,6 +1126,7 @@ export default function ShopScreen() {
       <AnimatePresence>
         {gachaResult && <GachaResult results={gachaResult} onClose={() => setGachaResult(null)} />}
         {previewHomeEffect && <HomeEffectPreviewModal item={previewHomeEffect} profile={profile} onClose={() => setPreviewHomeEffect(null)} />}
+        {previewPaperPart && <PaperPartPreviewModal item={previewPaperPart} profile={profile} onClose={() => setPreviewPaperPart(null)} />}
       </AnimatePresence>
 
     </div>

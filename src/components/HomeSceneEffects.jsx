@@ -49,9 +49,12 @@ export default function HomeSceneEffects({ theme = 'academy', equipped, entrance
     if (!hasGroundEffect || !showFrontLayer) return
     if (!entranceKey) return
     const key = entranceKey
-    setSummonKey(key)
+    const startTimer = window.setTimeout(() => setSummonKey(key), 0)
     const timer = window.setTimeout(() => setSummonKey(null), 1650)
-    return () => window.clearTimeout(timer)
+    return () => {
+      window.clearTimeout(startTimer)
+      window.clearTimeout(timer)
+    }
   }, [effects.groundEffect, entranceKey, hasGroundEffect, showFrontLayer])
 
   return (

@@ -7,8 +7,23 @@ export default function Avatar({
   outfit = 'academy',
   accessory = 'none',
   src = null,
+  layers = [],
   className = '',
 }) {
+  const behind = layers.filter(layer => layer.layer === 'back')
+  const inFront = layers.filter(layer => layer.layer !== 'back')
+
+  const renderLayer = layer => (
+    <img
+      key={`${layer.slot}:${layer.item.id}`}
+      src={layer.asset}
+      alt=""
+      draggable="false"
+      className="academy-avatar__paper-layer"
+      data-paper-doll-slot={layer.slot}
+    />
+  )
+
   return (
     <div
       className={[
@@ -22,7 +37,9 @@ export default function Avatar({
         className,
       ].join(' ')}
     >
-      <img src={src ?? avatars} alt="" draggable="false" />
+      {behind.map(renderLayer)}
+      <img src={src ?? avatars} alt="" draggable="false" className="academy-avatar__base" />
+      {inFront.map(renderLayer)}
     </div>
   )
 }

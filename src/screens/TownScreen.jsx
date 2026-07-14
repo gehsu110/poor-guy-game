@@ -3,11 +3,10 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, getTitle } from '../gameLogic'
-import { getOutfitAssets } from '../outfitAssets'
+import { getPaperDollAssets } from '../paperDoll'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
-import ChromaKeyCanvas from '../components/ChromaKeyCanvas'
-import SpriteCharacter from '../components/SpriteCharacter'
+import PaperDollFigure from '../components/PaperDollFigure'
 import HomeSceneEffects from '../components/HomeSceneEffects'
 import { setScreenChrome } from '../screenChrome'
 
@@ -36,6 +35,14 @@ const HOME_THEME_COLORS = {
     color: '#1f2649',
     background: 'linear-gradient(180deg, #172047 0%, #283058 54%, #f1d1b7 100%)',
   },
+  plain: {
+    color: '#e8e0f7',
+    background: 'linear-gradient(180deg, #e5ddf5 0%, #efe9f8 58%, #fdf8f0 100%)',
+  },
+  plaza: {
+    color: '#4a3f78',
+    background: 'linear-gradient(180deg, #3d3468 0%, #5a4f8e 58%, #f3d9c0 100%)',
+  },
 }
 
 function IdentityHUD({ profile }) {
@@ -47,12 +54,12 @@ function IdentityHUD({ profile }) {
   const expPct = expToNext > 0 ? Math.min(100, Math.round((expInLevel / expToNext) * 100)) : 100
   const gender = profile?.avatarGender ?? 'girl'
   const frame = profile?.equipped?.frame ?? 'soft_gold'
-  const portraitImage = getOutfitAssets(profile?.equipped?.outfit ?? 'academy', gender).image
+  const portraitAssets = getPaperDollAssets(profile?.equipped?.appearance)
   return (
     <div className="academy-identity-hud">
       <div className="academy-status-board">
         <div className="academy-identity-chip">
-          <Avatar gender={gender} variant="portrait" frame={frame} src={portraitImage} className="academy-hud-avatar" />
+          <Avatar gender={gender} variant="portrait" frame={frame} src={portraitAssets.staticImage} layers={portraitAssets.layers} className="academy-hud-avatar" />
           <span className="academy-identity-chip__copy">
             <strong>{playerName}</strong>
             <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
@@ -94,9 +101,8 @@ export default function TownScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile } = state
   const [characterCue, setCharacterCue] = useState(null)
-  const gender   = profile?.avatarGender ?? 'girl'
-  const outfitId = profile?.equipped?.outfit ?? 'academy'
-  const { bg, frames, blink, image, video, bgTheme, stageProfile } = getOutfitAssets(outfitId, gender)
+  const paperDollAssets = getPaperDollAssets(profile?.equipped?.appearance)
+  const { bg, bgTheme } = paperDollAssets
   const hasGroundEffect = Boolean(profile?.equipped?.groundEffect)
   const characterClass = [
     'academy-screen-character',
@@ -111,12 +117,13 @@ export default function TownScreen() {
 
   useEffect(() => {
     if (!state.homeEffectPulse) return
-    setCharacterCue(state.homeEffectPulse)
+    const startTimer = window.setTimeout(() => setCharacterCue(state.homeEffectPulse), 0)
     const cueTimer = window.setTimeout(() => setCharacterCue(null), 900)
     const clearTimer = window.setTimeout(() => {
       dispatch({ type: 'CLEAR_HOME_SUCCESS_EFFECT' })
     }, 1550)
     return () => {
+      window.clearTimeout(startTimer)
       window.clearTimeout(cueTimer)
       window.clearTimeout(clearTimer)
     }
@@ -131,43 +138,13 @@ export default function TownScreen() {
   }, [dispatch, state.pendingHomeSuccessEffect])
 
   return (
-    <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`} style={stageProfile ?? undefined}>
+    <div className={`academy-screen academy-screen--${bgTheme ?? 'academy'}`}>
       {/* 全螢幕背景 */}
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
       <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="back" />
-      {/* 角色：綠幕影片優先，無影片用多幀動畫，最後靜態圖 */}
-      {video ? (
-        <ChromaKeyCanvas
-          src={video}
-          keyColor={[0, 255, 0]}
-          threshold={130}
-          className={characterClass}
-        />
-      ) : frames?.length > 0 ? (
-        <SpriteCharacter
-          frames={frames}
-          blink={blink ?? []}
-          fps={4}
-          blinkInterval={3500}
-          className={characterClass}
-        />
-      ) : image ? (
-        <motion.img
-          key={image}
-          src={image}
-          alt=""
-          draggable="false"
-          className={characterClass}
-          initial={{ opacity: 0, x: '-50%', y: 24, scale: 0.92 }}
-          animate={{ opacity: 1, x: '-50%', y: characterCue ? -8 : 0, scale: characterCue ? 1.035 : 1 }}
-          transition={{
-            opacity: { duration: 0.5 },
-            scale:   { duration: characterCue ? 0.18 : 0.45 },
-            y: { duration: characterCue ? 0.18 : 0.45, ease: 'easeOut' },
-          }}
-        />
-      ) : null}
+      {/* 角色核心動畫與帽子、臉部、背部、寵物共用同一張標準畫布 */}
+      <PaperDollFigure assets={paperDollAssets} animated className={characterClass} />
       <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="front" />
       {/* UI 層（z-10，疊在角色上） */}
       <div className="academy-safe-top relative z-10 px-4">

@@ -832,6 +832,19 @@ body {
   transform: translateY(-50%);
 }
 
+.academy-avatar__base {
+  z-index: 1;
+}
+
+.academy-avatar__paper-layer {
+  z-index: 2;
+  pointer-events: none;
+}
+
+.academy-avatar__paper-layer[data-paper-doll-slot="backAccessory"] {
+  z-index: 0;
+}
+
 .academy-avatar--portrait img {
   top: 42%;
   width: 395%;
@@ -1112,9 +1125,64 @@ video.academy-home-hero__character {
   pointer-events: none; /* 讓卡片按鈕可點擊（角色覆蓋範圍不阻擋） */
 }
 
+.paper-doll-figure {
+  position: relative;
+  display: block;
+  aspect-ratio: 896 / 1200;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.paper-doll-figure__base,
+.paper-doll-figure__layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.paper-doll-figure__base {
+  z-index: 1;
+}
+
+.paper-doll-figure__layer {
+  z-index: 2;
+}
+
+.paper-doll-figure__layer[data-paper-doll-slot="backAccessory"] {
+  z-index: 0;
+}
+
+.paper-doll-figure__layer[data-paper-doll-slot="companion"] {
+  z-index: 3;
+  transform-origin: 78% 88%;
+  animation: paper-doll-companion-bob 3.2s ease-in-out infinite;
+}
+
+.paper-doll-figure.academy-screen-character {
+  position: absolute;
+  height: auto;
+  animation: character-glow 4s ease-in-out infinite;
+}
+
+.paper-doll-figure.academy-screen-character--celebrate {
+  animation: character-celebrate .9s cubic-bezier(.18,.82,.24,1) both, character-glow 4s ease-in-out infinite;
+}
+
+@keyframes paper-doll-companion-bob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
 img.academy-screen-character {
   background: transparent;
-  /* 呼吸光暈：drop-shadow 脈動 */
+  /* 呼吸光暈（動作本身由影片動畫呈現，不做 CSS 變形） */
   animation: character-glow 4s ease-in-out infinite;
 }
 canvas.academy-screen-character {
@@ -1145,7 +1213,7 @@ video.academy-screen-character {
   mix-blend-mode: multiply;
 }
 
-.academy-screen-character--tap { cursor: pointer; }
+.academy-screen-character--tap { cursor: pointer; pointer-events: auto; }
 .academy-screen-character--tap:active {
   transform: translateX(-50%) scale(0.96);
   transition: transform 0.1s ease;
@@ -3159,6 +3227,11 @@ video.academy-screen-character {
   filter: drop-shadow(0 14px 18px rgba(38,48,74,0.22));
 }
 
+.academy-outfit-stage__avatar.paper-doll-figure .paper-doll-figure__base,
+.academy-outfit-stage__avatar.paper-doll-figure .paper-doll-figure__layer {
+  object-position: center bottom;
+}
+
 .academy-outfit-stage--ledger .academy-outfit-stage__avatar {
   bottom: 5px;
   width: 54%;
@@ -3337,6 +3410,16 @@ video.academy-screen-character {
   color: #8e87a8;
   font-size: 10px;
   font-weight: 800;
+}
+
+.academy-shop-paper-preview__note {
+  margin: 0;
+  padding: 12px 16px 16px;
+  color: #77738d;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .academy-style-card__tags {
@@ -4924,6 +5007,14 @@ video.academy-screen-character {
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+/* 商店視窗只截取手機場景上半部，角色需使用預覽專屬錨點才能完整試穿。 */
+.academy-shop-effect-preview__scene .paper-doll-figure.academy-screen-character {
+  top: 125px;
+  bottom: auto;
+  width: 220px;
+  max-width: 220px;
 }
 
 .academy-shop-effect-preview__stage .home-scene-effects {

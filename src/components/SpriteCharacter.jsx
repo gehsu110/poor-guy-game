@@ -7,6 +7,8 @@ import { useState, useEffect, useRef, useMemo } from 'react'
  *   frames      : string[]   — 透明 PNG 的 URL / import 陣列（順序即播放順序）
  *   fps         : number     — 每秒幾幀（預設 6）
  *   blinkFrames : number[]   — 哪幾個 index 屬於眨眼幀（間歇性插入，預設 []）
+ *   blinkSrc    : string     — 整張眨眼替換圖（紙娃娃 pipeline：同圖局部編輯，換 src 即眨眼）
+ *   tapSrc      : string     — 整張點擊表情替換圖（點角色短暫顯示）
  *   blinkInterval: number   — 眨眼間隔毫秒（預設 3500）
  *   className   : string
  *   onClick     : () => void
@@ -15,13 +17,17 @@ export default function SpriteCharacter({
   frames = [],
   fps = 6,
   blinkFrames = [],
+  blinkSrc = null,
+  tapSrc = null,
   blinkInterval = 3500,
   className = '',
   onClick,
 }) {
   const [frameIdx, setFrameIdx] = useState(0)
   const [isBlinking, setIsBlinking] = useState(false)
+  const [isTapping, setIsTapping] = useState(false)
   const blinkRef  = useRef(null)
+  const tapRef    = useRef(null)
   const animRef   = useRef(null)
   const idxRef    = useRef(0)
 
@@ -48,7 +54,7 @@ export default function SpriteCharacter({
 
   // ── 眨眼（插入 blinkFrames，不打斷主 loop）──────────────────
   useEffect(() => {
-    if (blinkFrames.length === 0) return
+    if (blinkFrames.length === 0 && !blinkSrc) return
 
     function scheduleBlink() {
       // 隨機 ±500ms 讓眨眼不規律
@@ -58,21 +64,34 @@ export default function SpriteCharacter({
         setTimeout(() => {
           setIsBlinking(false)
           scheduleBlink()
-        }, (blinkFrames.length * 1000) / fps + 80)
+        }, blinkSrc ? 150 : (blinkFrames.length * 1000) / fps + 80)
       }, delay)
     }
 
     scheduleBlink()
     return () => clearTimeout(blinkRef.current)
-  }, [blinkFrames, blinkInterval, fps])
+  }, [blinkFrames, blinkSrc, blinkInterval, fps])
+
+  useEffect(() => () => clearTimeout(tapRef.current), [])
+
+  function handleClick(e) {
+    if (tapSrc) {
+      setIsTapping(true)
+      clearTimeout(tapRef.current)
+      tapRef.current = setTimeout(() => setIsTapping(false), 1400)
+    }
+    onClick?.(e)
+  }
 
   if (frames.length === 0) return null
 
-  // 眨眼期間改用 blinkFrames 系列
+  // 優先級：點擊表情 > 眨眼 > 主 loop
   const visibleFrames = isBlinking && blinkFrames.length > 0 ? blinkFrames : null
-  const src = visibleFrames
+  let src = visibleFrames
     ? frames[visibleFrames[frameIdx % visibleFrames.length]]
     : pingPongFrames[frameIdx]
+  if (isBlinking && blinkSrc) src = blinkSrc
+  if (isTapping && tapSrc) src = tapSrc
 
   return (
     <img
@@ -80,7 +99,7 @@ export default function SpriteCharacter({
       alt=""
       draggable="false"
       className={className}
-      onClick={onClick}
+      onClick={handleClick}
       style={{ imageRendering: 'auto' }}
     />
   )

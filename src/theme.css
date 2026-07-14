@@ -480,6 +480,42 @@
   max-width: 260px;
 }
 
+/* 紙娃娃舞台：比照原版呈現（角色站在場景地面上、背景全螢幕鋪滿） */
+.academy-screen--plain .academy-screen-character {
+  top: 232px;
+  width: 62vw;
+  max-width: 268px;
+}
+
+/* 廣場：從底部錨定，腳永遠在 dock 上方的光池區，不被選單擋住 */
+.academy-screen--plaza .academy-screen-character {
+  top: auto;
+  bottom: calc(150px + env(safe-area-inset-bottom));
+  width: 62vw;
+  max-width: 268px;
+}
+
+.academy-screen--plain .academy-home-hero,
+.academy-screen--plaza .academy-home-hero {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  isolation: auto;
+}
+
+.academy-screen--plain .academy-home-hero::before,
+.academy-screen--plain .academy-home-hero__shine,
+.academy-screen--plaza .academy-home-hero::before,
+.academy-screen--plaza .academy-home-hero__shine { display: none; }
+
+.academy-screen--plaza .academy-bg-soft {
+  background: linear-gradient(180deg, rgba(61,52,104,.04), rgba(61,52,104,.10) 58%, rgba(46,36,84,.24));
+}
+
+.academy-screen--plaza {
+  --screen-safe-bg: linear-gradient(180deg, #3d3468 0%, rgba(61,52,104,0) 100%);
+}
+
 .academy-screen--academy img.academy-screen-character[src*="home-hero-boy-v2"] {
   top: 182px;
   width: 48vw;
