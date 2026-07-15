@@ -17,6 +17,14 @@ import moonGlasses from './assets/academy-art/paper-doll-set/accessories/moon-gl
 import budgetWings from './assets/academy-art/paper-doll-set/accessories/budget-wings.png'
 import coinSprite from './assets/academy-art/paper-doll-set/accessories/coin-sprite.png'
 import ledgerOwl from './assets/academy-art/paper-doll-set/accessories/ledger-owl.png'
+import mintRangerCap from './assets/academy-art/paper-doll-set/accessories/mint-ranger-cap.png'
+import moonWitchHat from './assets/academy-art/paper-doll-set/accessories/moon-witch-hat.png'
+import mintSquareGlasses from './assets/academy-art/paper-doll-set/accessories/mint-square-glasses.png'
+import sunsetHeartGlasses from './assets/academy-art/paper-doll-set/accessories/sunset-heart-glasses.png'
+import moonHalo from './assets/academy-art/paper-doll-set/accessories/moon-halo.png'
+import ledgerRibbonBow from './assets/academy-art/paper-doll-set/accessories/ledger-ribbon-bow.png'
+import savingsPig from './assets/academy-art/paper-doll-set/accessories/savings-pig.png'
+import receiptCat from './assets/academy-art/paper-doll-set/accessories/receipt-cat.png'
 
 import twinUniformWand from './assets/academy-art/paper-doll-set/combos/twin-uniform-wand.png'
 import twinUniformWandBlink from './assets/academy-art/paper-doll-set/combos/twin-uniform-wand-blink.png'
@@ -110,6 +118,14 @@ export const PAPER_DOLL_ITEMS = {
       id: 'pd_headwear_saving_crown', name: '守財小王冠', desc: '月度預算守護者的金冠', rarity: 'SR', starter: false,
       asset: savingCrown, layer: 'front', compatibleOutfits: ['uniform', 'dress'],
     },
+    mintRangerCap: {
+      id: 'pd_headwear_mint_ranger_cap', name: '薄荷巡遊帽', desc: '帶星羅盤徽章的學院巡遊帽', rarity: 'R', starter: false,
+      asset: mintRangerCap, layer: 'front', compatibleOutfits: ['uniform', 'dress'],
+    },
+    moonWitchHat: {
+      id: 'pd_headwear_moon_witch_hat', name: '月影小魔女帽', desc: '綴著月星吊飾的柔紫尖帽', rarity: 'SR', starter: false,
+      asset: moonWitchHat, layer: 'front', compatibleOutfits: ['uniform', 'dress'],
+    },
   },
   faceAccessory: {
     none: { id: 'pd_face_none', name: '不戴配件', desc: '露出主角表情', rarity: 'N', starter: true },
@@ -117,12 +133,28 @@ export const PAPER_DOLL_ITEMS = {
       id: 'pd_face_moon_glasses', name: '月讀圓框眼鏡', desc: '帶星光鏡鏈的學院圓框', rarity: 'R', starter: true,
       asset: moonGlasses, layer: 'front', compatibleOutfits: ['uniform', 'dress'],
     },
+    mintSquareGlasses: {
+      id: 'pd_face_mint_square_glasses', name: '薄荷算式眼鏡', desc: '金邊薄荷色的圓角方框', rarity: 'R', starter: false,
+      asset: mintSquareGlasses, layer: 'front', compatibleOutfits: ['uniform', 'dress'],
+    },
+    sunsetHeartGlasses: {
+      id: 'pd_face_sunset_heart_glasses', name: '晚霞心語眼鏡', desc: '珊瑚金漸層的心形鏡框', rarity: 'SR', starter: false,
+      asset: sunsetHeartGlasses, layer: 'front', compatibleOutfits: ['uniform', 'dress'],
+    },
   },
   backAccessory: {
     none: { id: 'pd_back_none', name: '無背部配件', desc: '保持簡潔輪廓', rarity: 'N', starter: true },
     budgetWings: {
       id: 'pd_back_budget_wings', name: '預算守護翼', desc: '薄荷與星術紫交織的守護翅膀', rarity: 'SR', starter: false,
       asset: budgetWings, layer: 'back', compatibleOutfits: ['uniform', 'dress'],
+    },
+    moonHalo: {
+      id: 'pd_back_moon_halo', name: '月帳星環', desc: '月光與星圖構成的背後光環', rarity: 'SR', starter: false,
+      asset: moonHalo, layer: 'back', compatibleOutfits: ['uniform', 'dress'],
+    },
+    ledgerRibbonBow: {
+      id: 'pd_back_ledger_ribbon_bow', name: '帳本緞帶結', desc: '酒紅與奶油金交織的大緞帶', rarity: 'R', starter: false,
+      asset: ledgerRibbonBow, layer: 'back', compatibleOutfits: ['uniform', 'dress'],
     },
   },
   companion: {
@@ -134,6 +166,14 @@ export const PAPER_DOLL_ITEMS = {
     ledgerOwl: {
       id: 'pd_companion_ledger_owl', name: '帳本貓頭鷹', desc: '幫忙看守支出紀錄的夜行夥伴', rarity: 'SR', starter: false,
       asset: ledgerOwl, layer: 'companion', compatibleOutfits: ['uniform', 'dress'],
+    },
+    savingsPig: {
+      id: 'pd_companion_savings_pig', name: '存錢小豬', desc: '會守住零用預算的薄荷小夥伴', rarity: 'R', starter: false,
+      asset: savingsPig, layer: 'companion', compatibleOutfits: ['uniform', 'dress'],
+    },
+    receiptCat: {
+      id: 'pd_companion_receipt_cat', name: '收據信差貓', desc: '帶著空白收據卷的記帳信差', rarity: 'SR', starter: false,
+      asset: receiptCat, layer: 'companion', compatibleOutfits: ['uniform', 'dress'],
     },
   },
 }
