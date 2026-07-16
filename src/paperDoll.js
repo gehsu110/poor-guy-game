@@ -91,7 +91,7 @@ export const PAPER_DOLL_ITEMS = {
     pink: { id: 'pd_hair_pink', name: '粉長捲髮', desc: '蓬鬆的粉色長捲髮', rarity: 'SR', starter: true },
   },
   outfit: {
-    base:    { id: 'pd_outfit_base', name: '素體', desc: '未著裝（檢視體型用）', rarity: 'N', starter: true },
+    base:    { id: 'pd_outfit_base', name: '素體', desc: '未著裝（檢視體型用）', rarity: 'N', starter: true, randomizable: false },
     uniform: { id: 'pd_outfit_uniform', name: '見習制服', desc: '星紋斗篷制服與短靴', rarity: 'N', starter: true },
     dress:   { id: 'pd_outfit_dress', name: '公主紗裙', desc: '星紗澎裙與銀色瑪莉珍鞋', rarity: 'SR', starter: true },
   },
@@ -106,7 +106,10 @@ export const PAPER_DOLL_ITEMS = {
   },
   action: {
     stand: { id: 'pd_action_stand', name: '站姿', desc: '基本站姿（呼吸＋眨眼）', rarity: 'N', starter: true },
-    cast:  { id: 'pd_action_cast', name: '施法', desc: '舉杖施法、星光爆發的動作', rarity: 'SR', starter: true },
+    cast:  {
+      id: 'pd_action_cast', name: '施法', desc: '舉杖施法、星光爆發的動作', rarity: 'SR', starter: true,
+      compatibleCombos: ['twin-uniform-wand'],
+    },
   },
   headwear: {
     none: { id: 'pd_headwear_none', name: '不戴帽子', desc: '保留目前髮型', rarity: 'N', starter: true },
@@ -223,7 +226,22 @@ export function normalizeAppearance(appearance = {}) {
   for (const { key } of PAPER_DOLL_SLOTS) {
     if (!PAPER_DOLL_ITEMS[key][next[key]]) next[key] = DEFAULT_APPEARANCE[key]
   }
+  if (!isPartCompatible('action', next.action, next)) next.action = DEFAULT_APPEARANCE.action
   return next
+}
+
+function coreComboKey(appearance) {
+  return `${appearance.hair}-${appearance.outfit}-${appearance.prop}`
+}
+
+/** 部件是否能和指定外觀真正成立；不把尚未完成的資產 fallback 算成相容。 */
+export function isPartCompatible(slot, key, appearance = {}) {
+  const item = PAPER_DOLL_ITEMS[slot]?.[key]
+  if (!item) return false
+  const candidate = { ...DEFAULT_APPEARANCE, ...appearance, [slot]: key }
+  if (item.compatibleOutfits && !item.compatibleOutfits.includes(candidate.outfit)) return false
+  if (item.compatibleCombos && !item.compatibleCombos.includes(coreComboKey(candidate))) return false
+  return true
 }
 
 function resolveCombo({ hair, outfit, prop }) {
@@ -268,6 +286,75 @@ export function isPartOwned(slot, key, collectionIds) {
   const item = PAPER_DOLL_ITEMS[slot]?.[key]
   if (!item) return false
   return item.starter || collectionIds.has(item.id)
+}
+
+function ownedCompatibleKeys(slot, appearance, collectionIds, { includeNonRandom = false } = {}) {
+  return Object.entries(PAPER_DOLL_ITEMS[slot])
+    .filter(([key, item]) => (
+      (includeNonRandom || item.randomizable !== false)
+      && isPartOwned(slot, key, collectionIds)
+      && isPartCompatible(slot, key, appearance)
+    ))
+    .map(([key]) => key)
+}
+
+function randomEntry(items, random) {
+  return items[Math.min(items.length - 1, Math.floor(random() * items.length))]
+}
+
+/** 只用已擁有、相容且有正式資產的部件組出新造型。 */
+export function randomizeOwnedAppearance(appearance, collectionIds, random = Math.random) {
+  const owned = collectionIds instanceof Set ? collectionIds : new Set(collectionIds ?? [])
+  const current = normalizeAppearance(appearance)
+  const next = { ...current }
+
+  for (const slot of ['hair', 'outfit', 'prop', 'background']) {
+    const choices = ownedCompatibleKeys(slot, next, owned)
+    if (choices.length) next[slot] = randomEntry(choices, random)
+  }
+
+  const actions = ownedCompatibleKeys('action', next, owned)
+  next.action = actions.length ? randomEntry(actions, random) : DEFAULT_APPEARANCE.action
+
+  for (const slot of ['headwear', 'faceAccessory', 'backAccessory', 'companion']) {
+    const choices = ownedCompatibleKeys(slot, next, owned, { includeNonRandom: true })
+    if (choices.length) next[slot] = randomEntry(choices, random)
+  }
+
+  const normalized = normalizeAppearance(next)
+  if (JSON.stringify(normalized) !== JSON.stringify(current)) return normalized
+
+  // 極端情況下隨機值可能剛好全相同；優先換一個確實有第二選項的槽位。
+  for (const slot of PAPER_DOLL_SLOTS.map(item => item.key)) {
+    const choices = ownedCompatibleKeys(slot, current, owned)
+    const alternative = choices.find(key => key !== current[slot])
+    if (alternative) return normalizeAppearance({ ...current, [slot]: alternative })
+  }
+  return current
+}
+
+/** 精確計算玩家目前以正式資產可組出的造型數。 */
+export function countOwnedAppearanceCombinations(collectionIds) {
+  const owned = collectionIds instanceof Set ? collectionIds : new Set(collectionIds ?? [])
+  let total = 0
+  const hairKeys = ownedCompatibleKeys('hair', DEFAULT_APPEARANCE, owned)
+  const outfitKeys = ownedCompatibleKeys('outfit', DEFAULT_APPEARANCE, owned)
+  const propKeys = ownedCompatibleKeys('prop', DEFAULT_APPEARANCE, owned)
+  const backgroundCount = ownedCompatibleKeys('background', DEFAULT_APPEARANCE, owned).length
+
+  for (const hair of hairKeys) {
+    for (const outfit of outfitKeys) {
+      for (const prop of propKeys) {
+        const core = { ...DEFAULT_APPEARANCE, hair, outfit, prop }
+        const actionCount = ownedCompatibleKeys('action', core, owned).length
+        const overlayCount = ['headwear', 'faceAccessory', 'backAccessory', 'companion']
+          .map(slot => ownedCompatibleKeys(slot, core, owned, { includeNonRandom: true }).length)
+          .reduce((product, count) => product * count, 1)
+        total += actionCount * backgroundCount * overlayCount
+      }
+    }
+  }
+  return total
 }
 
 /** 給商店用：部件 id → { slot, key, item } */

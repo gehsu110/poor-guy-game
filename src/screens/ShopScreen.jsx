@@ -103,6 +103,25 @@ const EXCHANGE_ITEMS = [
   { id: 'player_badge_saver', type: 'playerBadge', category: 'identity', name: '節制者玩家徽章', source: '玩家徽章', place: '主頁 HUD / 公會名片', costType: 'yellow', cost: 9, rarity: 'R', color: '#FFE4A0', iconKey: 'star', disabled: true },
 ]
 
+const PAID_PAPER_PART_ITEMS = EXCHANGE_ITEMS.filter(item => item.type === 'paperPart' && item.cost > 0)
+
+function stableTextScore(value) {
+  let score = 2166136261
+  for (let i = 0; i < value.length; i++) {
+    score ^= value.charCodeAt(i)
+    score = Math.imul(score, 16777619)
+  }
+  return score >>> 0
+}
+
+function getDailyPaperPartPicks(date, count = 3) {
+  return PAID_PAPER_PART_ITEMS
+    .map(item => ({ item, score: stableTextScore(`${date}:${item.id}`) }))
+    .sort((a, b) => a.score - b.score)
+    .slice(0, count)
+    .map(entry => entry.item)
+}
+
 const DAILY_SUPPLIES = [
   {
     id: 'daily_yellow',
@@ -655,7 +674,7 @@ function HomeEffectPreviewModal({ item, profile, onClose }) {
   )
 }
 
-function PaperPartPreviewModal({ item, profile, onClose }) {
+function PaperPartPreviewModal({ item, profile, owned, equippedNow, onPurchase, onClose }) {
   const part = findPartById(item.id)
   if (!part) return null
   const current = normalizeAppearance(profile?.equipped?.appearance)
@@ -689,7 +708,18 @@ function PaperPartPreviewModal({ item, profile, onClose }) {
             <PaperDollFigure assets={previewAssets} className="academy-screen-character" />
           </div>
         </div>
-        <p className="academy-shop-paper-preview__note">使用目前角色與背景試穿；購買後可在「造型」自由裝卸。</p>
+        <div className="academy-shop-paper-preview__footer">
+          <p className="academy-shop-paper-preview__note">使用目前角色與背景試穿；取得後可在「造型」自由裝卸。</p>
+          <button type="button" className="academy-small-button" onClick={onPurchase} disabled={equippedNow}>
+            {equippedNow
+              ? '使用中'
+              : owned
+                ? '裝備這件'
+                : item.cost === 0
+                  ? '免費取得'
+                  : <><ResourceAmount type={item.costType} value={item.cost} compact /> 兌換</>}
+          </button>
+        </div>
       </motion.div>
     </motion.div>
   )
@@ -697,13 +727,14 @@ function PaperPartPreviewModal({ item, profile, onClose }) {
 
 export default function ShopScreen() {
   const { state, dispatch, navigate } = useApp()
-  const { profile, user } = state
+  const { profile, user, screenParams } = state
+  const requestedPaperPart = EXCHANGE_ITEMS.find(item => item.id === screenParams?.previewItemId && item.type === 'paperPart') ?? null
   const [gachaResult, setGachaResult] = useState(null)
-  const [tab, setTab] = useState('daily')
-  const [exchangeCategory, setExchangeCategory] = useState('all')
+  const [tab, setTab] = useState(screenParams?.tab ?? 'daily')
+  const [exchangeCategory, setExchangeCategory] = useState(screenParams?.category ?? 'all')
   const [isDrawing, setIsDrawing] = useState(false)
   const [previewHomeEffect, setPreviewHomeEffect] = useState(null)
-  const [previewPaperPart, setPreviewPaperPart] = useState(null)
+  const [previewPaperPart, setPreviewPaperPart] = useState(requestedPaperPart)
 
   const tickets = profile?.tickets ?? { normal: 0, gold: 0 }
   const stars = profile?.stars ?? { yellow: 0, purple: 0 }
@@ -711,6 +742,7 @@ export default function ShopScreen() {
   const equipped = profile?.equipped ?? {}
   const shopState = profile?.shop ?? {}
   const today = todayKey()
+  const dailyPaperPartPicks = getDailyPaperPartPicks(today)
   const dailyClaims = shopState.dailySupplyDate === today ? shopState.dailySupplyClaims ?? [] : []
   const resources = currencyFromState(stars, tickets)
   const visibleExchangeItems = EXCHANGE_ITEMS.filter(item => exchangeCategory === 'all' || item.category === exchangeCategory)
@@ -881,7 +913,7 @@ export default function ShopScreen() {
       <div className="academy-bg-soft" />
 
       <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
-        <button className="academy-back" onClick={() => navigate('town')}>←</button>
+        <button className="academy-back" onClick={() => screenParams?.returnTo === 'profile' ? navigate('profile', { tab: 'wardrobe' }) : navigate('town')}>←</button>
         <div className="flex-1 text-center text-sm font-black text-[#26324A]">商店</div>
         <div className="w-10" />
       </div>
@@ -944,6 +976,48 @@ export default function ShopScreen() {
                       </i>
                       <strong>{claimed ? '已領' : item.disabled ? '設計中' : disabled ? '不足' : '領取'}</strong>
                     </button>
+                  )
+                })}
+              </div>
+            </section>
+
+            <section className="academy-shop-section academy-shop-style-feature">
+              <div className="academy-shop-section__head">
+                <div>
+                  <b>今日造型選品</b>
+                  <small>每天輪替三件正式紙娃娃配件</small>
+                </div>
+                <span className="academy-status">每日更新</span>
+              </div>
+              <div className="academy-shop-style-picks">
+                {dailyPaperPartPicks.map(item => {
+                  const part = findPartById(item.id)
+                  const owned = collection.some(entry => entry.id === item.id)
+                  const equippedNow = isEquipped(item)
+                  const previewAssets = part
+                    ? getPaperDollAssets({ ...normalizeAppearance(equipped?.appearance), [part.slot]: part.key })
+                    : getPaperDollAssets(equipped?.appearance)
+                  return (
+                    <article key={item.id} className={`academy-shop-style-pick ${equippedNow ? 'is-equipped' : ''}`}>
+                      <button type="button" className="academy-shop-style-pick__stage" onClick={() => setPreviewPaperPart(item)} aria-label={`試穿${item.name}`}>
+                        <img src={previewAssets.bg} alt="" className="academy-shop-style-pick__bg" draggable="false" />
+                        <PaperDollFigure assets={previewAssets} className="academy-shop-style-pick__figure" />
+                      </button>
+                      <div className="academy-shop-style-pick__body">
+                        <b>{item.name}</b>
+                        <small>{item.source.replace('造型部件・', '')}</small>
+                        <div>
+                          <button type="button" onClick={() => setPreviewPaperPart(item)}>試穿</button>
+                          <button type="button" onClick={() => buyExchange(item)} disabled={equippedNow}>
+                            {equippedNow
+                              ? '使用中'
+                              : owned
+                                ? '裝備'
+                                : <ResourceAmount type={item.costType} value={item.cost} compact />}
+                          </button>
+                        </div>
+                      </div>
+                    </article>
                   )
                 })}
               </div>
@@ -1134,7 +1208,16 @@ export default function ShopScreen() {
       <AnimatePresence>
         {gachaResult && <GachaResult results={gachaResult} onClose={() => setGachaResult(null)} />}
         {previewHomeEffect && <HomeEffectPreviewModal item={previewHomeEffect} profile={profile} onClose={() => setPreviewHomeEffect(null)} />}
-        {previewPaperPart && <PaperPartPreviewModal item={previewPaperPart} profile={profile} onClose={() => setPreviewPaperPart(null)} />}
+        {previewPaperPart && (
+          <PaperPartPreviewModal
+            item={previewPaperPart}
+            profile={profile}
+            owned={collection.some(item => item.id === previewPaperPart.id)}
+            equippedNow={isEquipped(previewPaperPart)}
+            onPurchase={() => buyExchange(previewPaperPart)}
+            onClose={() => setPreviewPaperPart(null)}
+          />
+        )}
       </AnimatePresence>
 
     </div>

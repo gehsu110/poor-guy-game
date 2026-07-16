@@ -5,7 +5,16 @@ import { COLLECTIBLE_TITLES, getTitle, TITLES, formatMoney } from '../gameLogic'
 import { loginWithGoogle, updateProfile } from '../firebase'
 import Avatar from '../components/Avatar'
 import PaperDollFigure from '../components/PaperDollFigure'
-import { PAPER_DOLL_SLOTS, PAPER_DOLL_ITEMS, getPaperDollAssets, normalizeAppearance, isPartOwned } from '../paperDoll'
+import {
+  PAPER_DOLL_SLOTS,
+  PAPER_DOLL_ITEMS,
+  getPaperDollAssets,
+  normalizeAppearance,
+  isPartOwned,
+  isPartCompatible,
+  randomizeOwnedAppearance,
+  countOwnedAppearanceCombinations,
+} from '../paperDoll'
 import profileBg from '../assets/academy-art/profile-bg.webp'
 
 /** 部件制衣櫃：髮型/服裝/道具/背景 各自獨立選擇，自由混搭（限定搭配保留給未來的限定商品） */
@@ -21,8 +30,19 @@ function AppearanceStage({ appearance }) {
   )
 }
 
-function WardrobePanel({ appearance, collectionIds, onEquipPart }) {
+function WardrobePanel({
+  appearance,
+  collectionIds,
+  presets,
+  onEquipPart,
+  onApplyAppearance,
+  onSavePreset,
+  onDeletePreset,
+  onRandomize,
+  onOpenShop,
+}) {
   const current = normalizeAppearance(appearance)
+  const combinationCount = countOwnedAppearanceCombinations(collectionIds)
   return (
     <div className="academy-collection">
       <section className="academy-style-hero">
@@ -31,6 +51,48 @@ function WardrobePanel({ appearance, collectionIds, onEquipPart }) {
           <span className="academy-style-kicker">九槽混搭衣櫃</span>
           <h2>今天想怎麼冒險？</h2>
           <p>核心服裝維持完整對位，帽子、眼鏡、翅膀與寵物可以自由加上去。</p>
+          <div className="academy-style-meta">
+            <span>已解鎖 {combinationCount.toLocaleString('zh-TW')} 種正式搭配</span>
+          </div>
+          <button type="button" className="academy-style-randomize" onClick={onRandomize}>換一套靈感</button>
+        </div>
+      </section>
+
+      <section className="academy-style-presets">
+        <div className="academy-shop-section__head">
+          <div>
+            <b>我的造型卡</b>
+            <small>儲存三套常用搭配，換裝不用重新逐格找</small>
+          </div>
+          <span className="academy-status">{presets.filter(Boolean).length}/3</span>
+        </div>
+        <div className="academy-style-presets__grid">
+          {Array.from({ length: 3 }, (_, index) => {
+            const preset = presets[index]
+            const presetAppearance = preset?.appearance ? normalizeAppearance(preset.appearance) : null
+            const presetAssets = presetAppearance ? getPaperDollAssets(presetAppearance) : null
+            return (
+              <div key={index} className={`academy-style-preset ${preset ? '' : 'is-empty'}`}>
+                <button
+                  type="button"
+                  className="academy-style-preset__preview"
+                  onClick={() => presetAppearance ? onApplyAppearance(presetAppearance) : onSavePreset(index)}
+                  aria-label={presetAppearance ? `套用造型卡 ${index + 1}` : `儲存到造型卡 ${index + 1}`}
+                >
+                  {presetAssets ? (
+                    <PaperDollFigure assets={presetAssets} className="academy-style-preset__figure" />
+                  ) : (
+                    <span className="academy-style-preset__empty-mark">＋</span>
+                  )}
+                </button>
+                <b>造型 {index + 1}</b>
+                <div className="academy-style-preset__actions">
+                  <button type="button" onClick={() => onSavePreset(index)}>{preset ? '覆蓋' : '儲存'}</button>
+                  {preset && <button type="button" onClick={() => onDeletePreset(index)}>清除</button>}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
 
@@ -42,13 +104,14 @@ function WardrobePanel({ appearance, collectionIds, onEquipPart }) {
           <div className="academy-style-grid">
             {Object.entries(PAPER_DOLL_ITEMS[slot.key]).map(([key, item]) => {
               const owned = isPartOwned(slot.key, key, collectionIds)
+              const compatible = isPartCompatible(slot.key, key, current)
               const active = current[slot.key] === key
               const previewAssets = getPaperDollAssets({ ...current, [slot.key]: key })
               return (
                 <button
                   key={item.id}
-                  className={`academy-style-card ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'}`}
-                  onClick={() => owned && onEquipPart(slot.key, key)}
+                  className={`academy-style-card ${active ? 'is-active' : ''} ${owned ? '' : 'is-locked'} ${compatible ? '' : 'is-incompatible'}`}
+                  onClick={() => owned ? (compatible && onEquipPart(slot.key, key)) : onOpenShop(item.id)}
                 >
                   <div className="academy-outfit-stage academy-outfit-stage--plain academy-style-card__stage">
                     {slot.key === 'background' ? (
@@ -62,7 +125,7 @@ function WardrobePanel({ appearance, collectionIds, onEquipPart }) {
                       <b>{item.name}</b>
                       <span>{item.rarity}</span>
                     </div>
-                    <small>{owned ? item.desc : '未解鎖：商店取得'}</small>
+                    <small>{!owned ? '未解鎖：點擊前往商店' : compatible ? item.desc : '此搭配尚無正式動作資產'}</small>
                   </div>
                 </button>
               )
@@ -168,6 +231,7 @@ export default function ProfileScreen() {
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const equipped = profile?.equipped ?? {}
   const collectionIds = new Set((profile?.collection ?? []).map(item => item.id))
+  const appearancePresets = Array.from({ length: 3 }, (_, index) => profile?.appearancePresets?.[index] ?? null)
   const avatarGender = profile?.avatarGender ?? 'girl'
   const playerName = profile?.playerName?.trim() || '新手勇者'
   const directTab = ['wardrobe', 'settings'].includes(screenParams?.tab) ? screenParams.tab : null
@@ -224,10 +288,14 @@ export default function ProfileScreen() {
   }
 
   async function equipPart(slot, key) {
+    await applyAppearance({ ...normalizeAppearance(equipped.appearance), [slot]: key })
+  }
+
+  async function applyAppearance(appearance) {
     const data = {
       equipped: {
         ...equipped,
-        appearance: { ...normalizeAppearance(equipped.appearance), [slot]: key },
+        appearance: normalizeAppearance(appearance),
       },
     }
     dispatch({ type: 'UPDATE_PROFILE', data })
@@ -238,6 +306,41 @@ export default function ProfileScreen() {
         console.error(e)
       }
     }
+  }
+
+  async function saveAppearancePreset(index) {
+    const nextPresets = [...appearancePresets]
+    nextPresets[index] = {
+      appearance: normalizeAppearance(equipped.appearance),
+      savedAt: Date.now(),
+    }
+    const data = { appearancePresets: nextPresets }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    if (user) {
+      try {
+        await updateProfile(user.uid, data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
+  async function deleteAppearancePreset(index) {
+    const nextPresets = [...appearancePresets]
+    nextPresets[index] = null
+    const data = { appearancePresets: nextPresets }
+    dispatch({ type: 'UPDATE_PROFILE', data })
+    if (user) {
+      try {
+        await updateProfile(user.uid, data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
+  async function randomizeAppearance() {
+    await applyAppearance(randomizeOwnedAppearance(equipped.appearance, collectionIds))
   }
 
   async function updatePreference(key, value) {
@@ -345,7 +448,13 @@ export default function ProfileScreen() {
           <WardrobePanel
             appearance={equipped.appearance}
             collectionIds={collectionIds}
+            presets={appearancePresets}
             onEquipPart={equipPart}
+            onApplyAppearance={applyAppearance}
+            onSavePreset={saveAppearancePreset}
+            onDeletePreset={deleteAppearancePreset}
+            onRandomize={randomizeAppearance}
+            onOpenShop={itemId => navigate('shop', { tab: 'exchange', category: 'collection', previewItemId: itemId, returnTo: 'profile' })}
           />
         )}
 
