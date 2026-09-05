@@ -207,7 +207,7 @@ function SettingRow({ label, value, note, action, danger = false }) {
   )
 }
 
-function SettingToggle({ checked, onClick, label }) {
+function SettingToggle({ checked, onClick, label, disabled = false }) {
   return (
     <button
       type="button"
@@ -215,6 +215,7 @@ function SettingToggle({ checked, onClick, label }) {
       onClick={onClick}
       aria-label={label}
       aria-pressed={checked}
+      disabled={disabled}
     >
       <span />
     </button>
@@ -610,7 +611,7 @@ export default function ProfileScreen() {
             <SettingSection title="聲音與回饋" eyebrow="Audio">
               <SettingRow
                 label="背景音樂"
-                value="準備中"
+                value={profile?.preferences?.musicEnabled ? '已開啟' : '安靜模式'}
                 note="輕柔的學院旋律；開啟後點一下畫面開始，切到背景時暫停。"
                 action={(
                   <SettingToggle
@@ -647,11 +648,13 @@ export default function ProfileScreen() {
             <SettingSection title="提醒與說明" eyebrow="Guide">
               <SettingRow
                 label="每日記帳提醒"
+                value="尚未開放"
                 note="提醒功能會在通知權限流程完成後啟用。"
                 action={(
                   <SettingToggle
                     checked={!!profile?.preferences?.dailyReminder}
                     label="每日記帳提醒"
+                    disabled
                     onClick={() => updatePreference('dailyReminder', !profile?.preferences?.dailyReminder)}
                   />
                 )}
