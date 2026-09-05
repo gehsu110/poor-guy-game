@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { COLLECTIBLE_TITLES, getTitle } from '../gameLogic'
+import { COLLECTIBLE_TITLES, getTitle, formatMoney } from '../gameLogic'
 import { getPaperDollAssets } from '../paperDoll'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import PaperDollFigure from '../components/PaperDollFigure'
 import HomeSceneEffects from '../components/HomeSceneEffects'
 import { setScreenChrome } from '../screenChrome'
+import { buildMissions } from '../progression'
+import { useReducedMotion } from 'framer-motion'
+import StorybookActor from '../components/StorybookActor'
+import { STORYBOOK_ART, getStorybookArt } from '../storybookAssets'
+import { isStorybook, STORYBOOK_OWL_ID } from '../storybookCatalog'
 
 const HOME_THEME_COLORS = {
   academy: {
@@ -45,7 +50,7 @@ const HOME_THEME_COLORS = {
   },
 }
 
-function IdentityHUD({ profile }) {
+function IdentityHUD({ profile, navigate }) {
   const title = profile ? getTitle(profile.level) : null
   const equippedTitle = COLLECTIBLE_TITLES[profile?.equipped?.title]
   const playerName = profile?.playerName?.trim() || '新手勇者'
@@ -58,13 +63,13 @@ function IdentityHUD({ profile }) {
   return (
     <div className="academy-identity-hud">
       <div className="academy-status-board">
-        <div className="academy-identity-chip">
-          <Avatar gender={gender} variant="portrait" frame={frame} src={portraitAssets.staticImage} layers={portraitAssets.layers} className="academy-hud-avatar" />
+        <button className="academy-identity-chip" onClick={() => navigate('missions', { tab: 'journey' })} aria-label="查看冒險者成長">
+          <Avatar gender={gender} variant="portrait" frame={frame} src={isStorybook(profile) ? getStorybookArt(profile).still : portraitAssets.staticImage} layers={isStorybook(profile) ? [] : portraitAssets.layers} className={`academy-hud-avatar ${isStorybook(profile) ? 'storybook-portrait' : ''}`} />
           <span className="academy-identity-chip__copy">
             <strong>{playerName}</strong>
             <small>Lv.{profile?.level ?? 1}・{equippedTitle ?? title?.name ?? '菜鳥冒險者'}</small>
           </span>
-        </div>
+        </button>
         <div className="academy-exp-track" aria-label={`經驗 ${expInLevel}/${expToNext}`}>
           <div className="academy-exp-track__meta">
             <span>EXP</span>
@@ -75,10 +80,10 @@ function IdentityHUD({ profile }) {
           </div>
         </div>
         <div className="academy-currency-rail" aria-label="收藏資源">
-          <button className="academy-mini-currency academy-mini-currency--gold" title="黃星：每日與任務獎勵"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></button>
-          <button className="academy-mini-currency academy-mini-currency--purple" title="紫星：稀有兌換素材"><GameIcon name="coin-purple" /><b>{profile?.stars?.purple ?? 0}</b></button>
-          <button className="academy-mini-currency academy-mini-currency--pink" title="一般券：一般補給抽獎"><GameIcon name="ticket-normal" /><b>{profile?.tickets?.normal ?? 0}</b></button>
-          <button className="academy-mini-currency academy-mini-currency--gold" title="金券：限定補給抽獎"><GameIcon name="ticket-gold" /><b>{profile?.tickets?.gold ?? 0}</b></button>
+          <button onClick={() => navigate('shop')} className="academy-mini-currency academy-mini-currency--gold" title="黃星：每日與任務獎勵"><GameIcon name="coin-gold" /><b>{profile?.stars?.yellow ?? 0}</b></button>
+          <button onClick={() => navigate('shop')} className="academy-mini-currency academy-mini-currency--purple" title="紫星：稀有兌換素材"><GameIcon name="coin-purple" /><b>{profile?.stars?.purple ?? 0}</b></button>
+          <button onClick={() => navigate('shop')} className="academy-mini-currency academy-mini-currency--pink" title="一般券：一般補給抽獎"><GameIcon name="ticket-normal" /><b>{profile?.tickets?.normal ?? 0}</b></button>
+          <button onClick={() => navigate('shop')} className="academy-mini-currency academy-mini-currency--gold" title="金券：限定補給抽獎"><GameIcon name="ticket-gold" /><b>{profile?.tickets?.gold ?? 0}</b></button>
         </div>
       </div>
     </div>
@@ -100,9 +105,16 @@ function HeroShowcase({ hasVideo, onWardrobeClick }) {
 export default function TownScreen() {
   const { state, dispatch, navigate } = useApp()
   const { profile } = state
+  const missions = buildMissions(state)
+  const systemReduced = useReducedMotion()
+  const reduced = systemReduced || profile?.preferences?.reduceMotion
+  const todayBudget = state.dayRecord?.budget ?? profile?.dailyBudget ?? 1000
+  const ready = [...missions.daily, ...missions.weekly, ...missions.journey, ...missions.achievements, ...missions.activities, missions.chest].filter(m => !m.planned && m.progress >= m.target && !profile?.claimedMissions?.[m.key]).length
   const [characterCue, setCharacterCue] = useState(null)
   const paperDollAssets = getPaperDollAssets(profile?.equipped?.appearance)
-  const { bg, bgTheme } = paperDollAssets
+  const storybook = isStorybook(profile)
+  const bg = storybook ? STORYBOOK_ART.courtyard : paperDollAssets.bg
+  const bgTheme = storybook ? 'storybook' : paperDollAssets.bgTheme
   const hasGroundEffect = Boolean(profile?.equipped?.groundEffect)
   const characterClass = [
     'academy-screen-character',
@@ -142,18 +154,24 @@ export default function TownScreen() {
       {/* 全螢幕背景 */}
       <img src={bg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
-      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="back" />
+      {storybook && !reduced && <div className="storybook-motes" aria-hidden="true">{[0,1,2,3,4].map(i => <i key={i} style={{ '--i': i }} />)}</div>}
+      {!storybook && !reduced && <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="back" />}
       {/* 角色核心動畫與帽子、臉部、背部、寵物共用同一張標準畫布 */}
-      <PaperDollFigure assets={paperDollAssets} animated className={characterClass} />
-      <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="front" />
+      {storybook ? <StorybookActor outfit={profile?.equipped?.storybookOutfit} className="storybook-home-actor" reduced={reduced} interactive successPulse={state.homeEffectPulse} companion={profile?.equipped?.storybookCompanion === STORYBOOK_OWL_ID} message={state.homeEffectPulse ? '記好了！你的每一頁，我都會好好珍藏。' : missions.chest.progress === 3 ? '今天的三件小事完成了，一起去看看獎勵吧。' : '一筆真實的紀錄，就是今天的小小冒險。'} /> : <PaperDollFigure assets={paperDollAssets} animated={!reduced} className={characterClass} />}
+      {!storybook && !reduced && <HomeSceneEffects theme={bgTheme ?? 'academy'} equipped={profile?.equipped} successPulse={state.homeEffectPulse} layer="front" />}
       {/* UI 層（z-10，疊在角色上） */}
       <div className="academy-safe-top relative z-10 px-4">
-        <IdentityHUD profile={profile} />
+        <IdentityHUD profile={profile} navigate={navigate} />
       </div>
 
       <div className="academy-home-content relative z-10 flex flex-1 flex-col px-4 pt-2">
-        <HeroShowcase onWardrobeClick={() => navigate('profile', { tab: 'wardrobe' })} />
+        <HeroShowcase hasVideo={storybook} onWardrobeClick={() => navigate('profile', { tab: 'wardrobe' })} />
       </div>
+
+      <section className="home-adventure" aria-label="今日冒險摘要">
+        <div className="home-adventure__budget"><span>今日消費 <b className={state.totalSpent > todayBudget ? 'is-over' : ''}>NT${formatMoney(state.totalSpent)}</b></span><span>今日可用預算 <b>{formatMoney(todayBudget)}</b></span></div>
+        <button onClick={() => navigate('missions')}><GameIcon name="tab-quest" /><span><strong>{ready ? `${ready} 份冒險獎勵等你收下` : missions.chest.progress === 3 ? '今天的手帳，已經寫好了' : '今天也寫下一頁冒險'}</strong></span><em>{missions.chest.progress}/3 完成 →</em></button>
+      </section>
 
       <BottomNav current="town" navigate={navigate} />
     </div>

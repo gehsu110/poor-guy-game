@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'icons/*.png'],
       manifest: {
         name: '窮鬼勇者',
@@ -28,11 +28,16 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
+        clientsClaim: false,
+        skipWaiting: false,
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB 上限（角色動畫 webp 較大）
-        globPatterns: ['**/*.{js,css,html,ico,png,webp,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,svg,woff2}', 'icons/*.png', 'assets/courtyard-*.webp', 'assets/apprentice-*.webp'],
         runtimeCaching: [
+          {
+            urlPattern: ({ request, url }) => request.destination === 'image' && url.origin === self.location.origin,
+            handler: 'CacheFirst',
+            options: { cacheName: 'quest-art-v2', cacheableResponse: { statuses: [200] }, expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 90, purgeOnQuotaError: true } },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',

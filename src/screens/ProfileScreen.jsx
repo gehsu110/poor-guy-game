@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { parseAmount } from '../progression'
 import { useApp } from '../useAppStore'
 import { COLLECTIBLE_TITLES, getTitle, TITLES, formatMoney } from '../gameLogic'
-import { loginWithGoogle, updateProfile } from '../firebase'
+import { loginWithGoogle, updateProfile, exportSave, transactGame } from '../firebase'
 import Avatar from '../components/Avatar'
 import PaperDollFigure from '../components/PaperDollFigure'
 import {
@@ -16,6 +17,9 @@ import {
   countOwnedAppearanceCombinations,
 } from '../paperDoll'
 import profileBg from '../assets/academy-art/profile-bg.webp'
+import StorybookActor from '../components/StorybookActor'
+import { STORYBOOK_ART, getStorybookArt } from '../storybookAssets'
+import { isStorybook, STORYBOOK_OWL_ID, STORYBOOK_OUTFITS, equipStorybookParts } from '../storybookCatalog'
 
 /** 部件制衣櫃：髮型/服裝/道具/背景 各自獨立選擇，自由混搭（限定搭配保留給未來的限定商品） */
 
@@ -218,11 +222,13 @@ function SettingToggle({ checked, onClick, label }) {
 }
 
 export default function ProfileScreen() {
-  const { state, dispatch, navigate } = useApp()
+  const { state, dispatch, navigate, notify, refresh } = useApp()
   const { profile, user, screenParams } = state
   const [tab, setTab] = useState(screenParams?.tab ?? 'stats')
   const [editName, setEditName] = useState(false)
   const [nameInput, setNameInput] = useState(profile?.playerName ?? '新手勇者')
+  const [budgetInput, setBudgetInput] = useState(String(profile?.dailyBudget ?? 1000))
+  const [exporting, setExporting] = useState(false)
 
   const level = profile?.level ?? 1
   const expInLevel = profile?.expInLevel ?? 0
@@ -239,7 +245,45 @@ export default function ProfileScreen() {
     : directTab === 'settings' ? '設定'
     : '冒險者資料'
   const profilePortraitAssets = getPaperDollAssets(equipped.appearance)
+  const [styleSaving, setStyleSaving] = useState(false)
+  async function equipStorybook(withOwl = equipped.storybookCompanion === STORYBOOK_OWL_ID, outfit = equipped.storybookOutfit ?? 'mint') {
+    if (styleSaving) return
+    if (withOwl && !collectionIds.has(STORYBOOK_OWL_ID)) return notify('累積記帳 3 天後，到冒險手帳迎接書頁小鴞。')
+    setStyleSaving(true)
+    try {
+      const result = await transactGame(user.uid, state.date, (fresh, record) => ({ profile: equipStorybookParts(fresh, { storybookOutfit: outfit, storybookCompanion: withOwl ? STORYBOOK_OWL_ID : null }), record }))
+      dispatch({ type: 'UPDATE_PROFILE', data: result.profile })
+      notify('薄荷帳本造型已裝備。')
+    } catch (e) { notify(e.message) }
+    finally { setStyleSaving(false) }
+  }
 
+  async function downloadBackup() {
+    if (!user || exporting) return
+    setExporting(true)
+    try {
+      const data = await exportSave(user.uid)
+      const blob = new Blob([JSON.stringify({ ...data, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `expense-quest-${state.date}.json`
+      link.click()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+      notify('備份檔已準備下載，包含帳本、造型與遊戲進度。')
+    } catch (e) { notify(e.message) }
+    finally { setExporting(false) }
+  }
+  async function saveBudget() {
+    const dailyBudget = parseAmount(budgetInput)
+    if (!dailyBudget) return notify('請輸入有效的每日預算。')
+    try {
+      await updateProfile(user.uid, { dailyBudget })
+      dispatch({ type: 'UPDATE_PROFILE', data: { dailyBudget } })
+      await refresh()
+      notify(state.expenses.length || state.dayRecord.noSpend ? '預算已儲存，從明天的冒險生效。' : '每日預算已更新。')
+    } catch (e) { notify(e.message) }
+  }
   async function handleGoogleLink() {
     try {
       await loginWithGoogle()
@@ -264,7 +308,7 @@ export default function ProfileScreen() {
   }
 
   async function replayOnboarding() {
-    const data = { onboardingDone: false }
+    const data = { onboardingDone: false, nameConfirmed: false }
     dispatch({ type: 'UPDATE_PROFILE', data })
     if (user) {
       try {
@@ -292,20 +336,24 @@ export default function ProfileScreen() {
   }
 
   async function applyAppearance(appearance) {
+    if (styleSaving) return
+    setStyleSaving(true)
     const data = {
       equipped: {
         ...equipped,
+        visualStyle: 'classic',
         appearance: normalizeAppearance(appearance),
       },
     }
-    dispatch({ type: 'UPDATE_PROFILE', data })
     if (user) {
       try {
         await updateProfile(user.uid, data)
+        dispatch({ type: 'UPDATE_PROFILE', data })
       } catch (e) {
-        console.error(e)
+        notify(e.message)
       }
     }
+    setStyleSaving(false)
   }
 
   async function saveAppearancePreset(index) {
@@ -359,8 +407,8 @@ export default function ProfileScreen() {
   }
 
   return (
-    <div className="academy-screen">
-      <img src={profileBg} alt="" className="academy-bg" draggable="false" />
+    <div className="academy-screen academy-profile-screen">
+      <img src={isStorybook(profile) ? STORYBOOK_ART.courtyard : profileBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
       <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
@@ -378,8 +426,8 @@ export default function ProfileScreen() {
               frame={equipped.frame ?? 'soft_gold'}
               outfit={equipped.outfit ?? 'academy'}
               accessory={equipped.accessory ?? 'star_pin'}
-              src={profilePortraitAssets.staticImage}
-              layers={profilePortraitAssets.layers}
+              src={isStorybook(profile) ? getStorybookArt(profile).still : profilePortraitAssets.staticImage}
+              layers={isStorybook(profile) ? [] : profilePortraitAssets.layers}
               className="academy-profile-avatar"
             />
           </div>
@@ -445,6 +493,18 @@ export default function ProfileScreen() {
         )}
 
         {tab === 'wardrobe' && (
+          <>
+          <section className="storybook-style-card">
+            <div className="storybook-style-card__scene" style={{ backgroundImage: `url(${STORYBOOK_ART.courtyard})` }}><StorybookActor outfit={equipped.storybookOutfit} reduced={profile?.preferences?.reduceMotion} companion={equipped.storybookCompanion === STORYBOOK_OWL_ID} /></div>
+            <div className="storybook-style-card__copy"><span className="journal-eyebrow">薄荷帳本 · 新系列 01</span><h2>把日常，穿成自己的樣子。</h2><p>薄荷斗篷、星徽貝雷帽與隨身帳本。會寫帳，也會向你打招呼。</p><button className="journal-primary" disabled={styleSaving || isStorybook(profile)} onClick={() => equipStorybook()}>{isStorybook(profile) ? '目前裝備中' : '裝備薄荷帳本'}</button>
+            <div className="storybook-clothes-grid" aria-label="薄荷帳本衣服">{Object.entries(STORYBOOK_OUTFITS).map(([key, item]) => {
+              const owned = item.cost === 0 || collectionIds.has(item.id)
+              const active = isStorybook(profile) && (equipped.storybookOutfit ?? 'mint') === key
+              return <button key={key} className={active ? 'is-active' : ''} disabled={styleSaving || active} onClick={() => owned ? equipStorybook(undefined, key) : navigate('shop', { tab: 'exchange', category: 'storybook' })}><StorybookActor outfit={key} reduced /><b>{item.name}</b><small>{active ? '穿著中' : owned ? '點擊換上' : '12 黃星 · 前往小店'}</small></button>
+            })}</div>
+            <button className="storybook-companion-toggle" disabled={styleSaving} onClick={() => collectionIds.has(STORYBOOK_OWL_ID) ? equipStorybook(equipped.storybookCompanion !== STORYBOOK_OWL_ID) : navigate('missions', { tab: 'collection' })}><img src={STORYBOOK_ART.owl} alt="" /><span><b>書頁小鴞</b><small>{collectionIds.has(STORYBOOK_OWL_ID) ? equipped.storybookCompanion === STORYBOOK_OWL_ID ? '同行中 · 點擊休息' : '已收藏 · 點擊同行' : '累積記帳 3 天後，在手帳領取'}</small></span><b>→</b></button></div>
+          </section>
+          <div className="journal-section-title"><h2>經典混搭</h2><span>選擇部件即可切換系列</span></div>
           <WardrobePanel
             appearance={equipped.appearance}
             collectionIds={collectionIds}
@@ -456,6 +516,7 @@ export default function ProfileScreen() {
             onRandomize={randomizeAppearance}
             onOpenShop={itemId => navigate('shop', { tab: 'exchange', category: 'collection', previewItemId: itemId, returnTo: 'profile' })}
           />
+          </>
         )}
 
         {tab === 'settings' && (
@@ -508,8 +569,12 @@ export default function ProfileScreen() {
               </div>
             </SettingSection>
 
+            <SettingSection title="冒險預算" eyebrow="Budget">
+              <label className="onboarding-budget"><span>每日可用預算 NT$<small className="block">今日已有紀錄時，調整從明天生效</small></span><input aria-label="調整每日預算" inputMode="decimal" value={budgetInput} onChange={e => setBudgetInput(e.target.value)} /></label>
+              <button className="journal-primary" onClick={saveBudget}>儲存預算</button>
+            </SettingSection>
             <SettingSection title="資料與同步" eyebrow="Privacy">
-              {user?.isAnonymous ? (
+              {user?.isLocal ? <SettingRow label="同步狀態" value="本機存檔" note="資料保存在這個瀏覽器，重新整理仍會保留；尚未同步至雲端。可下載備份。" /> : user?.isAnonymous ? (
                 <SettingRow
                   label="同步狀態"
                   value="匿名備份"
@@ -524,14 +589,15 @@ export default function ProfileScreen() {
                 />
               )}
               <SettingRow
-                label="資料分層"
-                value="規劃中"
-                note="未來會把遊戲進度與記帳明細分開管理，方便匯出與刪除。"
+                label="存檔內容"
+                value="帳本與冒險"
+                note="記帳明細、每日進度、任務、收藏與設定一起保存。"
               />
               <SettingRow
                 label="匯出資料"
-                value="CSV / JSON"
-                note="先預留入口，之後提供記帳明細匯出。"
+                value="JSON 備份"
+                note="下載全部記帳明細、每日紀錄與遊戲進度。"
+                action={<button className="academy-inline-action" disabled={exporting} onClick={downloadBackup}>{exporting ? '準備中' : '下載'}</button>}
               />
               <SettingRow
                 label="清除本機資料"
@@ -545,7 +611,7 @@ export default function ProfileScreen() {
               <SettingRow
                 label="背景音樂"
                 value="準備中"
-                note="未來首頁、地圖與 Boss 會有不同氛圍；預設會保持安靜。"
+                note="輕柔的學院旋律；開啟後點一下畫面開始，切到背景時暫停。"
                 action={(
                   <SettingToggle
                     checked={!!profile?.preferences?.musicEnabled}
@@ -556,7 +622,7 @@ export default function ProfileScreen() {
               />
               <SettingRow
                 label="操作音效"
-                note="控制記帳、戰鬥、任務、抽獎與升級的短音效。"
+                note="控制記帳成功與領取任務獎勵的短音效。"
                 action={(
                   <SettingToggle
                     checked={profile?.preferences?.soundEnabled !== false}

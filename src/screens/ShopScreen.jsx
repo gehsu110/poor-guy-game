@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../useAppStore'
-import { updateProfile } from '../firebase'
+import { transactGame } from '../firebase'
+import { currencyFromState, hasResources, purchaseItem, claimShopSupply, openSupply } from '../economy'
+import { STORYBOOK_ART, getStorybookArt } from '../storybookAssets'
+import { isStorybook, STORYBOOK_OUTFITS } from '../storybookCatalog'
 import GameIcon from '../components/GameIcon'
 import Avatar from '../components/Avatar'
 import PaperDollFigure from '../components/PaperDollFigure'
@@ -9,10 +12,11 @@ import HomeSceneEffects from '../components/HomeSceneEffects'
 import { HOME_EFFECT_TYPE_LABELS, flattenHomeSceneEffects } from '../homeSceneEffects'
 import { flattenBattleAttackEffects } from '../battleEffects'
 import { findPartById, normalizeAppearance, getPaperDollAssets } from '../paperDoll'
+import StorybookActor from '../components/StorybookActor'
 import shopBg from '../assets/academy-art/shop-bg.webp'
 import shopAssets from '../assets/academy-art/shop-assets.png'
 
-const GACHA_POOL = [
+const LEGACY_GACHA_POOL = [
   { id: 'fx_slash', type: 'effect', name: '星軌斬擊', rarity: 'R', color: '#A8D8EA', iconKey: 'crystal' },
   { id: 'fx_fire', type: 'effect', name: '粉晶爆發', rarity: 'SR', color: '#FFB3C6', iconKey: 'star' },
   { id: 'fx_star', type: 'effect', name: '星芒結界', rarity: 'SSR', color: '#FFE4A0', iconKey: 'star' },
@@ -24,8 +28,11 @@ const GACHA_POOL = [
   { id: 'frame_ribbon', type: 'frame', name: '緞帶邊框', rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
 ]
 
+const GACHA_POOL = LEGACY_GACHA_POOL.filter(item => item.type !== 'effect')
+
 const EXCHANGE_CATEGORIES = [
   { key: 'all', label: '全部' },
+  { key: 'storybook', label: '薄荷帳本' },
   { key: 'utility', label: '功能' },
   { key: 'homefx', label: '主頁特效' },
   { key: 'battlefx', label: '戰鬥特效' },
@@ -69,6 +76,7 @@ const BATTLE_EFFECT_EXCHANGE_ITEMS = flattenBattleAttackEffects().map(effect => 
 }))
 
 const EXCHANGE_ITEMS = [
+  ...Object.values(STORYBOOK_OUTFITS).sort((a, b) => b.cost - a.cost).map(item => ({ ...item, category: 'storybook', source: '衣服 · 含專屬動作', place: '角色衣服欄', color: '#7161B8', iconKey: 'star' })),
   { id: 'normal_ticket_pack', type: 'resource', category: 'utility', name: '一般補給券', source: '補給池抽取', place: '補給池', costType: 'yellow', cost: 3, reward: { normalTicket: 1 }, rarity: 'R', color: '#FFDDE8', iconKey: 'ticket' },
   { id: 'daily_yellow_boost', type: 'boost', category: 'utility', name: '今日黃星祝福', source: '每日加成', place: '主頁 HUD / 今日頁', costType: 'yellow', cost: 2, rarity: 'R', color: '#FFE4A0', iconKey: 'star', disabled: true },
   { id: 'reminder_bell_skin', type: 'reminderSkin', category: 'utility', name: '星鈴提醒外觀', source: '提醒外觀', place: '設定 / 記帳入口', costType: 'yellow', cost: 4, rarity: 'R', color: '#A8D8EA', iconKey: 'ticket', disabled: true },
@@ -101,9 +109,11 @@ const EXCHANGE_ITEMS = [
   { id: 'frame_ribbon', type: 'frame', category: 'identity', name: '緞帶頭像框', source: '頭像框', place: '商店頭像 / 個人頁', costType: 'purple', cost: 2, rarity: 'SR', color: '#FFB3C6', iconKey: 'ticket' },
   { id: 'title_budget', type: 'title', category: 'identity', name: '預算守門人', source: '稱號', place: '主頁名稱下方', costType: 'purple', cost: 3, rarity: 'SR', color: '#A8D8EA', iconKey: 'coin' },
   { id: 'player_badge_saver', type: 'playerBadge', category: 'identity', name: '節制者玩家徽章', source: '玩家徽章', place: '主頁 HUD / 公會名片', costType: 'yellow', cost: 9, rarity: 'R', color: '#FFE4A0', iconKey: 'star', disabled: true },
-]
+].map(item => ({ ...item, cost: item.costType === 'yellow' && !['resource', 'storybookOutfit'].includes(item.type) ? item.cost * 3 : item.cost }))
 
-const PAID_PAPER_PART_ITEMS = EXCHANGE_ITEMS.filter(item => item.type === 'paperPart' && item.cost > 0)
+const LIVE_EXCHANGE_ITEMS = EXCHANGE_ITEMS.filter(item => !item.disabled && item.type !== 'background')
+
+const PAID_PAPER_PART_ITEMS = LIVE_EXCHANGE_ITEMS.filter(item => item.type === 'paperPart' && item.cost > 0)
 
 function stableTextScore(value) {
   let score = 2166136261
@@ -249,42 +259,18 @@ function buildHomeEffectPreview(item) {
   return preview
 }
 
-function currencyFromState(stars, tickets) {
-  return {
-    yellow: stars.yellow ?? 0,
-    purple: stars.purple ?? 0,
-    normalTicket: tickets.normal ?? 0,
-    goldTicket: tickets.gold ?? 0,
-  }
-}
-
-function hasResources(resources, cost = {}) {
-  return Object.entries(cost).every(([key, value]) => (resources[key] ?? 0) >= value)
-}
-
-function applyResourceDelta(stars, tickets, delta = {}, direction = 1) {
-  return {
-    stars: {
-      yellow: (stars.yellow ?? 0) + direction * (delta.yellow ?? 0),
-      purple: (stars.purple ?? 0) + direction * (delta.purple ?? 0),
-    },
-    tickets: {
-      normal: (tickets.normal ?? 0) + direction * (delta.normalTicket ?? 0),
-      gold: (tickets.gold ?? 0) + direction * (delta.goldTicket ?? 0),
-    },
-  }
-}
-
 function buildEquippedItem(equipped, item) {
+  if (item.type === 'storybookOutfit') return { ...equipped, visualStyle: 'storybook', storybookOutfit: item.key }
   if (item.type === 'paperPart') {
     const part = findPartById(item.id)
     if (!part) return equipped
     return {
       ...equipped,
+      visualStyle: 'classic',
       appearance: { ...normalizeAppearance(equipped.appearance), [part.slot]: part.key },
     }
   }
-  return { ...equipped, [item.type]: item.id }
+  return { ...equipped, ...(isHomeEffectItem(item) ? { visualStyle: 'classic' } : {}), [item.type]: item.id }
 }
 
 function drawGacha(count = 1, gold = false) {
@@ -315,7 +301,7 @@ function ShopPlayerCard({ profile }) {
   return (
     <div className="academy-shop-player-card">
       <div className={`academy-shop-player-avatar academy-avatar-frame--${frame}`}>
-        <Avatar gender={gender} variant="portrait" frame={frame} src={portraitAssets.staticImage} layers={portraitAssets.layers} />
+        <Avatar gender={gender} variant="portrait" frame={frame} src={isStorybook(profile) ? getStorybookArt(profile).still : portraitAssets.staticImage} layers={isStorybook(profile) ? [] : portraitAssets.layers} className={isStorybook(profile) ? 'storybook-portrait' : ''} />
       </div>
       <div>
         <b>{name}</b>
@@ -392,7 +378,8 @@ function CollectionGrid({ items, equipped, onEquip }) {
   return (
     <div className="grid grid-cols-3 gap-2">
       {items.map((item, i) => {
-        const prize = [...GACHA_POOL, ...EXCHANGE_ITEMS].find(g => g.id === item.id) ?? GACHA_POOL[0]
+        const prize = [...GACHA_POOL, ...LIVE_EXCHANGE_ITEMS].find(g => g.id === item.id)
+        if (!prize) return null
         const rar = RARITY_CONFIG[prize.rarity] ?? RARITY_CONFIG.R
         const isEquipped = equipped?.[prize.type] === prize.id || equipped?.set === prize.id
         return (
@@ -407,37 +394,6 @@ function CollectionGrid({ items, equipped, onEquip }) {
           </div>
         )
       })}
-    </div>
-  )
-}
-
-function RewardPreview() {
-  const previews = [
-    { type: 'effect', label: '星軌斬擊', sub: '戰鬥攻擊' },
-    { type: 'title', label: '預算守門人', sub: '主頁稱號' },
-    { type: 'frame', label: '星砂邊框', sub: '玩家頭像' },
-    { type: 'background', label: '薄荷晨光', sub: '主頁氛圍' },
-  ]
-  return (
-    <div className="academy-card">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div>
-          <div className="text-sm font-black text-[#26324A]">常駐收藏預覽</div>
-          <div className="text-[10px] font-bold text-[#8E87A8]">節日完整套裝會留在活動任務線</div>
-        </div>
-        <span className="academy-status">常駐</span>
-      </div>
-      <div className="academy-reward-preview">
-        {previews.map(item => (
-          <div key={item.type} className="academy-reward-tile">
-            <div className={`academy-reward-tile__visual academy-reward-tile__visual--${item.type}`}>
-              {item.type === 'title' && <span className="text-[9px] font-black text-[#7B63D8]">稱號</span>}
-            </div>
-            <div className="academy-reward-tile__label">{item.label}</div>
-            <div className="academy-reward-tile__sub">{item.sub}</div>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
@@ -726,13 +682,14 @@ function PaperPartPreviewModal({ item, profile, owned, equippedNow, onPurchase, 
 }
 
 export default function ShopScreen() {
-  const { state, dispatch, navigate } = useApp()
+  const { state, dispatch, navigate, notify } = useApp()
   const { profile, user, screenParams } = state
   const requestedPaperPart = EXCHANGE_ITEMS.find(item => item.id === screenParams?.previewItemId && item.type === 'paperPart') ?? null
   const [gachaResult, setGachaResult] = useState(null)
   const [tab, setTab] = useState(screenParams?.tab ?? 'daily')
   const [exchangeCategory, setExchangeCategory] = useState(screenParams?.category ?? 'all')
   const [isDrawing, setIsDrawing] = useState(false)
+  const shopLock = useRef(false)
   const [previewHomeEffect, setPreviewHomeEffect] = useState(null)
   const [previewPaperPart, setPreviewPaperPart] = useState(requestedPaperPart)
 
@@ -745,176 +702,56 @@ export default function ShopScreen() {
   const dailyPaperPartPicks = getDailyPaperPartPicks(today)
   const dailyClaims = shopState.dailySupplyDate === today ? shopState.dailySupplyClaims ?? [] : []
   const resources = currencyFromState(stars, tickets)
-  const visibleExchangeItems = EXCHANGE_ITEMS.filter(item => exchangeCategory === 'all' || item.category === exchangeCategory)
+  const visibleExchangeItems = LIVE_EXCHANGE_ITEMS.filter(item => exchangeCategory === 'all' || item.category === exchangeCategory)
 
   function isEquipped(item) {
+    if (item.type === 'storybookOutfit') return isStorybook(profile) && (equipped.storybookOutfit ?? 'mint') === item.key
     if (item.type === 'paperPart') {
       const part = findPartById(item.id)
-      return part ? normalizeAppearance(equipped?.appearance)[part.slot] === part.key : false
+      return !isStorybook(profile) && part ? normalizeAppearance(equipped?.appearance)[part.slot] === part.key : false
     }
     return equipped?.[item.type] === item.id || equipped?.frame === item.id
   }
 
-  function notify(message) {
-    dispatch({ type: 'SET_NOTIFICATION', notification: { type: 'shop', message } })
-    setTimeout(() => dispatch({ type: 'SET_NOTIFICATION', notification: null }), 2200)
-  }
-
-  async function handleGacha(count, isGold) {
-    const available = isGold ? tickets.gold : tickets.normal
-    if (isDrawing) return
-    if (available < count) {
-      notify(isGold ? '金色補給券不足，先完成公會月度挑戰。' : '一般補給券不足，先擊殺當日怪物。')
-      return
-    }
-
+  async function runShop(transform) {
+    if (shopLock.current || !user) return null
+    shopLock.current = true
     setIsDrawing(true)
+    try {
+      const result = await transactGame(user.uid, state.date, (fresh, record) => ({ profile: transform(fresh), record }))
+      dispatch({ type: 'UPDATE_PROFILE', data: result.profile })
+      return result.profile
+    } catch (e) { notify(e.message); return null }
+    finally { shopLock.current = false; setIsDrawing(false) }
+  }
+  async function handleGacha(count, isGold) {
     const results = drawGacha(count, isGold)
-    const newTickets = {
-      normal: (tickets.normal ?? 0) - (isGold ? 0 : count),
-      gold: (tickets.gold ?? 0) - (isGold ? count : 0),
-    }
-    const now = Date.now()
-    const ownedIds = new Set(collection.map(item => item.id))
-    const newItems = []
-    const duplicateStars = { yellow: 0, purple: 0 }
-    results.forEach((item, i) => {
-      if (ownedIds.has(item.id)) {
-        if (item.rarity === 'SSR') duplicateStars.purple += 1
-        else duplicateStars.yellow += item.rarity === 'SR' ? 2 : 1
-      } else {
-        ownedIds.add(item.id)
-        newItems.push({ id: item.id, rarity: item.rarity, obtainedAt: now + i })
-      }
-    })
-    const data = {
-      tickets: newTickets,
-      stars: {
-        yellow: (stars.yellow ?? 0) + duplicateStars.yellow,
-        purple: (stars.purple ?? 0) + duplicateStars.purple,
-      },
-      collection: [...collection, ...newItems],
-    }
-    const rollback = {
-      tickets: profile?.tickets ?? { normal: 0, gold: 0 },
-      stars: profile?.stars ?? { yellow: 0, purple: 0 },
-      collection: profile?.collection ?? [],
-    }
-    dispatch({ type: 'UPDATE_PROFILE', data })
-
-    try {
-      if (user) await updateProfile(user.uid, data)
-      setGachaResult(results)
-    } catch (e) {
-      console.error(e)
-      dispatch({ type: 'UPDATE_PROFILE', data: rollback })
-      notify('補給同步失敗，請稍後再試。')
-    } finally {
-      setIsDrawing(false)
-    }
+    if (await runShop(fresh => openSupply(fresh, results, isGold))) setGachaResult(results)
   }
-
   async function claimDailySupply(item) {
-    if (item.disabled) {
-      notify('這個補給位先保留，功能完成後開放。')
-      return
-    }
-    if (dailyClaims.includes(item.id)) return
-    if (!hasResources(resources, item.cost)) {
-      notify('資源不足，先完成今日任務或記帳。')
-      return
-    }
-    const afterCost = applyResourceDelta(stars, tickets, item.cost, -1)
-    const afterReward = applyResourceDelta(afterCost.stars, afterCost.tickets, item.reward, 1)
-    const data = {
-      stars: afterReward.stars,
-      tickets: afterReward.tickets,
-      shop: {
-        ...shopState,
-        dailySupplyDate: today,
-        dailySupplyClaims: [...dailyClaims, item.id],
-      },
-    }
-    dispatch({ type: 'UPDATE_PROFILE', data })
-    try {
-      if (user) await updateProfile(user.uid, data)
-      notify(`${item.name} 已領取`)
-    } catch (e) {
-      console.error(e)
-      dispatch({ type: 'UPDATE_PROFILE', data: { stars, tickets, shop: shopState } })
-      notify('每日商品同步失敗，請稍後再試。')
-    }
+    if (await runShop(fresh => claimShopSupply(fresh, today, item))) notify(`${item.name} 已領取`)
   }
-
   async function buyExchange(item) {
-    if (item.disabled) {
-      notify('這個品項先放在設計位，功能完成後開放。')
-      return
-    }
-    if (item.reward) {
-      const cost = { [item.costType]: item.cost }
-      if (!hasResources(resources, cost)) {
-        notify(item.costType === 'purple' ? '紫星不足。' : '黃星不足。')
-        return
-      }
-      const afterCost = applyResourceDelta(stars, tickets, cost, -1)
-      const afterReward = applyResourceDelta(afterCost.stars, afterCost.tickets, item.reward, 1)
-      const data = { stars: afterReward.stars, tickets: afterReward.tickets }
-      dispatch({ type: 'UPDATE_PROFILE', data })
-      try {
-        if (user) await updateProfile(user.uid, data)
-        notify(`${item.name} 已兌換`)
-      } catch (e) {
-        console.error(e)
-        dispatch({ type: 'UPDATE_PROFILE', data: { stars, tickets } })
-        notify('兌換同步失敗，請稍後再試。')
-      }
-      return
-    }
-    const alreadyOwned = collection.some(c => c.id === item.id)
-    if (alreadyOwned) {
-      await equipItem(item)
-      return
-    }
-    const cost = { [item.costType]: item.cost }
-    if (!hasResources(resources, cost)) {
-      notify(item.costType === 'purple' ? '紫星不足。' : '黃星不足。')
-      return
-    }
-    const next = applyResourceDelta(stars, tickets, cost, -1)
-    const autoEquip = item.cost === 0 && (isHomeEffectItem(item) || item.type === 'attackEffect' || item.type === 'paperPart')
-    const data = {
-      stars: next.stars,
-      tickets: next.tickets,
-      collection: [...collection, { id: item.id, rarity: item.rarity, obtainedAt: Date.now(), source: 'exchange' }],
-      ...(autoEquip ? { equipped: buildEquippedItem(equipped, item) } : {}),
-    }
-    dispatch({ type: 'UPDATE_PROFILE', data })
-    try {
-      if (user) await updateProfile(user.uid, data)
-      notify(autoEquip ? `${item.name} 已加入收藏並裝備` : `${item.name} 已加入收藏`)
-    } catch (e) {
-      console.error(e)
-      dispatch({ type: 'UPDATE_PROFILE', data: { stars, tickets, collection, equipped } })
-      notify('兌換同步失敗，請稍後再試。')
-    }
+    if (collection.some(entry => entry.id === item.id) && !item.reward) return equipItem(item)
+    const saved = await runShop(fresh => purchaseItem(fresh, item))
+    if (saved) notify(item.reward ? `${item.name} 已兌換` : `${item.name} 已加入收藏，可到造型頁裝備。`)
   }
-
   async function equipItem(item) {
-    const data = { equipped: buildEquippedItem(equipped, item) }
-    dispatch({ type: 'UPDATE_PROFILE', data })
-    notify(`${item.name} 已裝備`)
-    if (user) await updateProfile(user.uid, data)
+    const saved = await runShop(fresh => {
+      if (!fresh.collection?.some(entry => entry.id === item.id)) throw new Error('請先收藏這件商品。')
+      return { ...fresh, equipped: buildEquippedItem(fresh.equipped, item) }
+    })
+    if (saved) notify(`${item.name} 已裝備`)
   }
 
   return (
     <div className="academy-screen academy-shop-screen" style={{ '--shop-assets': `url(${shopAssets})` }}>
-      <img src={shopBg} alt="" className="academy-bg" draggable="false" />
+      <img src={isStorybook(profile) ? STORYBOOK_ART.courtyard : shopBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
       <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
         <button className="academy-back" onClick={() => screenParams?.returnTo === 'profile' ? navigate('profile', { tab: 'wardrobe' }) : navigate('town')}>←</button>
-        <div className="flex-1 text-center text-sm font-black text-[#26324A]">商店</div>
+        <div className="flex-1 text-center text-sm font-black text-[#26324A]">學院小店</div>
         <div className="w-10" />
       </div>
 
@@ -937,11 +774,13 @@ export default function ShopScreen() {
       </div>
 
       <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
+        {tab === 'daily' && <section className="storybook-currency-guide"><div><GameIcon name="coin-gold" /><span><b>黃星，收集日常</b><small>每日手帳禮 +2 · 結算 +1–2 · 小店 +1</small></span></div><div><GameIcon name="coin-purple" /><span><b>紫星，留給特別的收藏</b><small>本週累積 5 天、7 天記帳，各領 1 枚</small></span></div><button onClick={() => navigate('missions')}>看看我的任務 →</button></section>}
+        {tab === 'daily' && <button className="storybook-shop-feature" onClick={() => { setTab('exchange'); setExchangeCategory('storybook') }}><StorybookActor outfit="star" reduced /><span><small>薄荷帳本 · 衣服上新</small><b>晚星制服</b><em>12 黃星 · 寫帳、招呼動作一起收藏</em><strong>進店試穿 →</strong></span></button>}
         {tab === 'daily' && (
           <div className="flex flex-col gap-3">
             <div className="academy-card academy-shop-hero-card">
               <div className="academy-shop-hero">
-                <ShopSprite name="keeper" />
+                <img className="storybook-shop-keeper" src={STORYBOOK_ART.owl} alt="書頁小鴞店員" />
                 <div>
                   <div className="text-base font-black text-[#26324A]">學院商店櫃台</div>
                   <div className="mt-1 text-xs font-bold leading-5 text-[#8E87A8]">
@@ -957,14 +796,14 @@ export default function ShopScreen() {
                   <b>每日商品</b>
                   <small>{today}</small>
                 </div>
-                <span className="academy-status">{dailyClaims.length}/{DAILY_SUPPLIES.length}</span>
+                <span className="academy-status">{dailyClaims.length}/{DAILY_SUPPLIES.filter(item => !item.disabled).length}</span>
               </div>
               <div className="academy-shop-supply-grid">
-                {DAILY_SUPPLIES.map(item => {
+                {DAILY_SUPPLIES.filter(item => !item.disabled).map(item => {
                   const claimed = dailyClaims.includes(item.id)
                   const disabled = claimed || item.disabled || !hasResources(resources, item.cost)
                   return (
-                    <button key={item.id} className={`academy-shop-supply ${claimed ? 'is-claimed' : ''} ${item.disabled ? 'is-disabled' : ''}`} onClick={() => claimDailySupply(item)} disabled={claimed}>
+                    <button key={item.id} className={`academy-shop-supply ${claimed ? 'is-claimed' : ''} ${item.disabled ? 'is-disabled' : ''}`} onClick={() => claimDailySupply(item)} disabled={claimed || isDrawing}>
                       <PrizeIcon item={{ ...item, color: claimed ? '#D7D0E8' : '#FFE4A0' }} />
                       <span>
                         <b>{item.name}</b>
@@ -1008,7 +847,7 @@ export default function ShopScreen() {
                         <small>{item.source.replace('造型部件・', '')}</small>
                         <div>
                           <button type="button" onClick={() => setPreviewPaperPart(item)}>試穿</button>
-                          <button type="button" onClick={() => buyExchange(item)} disabled={equippedNow}>
+                          <button type="button" onClick={() => buyExchange(item)} disabled={equippedNow || isDrawing}>
                             {equippedNow
                               ? '使用中'
                               : owned
@@ -1034,7 +873,7 @@ export default function ShopScreen() {
                 <ShopSprite name="box" />
                 <div>
                   <b>一般補給箱</b>
-                  <p>用任務與每日商品拿到的一般券抽常駐特效、稱號、頭像框與普通套裝。</p>
+                  <p>用任務與每日商品拿到的一般券抽常駐稱號與頭像框；重複收藏會轉成星星。</p>
                   <button className="academy-small-button" onClick={() => setTab('gacha')}>前往抽獎</button>
                 </div>
               </div>
@@ -1046,7 +885,7 @@ export default function ShopScreen() {
           <div className="flex flex-col gap-3">
             <div className="academy-card">
               <div className="academy-shop-hero">
-                <ShopSprite name="keeper" />
+                <img className="storybook-shop-keeper" src={STORYBOOK_ART.owl} alt="書頁小鴞店員" />
                 <div>
                   <div className="text-base font-black text-[#26324A]">常駐補給池</div>
                   <div className="mt-1 text-xs font-bold leading-5 text-[#8E87A8]">
@@ -1061,7 +900,7 @@ export default function ShopScreen() {
                 <ShopSprite name="box" />
                 <div>
                   <b>一般補給箱</b>
-                  <small>特效・稱號・邊框・常駐套裝</small>
+                  <small>稱號・頭像框</small>
                 </div>
                 <ResourceAmount type="normalTicket" value={tickets.normal} />
               </div>
@@ -1094,8 +933,8 @@ export default function ShopScreen() {
               <div className="academy-shop-pool-head">
                 <ShopSprite name="goldTicket" />
                 <div>
-                  <b>限定金色池</b>
-                  <small>傳說機率提升，公會月度挑戰取得</small>
+                  <b>金色補給箱</b>
+                  <small>傳說 12%・稀有 33%・普通 55%</small>
                 </div>
                 <ResourceAmount type="goldTicket" value={tickets.gold} />
               </div>
@@ -1108,9 +947,9 @@ export default function ShopScreen() {
             <div className="academy-card">
               <div className="mb-2 text-xs font-black text-[#26324A]">資源獲得方式</div>
               <div className="academy-shop-source-list">
-                <span>C/B/A 每日結算</span><ResourceList data={{ yellow: 1 }} compact />
-                <span>S 每日結算</span><ResourceList data={{ purple: 1 }} compact />
-                <span>擊殺當日怪物</span><ResourceList data={{ normalTicket: 1 }} compact />
+                <span>每日結算（依評價 1–2 黃星）</span><ResourceList data={{ yellow: 1 }} compact />
+                <span>本週 5 日、7 日任務（各 1 紫星）</span><ResourceList data={{ purple: 1 }} compact />
+                <span>跨日討伐結算</span><ResourceList data={{ normalTicket: 1 }} compact />
                 <span>公會月度挑戰</span><ResourceList data={{ goldTicket: 1 }} compact />
               </div>
             </div>
@@ -1119,7 +958,6 @@ export default function ShopScreen() {
 
         {tab === 'exchange' && (
           <div className="flex flex-col gap-2">
-            <RewardPreview />
             {exchangeCategory === 'utility' && <UtilityPresentationPreview />}
             {exchangeCategory === 'homefx' && <HomeEffectsPresentationPreview />}
             {exchangeCategory === 'battlefx' && <BattleEffectsPresentationPreview />}
@@ -1148,6 +986,7 @@ export default function ShopScreen() {
                   const equippedNow = isEquipped(item)
                   const homeEffectProduct = isHomeEffectItem(item)
                   const paperPartProduct = item.type === 'paperPart'
+                  if (item.type === 'storybookOutfit') return <article key={item.id} className="storybook-shop-outfit"><div className="storybook-shop-outfit__scene" style={{ backgroundImage: `url(${STORYBOOK_ART.courtyard})` }}><StorybookActor outfit={item.key} reduced={profile.preferences?.reduceMotion} interactive /></div><div className="storybook-shop-outfit__copy"><span className="journal-eyebrow">薄荷帳本 · 衣服</span><h3>{item.name}</h3><p>{item.desc}</p><small>可和書頁小鴞分開搭配 · 點角色試看招呼</small><div><span>{item.cost ? <ResourceAmount type={item.costType} value={item.cost} /> : '免費收藏'}</span><button className="journal-primary" disabled={isDrawing || equippedNow} onClick={() => buyExchange(item)}>{equippedNow ? '穿著中' : owned ? '換上這件' : '兌換收藏'}</button></div></div></article>
                   return (
                     <div key={item.id} className={`academy-shop-product ${item.disabled ? 'is-disabled' : ''} ${equippedNow ? 'is-equipped' : ''}`}>
                       <PrizeIcon item={item} />
@@ -1156,7 +995,7 @@ export default function ShopScreen() {
                           <b>{item.name}</b>
                           <span style={{ '--rarity-color': rarity.color }}>{rarity.label}</span>
                         </div>
-                        <small>{item.source} / {item.place}</small>
+                        <small>{item.type === 'paperPart' || isHomeEffectItem(item) ? '經典混搭系列 · ' : ''}{item.source} / {item.place}</small>
                       </div>
                       <div className="academy-shop-product__actions">
                         {homeEffectProduct && (
@@ -1169,7 +1008,7 @@ export default function ShopScreen() {
                             試穿
                           </button>
                         )}
-                        <button className="academy-small-button" onClick={() => buyExchange(item)} disabled={equippedNow}>
+                        <button className="academy-small-button" onClick={() => buyExchange(item)} disabled={equippedNow || isDrawing}>
                           {item.disabled
                             ? '設計中'
                             : equippedNow
@@ -1200,7 +1039,7 @@ export default function ShopScreen() {
               </div>
               <span className="academy-status">{collection.length}</span>
             </div>
-            <CollectionGrid items={collection} equipped={equipped} onEquip={equipItem} />
+            <button className="journal-link-row" onClick={() => navigate('profile', { tab: 'wardrobe' })}><span><b>薄荷帳本與我的全部造型 →</b><small>查看新系列、里程碑夥伴與經典混搭</small></span></button><CollectionGrid items={collection} equipped={equipped} onEquip={equipItem} />
           </div>
         )}
       </div>

@@ -5,7 +5,7 @@
 ## 本機開發
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -16,13 +16,16 @@ npm run dev
 - Build output：`build`
 - Node.js：建議 22
 
-`public/_redirects` 提供 SPA fallback；`public/_headers` 負責安全標頭及帶 hash 靜態資產快取。PWA 使用 auto-update，部署新版後會清除過期快取並接管現有頁面。
+`public/_redirects` 提供 SPA fallback；`public/_headers` 負責安全標頭及帶 hash 靜態資產快取。PWA 會提示新版可用，記帳時不強制接管或重載。應用程式先快取核心畫面，其他收藏資產依使用情況快取。
+
+複製 `.env.example` 為 `.env` 並填入 Firebase 專案設定。缺少設定時使用持久本機存檔；開發環境可用 `?local=1` 測試本機模式。設定頁可匯出帳本、造型和遊戲進度的 JSON 備份。Google 綁定與 Firestore 權限需要在對應 Firebase 專案啟用。
 
 每次 push 前執行：
 
 ```bash
-npm run lint
-npm run build
+npm run check
 ```
 
 視覺規格位於 [`docs/VISUAL_SYSTEM.md`](docs/VISUAL_SYSTEM.md)。
+
+本次改版盤點與驗證範圍：[收藏冒險改版紀錄](docs/collection-overhaul.md)。美術母版、動作來源和轉檔規則：[薄荷帳本素材紀錄](docs/storybook-art-production.md)。

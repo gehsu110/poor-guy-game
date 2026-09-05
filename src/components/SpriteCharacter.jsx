@@ -28,6 +28,7 @@ export default function SpriteCharacter({
   const [isTapping, setIsTapping] = useState(false)
   const blinkRef  = useRef(null)
   const tapRef    = useRef(null)
+  const blinkEndRef = useRef(null)
   const animRef   = useRef(null)
   const idxRef    = useRef(0)
 
@@ -61,7 +62,7 @@ export default function SpriteCharacter({
       const delay = blinkInterval + (Math.random() - 0.5) * 1000
       blinkRef.current = setTimeout(() => {
         setIsBlinking(true)
-        setTimeout(() => {
+        blinkEndRef.current = setTimeout(() => {
           setIsBlinking(false)
           scheduleBlink()
         }, blinkSrc ? 150 : (blinkFrames.length * 1000) / fps + 80)
@@ -69,7 +70,7 @@ export default function SpriteCharacter({
     }
 
     scheduleBlink()
-    return () => clearTimeout(blinkRef.current)
+    return () => { clearTimeout(blinkRef.current); clearTimeout(blinkEndRef.current) }
   }, [blinkFrames, blinkSrc, blinkInterval, fps])
 
   useEffect(() => () => clearTimeout(tapRef.current), [])

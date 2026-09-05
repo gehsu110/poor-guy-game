@@ -1,6 +1,6 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { DEFAULT_CATEGORIES, formatMoney, calcDamage } from '../gameLogic'
 import GameIcon from '../components/GameIcon'
@@ -14,7 +14,11 @@ import monsterWeekend from '../assets/academy-art/generated/monster-weekend.png'
 import monsterSunday from '../assets/academy-art/generated/monster-sunday.png'
 import monsterMonth from '../assets/academy-art/generated/monster-month.png'
 import { setScreenChrome } from '../screenChrome'
+import { parseAmount } from '../progression'
 import { DEFAULT_BATTLE_ATTACK_EFFECT, getBattleAttackEffect } from '../battleEffects'
+import StorybookActor from '../components/StorybookActor'
+import { STORYBOOK_ART } from '../storybookAssets'
+import { isStorybook } from '../storybookCatalog'
 
 const MONSTER_ART = {
   slime: monsterSlime,
@@ -172,12 +176,13 @@ function MonsterArea({
   showProjectile,
   showImpact,
   attackEffectId,
+  storybook,
+  reduced,
 }) {
   if (!monster) return null
   const hpPct = monster.maxHp > 0 ? Math.max(0, currentHp / monster.maxHp) : 0
   const defeated = currentHp <= 0
   const isAngry = hpPct < 0.3 && !defeated
-  const attackPower = Math.max(0, Math.round(totalSpent / 10))
   const attackEffect = getBattleAttackEffect(attackEffectId)
   const drop = getBattleDrop(monster.tier)
 
@@ -194,7 +199,7 @@ function MonsterArea({
 
         <div className="academy-battle-stage__quickstats">
           <span>今日 NT${formatMoney(totalSpent)}</span>
-          <span>攻擊 +{attackPower}</span>
+          <span>如實記帳，守住預算</span>
           <span>{attackEffect.name}</span>
           <span>HP {Math.round(hpPct * 100)}%</span>
         </div>
@@ -218,16 +223,17 @@ function MonsterArea({
         <motion.div
           className={`academy-battle-monster ${isHit ? 'monster-hit' : ''}`}
           animate={
-            defeated ? { rotate: [-4, 4, -4], scale: 0.9 } :
+            reduced ? { x: 0, y: 0, rotate: 0, scale: 1 } :
+            defeated ? { y: [0, -5, 0], scale: 0.9 } :
             isHit ? { x: [0, 12, -8, 4, 0], scale: [1, 0.88, 1.05, 0.97, 1] } :
             isAngry ? { scale: [1, 1.08, 1] } :
-            { y: [0, -8, 0] }
+            { scaleY: [1, 1.025, 1], rotate: [-1, 1, -1] }
           }
-          transition={{ duration: defeated ? 1 : isHit ? 0.4 : isAngry ? 0.45 : 2.4, repeat: (defeated || isAngry) ? Infinity : 0 }}
+          transition={{ duration: reduced ? 0 : defeated ? 2.8 : isHit ? 0.4 : isAngry ? 1.4 : 3.6, repeat: reduced || isHit ? 0 : Infinity, ease: 'easeInOut' }}
         >
           {defeated
             ? <span className="academy-icon academy-icon--star h-16 w-16" />
-            : <img className="academy-battle-monster-art" src={MONSTER_ART[monster.id]} alt="" draggable="false" />}
+            : storybook ? <span className={`academy-monster-sprite academy-monster-sprite--${monster.id} storybook-battle-monster`} role="img" aria-label={monster.name} /> : <img className="academy-battle-monster-art" src={MONSTER_ART[monster.id]} alt="" draggable="false" />}
         </motion.div>
         {isAngry && <div className="academy-battle-alert" />}
 
@@ -277,7 +283,7 @@ function MonsterArea({
             <div className="mt-1 flex justify-center gap-1">
               <BattleRewardPill type="normalTicket" value={drop.normalTicket} />
             </div>
-            <div className="mt-1 text-[10px] font-bold text-[#8E87A8]">任務與結算徽章會在今日結算同步</div>
+            <div className="mt-1 text-[10px] font-bold text-[#8E87A8]">掉落預告 · 正式獎勵在跨日結算發放</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -293,13 +299,7 @@ function CategoryIcon({ cat, className = '' }) {
   )
 }
 
-function evaluateAmount(value) {
-  return String(value)
-    .split('+')
-    .map(Number)
-    .filter(Number.isFinite)
-    .reduce((sum, number) => sum + number, 0)
-}
+function evaluateAmount(value) { return parseAmount(value) }
 
 function CategoryPicker({ selected, onSelect, categories }) {
   return (
@@ -323,7 +323,8 @@ function CalcKeyboard({ value, onChange }) {
   function press(k) {
     if (k === '⌫') onChange(value.slice(0, -1) || '0')
     else if (k === 'AC') onChange('0')
-    else if (k === '+') onChange(value + '+')
+    else if (k === '+') { if (!value.endsWith('+') && parseAmount(value)) onChange(value + '+') }
+    else if (k === '.' && value.split('+').at(-1).includes('.')) return
     else if (value === '0' && k !== '.') onChange(k)
     else onChange(value + k)
   }
@@ -343,7 +344,7 @@ function CalcKeyboard({ value, onChange }) {
           <motion.button
             key={k}
             className={`academy-key ${isOp ? 'academy-key--op' : ''} ${isEqual ? 'academy-key--submit' : ''}`}
-            onClick={() => isEqual ? onChange(String(evalValue())) : press(k)}
+            onClick={() => isEqual ? onChange(String(evalValue() ?? 0)) : press(k)}
             whileTap={{ scale: 0.9 }}
           >
             {k}
@@ -354,7 +355,7 @@ function CalcKeyboard({ value, onChange }) {
   )
 }
 
-function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, categories }) {
+function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, categories, busy, noSpend, onNoSpend }) {
   const [category, setCategory] = useState(editingExpense?.category ?? null)
   const [note, setNote] = useState(editingExpense?.note ?? '')
   const [amount, setAmount] = useState(String(editingExpense?.amount ?? 0))
@@ -363,10 +364,11 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
 
   const currentCat = categories.find(c => c.id === category)
 
-  function handleAmountSubmit(val) {
-    const n = Number(val)
-    if (!n || n <= 0) {
-      setError('請輸入金額')
+  async function handleAmountSubmit(val) {
+    if (busy) return
+    const n = parseAmount(val)
+    if (!n) {
+      setError('請輸入有效金額，最多兩位小數；加號後也需要金額。')
       return
     }
     if (!category) {
@@ -374,10 +376,10 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
       return
     }
     setError('')
-    onSubmit({ category, note, amount: n })
+    const saved = await onSubmit({ category, note, amount: n })
+    if (!saved) { setError('尚未儲存成功，輸入內容已保留。'); return }
     setAmount('0')
     setNote('')
-    setCategory(null)
     onCancelEdit?.()
   }
 
@@ -426,7 +428,8 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
               aria-label="消費金額"
               value={amount === '0' ? '' : amount}
               placeholder="0"
-              onChange={event => setAmount(event.target.value.replace(/[^0-9.+]/g, ''))}
+              onChange={event => setAmount(event.target.value)}
+              maxLength={80}
               onKeyDown={event => {
                 if (event.key === 'Enter') handleAmountSubmit(evaluatedAmount)
               }}
@@ -440,8 +443,8 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
         <button className="academy-calculator-toggle" onClick={() => setShowCalculator(value => !value)}>
           {showCalculator ? '收起加總' : '多筆加總'}
         </button>
-        <button className="academy-battle-submit" onClick={() => handleAmountSubmit(evaluatedAmount)}>
-          記帳攻擊
+        <button className="academy-battle-submit" disabled={busy} onClick={() => handleAmountSubmit(evaluatedAmount)}>
+          {busy ? '儲存中…' : editingExpense ? '儲存修改' : '記帳攻擊'}
         </button>
       </div>
 
@@ -457,7 +460,7 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
             <div className="academy-calculator-sheet__header">
               <div>
                 <span>多筆加總</span>
-                <b>NT$ {formatMoney(evaluatedAmount)}</b>
+                <b>NT$ {formatMoney(evaluatedAmount ?? 0)}</b>
               </div>
               <button onClick={() => setShowCalculator(false)}>完成</button>
             </div>
@@ -468,9 +471,10 @@ function ExpensePanel({ onSubmit, budget, spent, editingExpense, onCancelEdit, c
         document.body,
       )}
 
+      {!editingExpense && !spent && <button className="battle-no-spend" disabled={busy || noSpend} onClick={onNoSpend}>{noSpend ? '今天零消費，已記在手帳裡 ✓' : '今天沒有消費？留下零消費紀錄'}</button>}
       {error && (
         <motion.div
-          className="text-center text-xs font-black text-[#FF6D98]"
+          className="text-center text-xs font-black text-[#D96573]" role="alert"
           initial={{ x: -5 }}
           animate={{ x: 0 }}
         >
@@ -498,7 +502,15 @@ function ExpenseLogButton({ expenses, categories, onClick }) {
   )
 }
 
-function ExpenseLogDrawer({ open, expenses, categories, onClose, onEdit, onDelete }) {
+function ExpenseLogDrawer({ open, expenses, categories, onClose, onEdit, onDelete, onReview, noSpend, busy }) {
+  const [confirmDelete, setConfirmDelete] = useState(null)
+  const closeRef = useRef(null)
+  useEffect(() => {
+    if (!open) return
+    const previous = document.activeElement
+    closeRef.current?.focus()
+    return () => previous?.isConnected && previous.focus?.()
+  }, [open])
   return createPortal(
     <AnimatePresence>
       {open && (
@@ -511,6 +523,15 @@ function ExpenseLogDrawer({ open, expenses, categories, onClose, onEdit, onDelet
           <button className="academy-battle-log-backdrop" onClick={onClose} aria-label="關閉今日明細" />
           <motion.div
             className="academy-battle-log-sheet"
+            role="dialog" aria-modal="true" aria-label="今日明細"
+            onKeyDown={event => {
+              if (event.key === 'Escape') onClose()
+              if (event.key === 'Tab') {
+                const buttons = [...event.currentTarget.querySelectorAll('button:not(:disabled)')]
+                if (!event.shiftKey && document.activeElement === buttons.at(-1)) { event.preventDefault(); buttons[0]?.focus() }
+                if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons.at(-1)?.focus() }
+              }
+            }}
             initial={{ y: 28, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 28, opacity: 0 }}
@@ -521,9 +542,12 @@ function ExpenseLogDrawer({ open, expenses, categories, onClose, onEdit, onDelet
                 <b>今日明細</b>
                 <span>可修改或刪除單筆紀錄</span>
               </div>
-              <button onClick={onClose}>完成</button>
+              <button ref={closeRef} onClick={onClose}>完成</button>
             </div>
-            <ExpenseList expenses={expenses} categories={categories} onEdit={onEdit} onDelete={onDelete} />
+            <ExpenseList expenses={expenses} categories={categories} onEdit={onEdit} onDelete={setConfirmDelete} />
+            {confirmDelete && <div className="journal-delete-confirm" role="alert"><p>刪除這筆紀錄？今日消費與戰鬥進度會重新計算。</p><button disabled={busy} onClick={async () => { if (await onDelete(confirmDelete)) setConfirmDelete(null) }}>確認刪除</button><button onClick={() => setConfirmDelete(null)}>保留紀錄</button></div>}
+            <button className="journal-primary" disabled={busy || (!expenses.length && !noSpend)} onClick={onReview}>確認今日帳本無誤</button>
+            <p className="battle-kind-note">{noSpend ? '今天零消費，也是一頁值得記下的冒險。' : '有新增或修改紀錄時，可以再回來確認。'}</p>
           </motion.div>
         </motion.div>
       )}
@@ -569,7 +593,7 @@ function ExpenseList({ expenses, onEdit, onDelete, categories }) {
 }
 
 export default function BattleScreen() {
-  const { state, navigate, submitExpense, updateExpenseEntry, deleteExpenseEntry } = useApp()
+  const { state, navigate, submitExpense, updateExpenseEntry, deleteExpenseEntry, recordAction } = useApp()
   const { profile, monster, currentHp, totalSpent, damageNumbers, expenses } = state
   const [isHit, setIsHit] = useState(false)
   const [isCrit, setIsCrit] = useState(false)
@@ -577,8 +601,13 @@ export default function BattleScreen() {
   const [showImpact, setShowImpact] = useState(false)
   const [hitKey, setHitKey] = useState(0)
   const [editingExpense, setEditingExpense] = useState(null)
-  const [logOpen, setLogOpen] = useState(false)
-  const budget = profile?.dailyBudget ?? 1000
+  const [logOpen, setLogOpen] = useState(!!state.screenParams?.review)
+  const timers = useRef([])
+  const systemReduced = useReducedMotion()
+  const reduced = systemReduced || profile?.preferences?.reduceMotion
+  const storybook = isStorybook(profile)
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
+  const budget = state.dayRecord?.budget ?? profile?.dailyBudget ?? 1000
   const categories = [...DEFAULT_CATEGORIES, ...(profile?.customCategories ?? [])]
   const remaining = budget - totalSpent
   const attackEffectId = profile?.equipped?.attackEffect ?? DEFAULT_BATTLE_ATTACK_EFFECT
@@ -591,38 +620,26 @@ export default function BattleScreen() {
   }, [])
 
   async function handleSubmit(data) {
-    const spentBase = editingExpense ? totalSpent - Number(editingExpense.amount ?? 0) : totalSpent
-    const { mult } = calcDamage(data.amount, spentBase, budget)
-    const crit = mult >= 1.2
-
-    setIsCrit(crit)
+    const wasEditing = !!editingExpense
+    const saved = wasEditing ? await updateExpenseEntry(editingExpense.id, data) : await submitExpense(data)
+    if (!saved) return false
+    if (wasEditing) { setEditingExpense(null); return true }
+    timers.current.forEach(clearTimeout)
+    setIsCrit(false)
     setHitKey(k => k + 1)
-    setShowProjectile(true)
-
-    // 投射物飛行後命中
-    setTimeout(() => {
-      setShowProjectile(false)
-      setIsHit(true)
-      setShowImpact(true)
-    }, 900)
-
-    // 清除命中狀態
-    setTimeout(() => {
-      setIsHit(false)
-      setShowImpact(false)
-    }, 2400)
-
-    if (editingExpense) {
-      await updateExpenseEntry(editingExpense.id, data)
-      setEditingExpense(null)
-    } else {
-      await submitExpense(data)
+    if (!reduced) {
+      setShowProjectile(true)
+      timers.current = [
+        setTimeout(() => { setShowProjectile(false); setIsHit(true); setShowImpact(true) }, 900),
+        setTimeout(() => { setIsHit(false); setShowImpact(false) }, 2400),
+      ]
     }
+    return true
   }
 
   return (
-    <div className="academy-screen academy-screen--battle">
-      <img src={battleBg} alt="" className="academy-bg" draggable="false" />
+    <div className={`academy-screen academy-screen--battle ${storybook ? 'storybook-battle' : ''}`} style={{ '--monster-sprites': `url(${STORYBOOK_ART.monsters})` }}>
+      <img src={storybook ? STORYBOOK_ART.courtyard : battleBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-battle-scene-glow" />
       <div className="academy-bg-soft" />
 
@@ -659,7 +676,10 @@ export default function BattleScreen() {
           showProjectile={showProjectile}
           showImpact={showImpact}
           attackEffectId={attackEffectId}
+          storybook={storybook}
+          reduced={reduced}
         />
+        {storybook && <div className="storybook-battle-buddy"><StorybookActor outfit={profile?.equipped?.storybookOutfit} reduced={reduced} successPulse={hitKey} /><span><b>{showProjectile ? '把這一筆，化成星光。' : showImpact ? '記好了！又前進了一點。' : '我準備好了，今天一起慢慢來。'}</b><small>如實記帳，預算餘裕會在跨日結算時完成最後一擊。</small></span></div>}
 
         <div className="academy-battle-panel">
           <ExpensePanel
@@ -670,6 +690,9 @@ export default function BattleScreen() {
             editingExpense={editingExpense}
             onCancelEdit={() => setEditingExpense(null)}
             categories={categories}
+            busy={state.busy}
+            noSpend={state.dayRecord?.noSpend}
+            onNoSpend={() => recordAction('noSpend')}
           />
         </div>
 
@@ -685,6 +708,9 @@ export default function BattleScreen() {
           setLogOpen(false)
         }}
         onDelete={deleteExpenseEntry}
+        busy={state.busy}
+        noSpend={state.dayRecord?.noSpend}
+        onReview={async () => { if (await recordAction('review')) setLogOpen(false) }}
       />
 
     </div>

@@ -72,17 +72,23 @@ export function generateDayMonster(dateStr, budget) {
  * @param {number} budget         今日預算
  */
 export function calcDamage(amount, todayTotal, budget) {
-  const usage = budget > 0 ? todayTotal / budget : 0
-  let mult
-  if (usage < 0.50) mult = 1.2
-  else if (usage < 0.85) mult = 1.0
-  else if (usage < 1.00) mult = 0.7
-  else if (usage < 1.20) mult = 0.35
-  else if (usage < 1.50) mult = 0.15
-  else mult = 0.05
-
-  const dmg = Math.round(amount * mult)
-  return { damage: dmg, mult }
+  const safeAmount = Math.max(0, Number(amount) || 0)
+  const safeTotal = Math.max(0, Number(todayTotal) || 0)
+  if (!(budget > 0)) return { damage: 0, mult: 0 }
+  // Integrate budget bands: a large purchase cannot borrow the first band's
+  // multiplier for its entire amount, and splitting a purchase adds no damage.
+  function cumulative(total) {
+    let result = 0, previous = 0
+    for (const [edge, mult] of [[.5,1.2],[.85,1],[1,.7],[1.2,.35],[1.5,.15],[Infinity,.05]]) {
+      const upper = edge * budget
+      result += Math.max(0, Math.min(total, upper) - previous) * mult
+      if (total <= upper) break
+      previous = upper
+    }
+    return Math.round(result * 100) / 100
+  }
+  const damage = Math.round((cumulative(safeTotal + safeAmount) - cumulative(safeTotal)) * 100) / 100
+  return { damage, mult: safeAmount ? damage / safeAmount : 0 }
 }
 
 /**
@@ -98,16 +104,16 @@ export function calcFinalBlow(spent, budget) {
 
 export function calcRating(spent, budget, entryCount) {
   const usage = budget > 0 ? spent / budget : 999
-  if (usage <= 0.5 && entryCount >= 3) return 'S'
-  if (usage <= 1.0 && entryCount >= 3) return 'A'
+  if (usage <= 0.5 && entryCount >= 1) return 'S'
+  if (usage <= 1.0 && entryCount >= 1) return 'A'
   if (usage <= 1.0) return 'B'
   return 'C'
 }
 
 export const RATING_REWARDS = {
-  S: { yellow: 0, purple: 1, exp: 60 },
-  A: { yellow: 3, purple: 0, exp: 40 },
-  B: { yellow: 2, purple: 0, exp: 25 },
+  S: { yellow: 2, purple: 0, exp: 60 },
+  A: { yellow: 2, purple: 0, exp: 40 },
+  B: { yellow: 1, purple: 0, exp: 25 },
   C: { yellow: 1, purple: 0, exp: 10 },
 }
 

@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../useAppStore'
 import { calcLevel, updateProfile } from '../firebase'
+import { STORYBOOK_ART } from '../storybookAssets'
+import { isStorybook } from '../storybookCatalog'
 import guildBg from '../assets/academy-art/guild-bg.webp'
 import { formatMoney, getTitle } from '../gameLogic'
 
@@ -222,7 +224,7 @@ export default function QuestScreen() {
 
   return (
     <div className="academy-screen">
-      <img src={guildBg} alt="" className="academy-bg" draggable="false" />
+      <img src={isStorybook(profile) ? STORYBOOK_ART.courtyard : guildBg} alt="" className="academy-bg" draggable="false" />
       <div className="academy-bg-soft" />
 
       <div className="academy-safe-top relative z-10 flex items-center gap-2 px-4 pb-2">
