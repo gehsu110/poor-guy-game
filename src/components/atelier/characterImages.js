@@ -1,7 +1,7 @@
 function decodeImage(src) {
   const image = new Image();
   image.src = src;
-  return image.decode();
+  return image.decode().then(() => image);
 }
 
 // Failed requests are not cached. A subsequent mount or outfit change can retry.

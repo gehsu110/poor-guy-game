@@ -45,7 +45,7 @@ export default defineConfig({
           "assets/rig-*.webp",
           "assets/mint-*.webp",
           "assets/night-*.webp",
-          "assets/book-*.webp",
+          "assets/belt-journal-*.webp",
           "assets/satchel-*.webp",
           "assets/owl-*.webp",
           "assets/cat-*.webp",

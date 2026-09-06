@@ -1675,3 +1675,27 @@
     line-height: 14px;
   }
 }
+
+/* A runtime-composed 2D mesh moves fabric without detaching worn items. */
+.wind-rig-host {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.wind-rig-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.wind-rig-canvas[data-ready="true"] {
+  opacity: 1;
+}
+.wind-rig-host:has(> .wind-rig-canvas[data-ready="true"]) > .wind-rig {
+  visibility: hidden;
+}
+.wind-rig-host:has(> .wind-rig-canvas[data-ready="true"]) > .wind-rig * {
+  animation-play-state: paused;
+}

@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-06",
+  "tool": "image_gen.imagegen",
+  "source": "src/assets/academy-art/wind-atelier/book.webp",
+  "output": "src/assets/academy-art/wind-atelier/belt-journal.webp",
+  "prompt": "Edit the supplied original fantasy notebook accessory into a wearable belt-hung journal sprite for the SAME anime game. Preserve its navy blue leather, restrained antique gold corner protectors and compass star motif, same clean detailed anime line art and soft painted shading. Make the book nearly upright and viewed almost straight from the front, with just a small visible right page edge. Add a believable short dark brown leather hanging tab ABOVE the top edge of the book, with a closed small loop that wraps over a belt and an antique brass rivet fastening it to the back of the journal. The top loop must be clearly visible and centered around 45% of image width. It is a secure belt accessory, not a handbag, not a hand-held item. No hand, arm, body, person, background, labels, captions or shadows outside the object. Keep the hanging tab short: about 15% of the journal's height. One complete isolated accessory, generous small padding, truly transparent background. High quality same original artwork style. Return only the finished sprite.",
+  "alpha": {
+    "tool": "Higgsfield image_background_remover",
+    "job": "4fff5a21-0f5c-45d3-a881-0aced0d82e93",
+    "reason": "Generated file had an opaque checkerboard background."
+  },
+  "export": {
+    "crop": [215, 58, 991, 1246],
+    "size": [392, 600],
+    "format": "webp",
+    "quality": 93,
+    "method": 6
+  }
+}
