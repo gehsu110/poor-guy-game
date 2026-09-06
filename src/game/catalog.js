@@ -226,3 +226,12 @@ export function purchase(profile, id, operationId) {
     ].slice(-120),
   };
 }
+
+// Purchase and equipment share one repository transaction; retries never charge twice.
+export function purchaseAndEquip(profile, id, operationId) {
+  const purchased = purchase(profile, id, operationId);
+  return equipLook(purchased, {
+    ...profile.equipped.layered,
+    [ITEM_BY_ID[id].slot]: id,
+  });
+}

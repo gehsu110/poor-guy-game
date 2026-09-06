@@ -26,6 +26,7 @@ const {
 } = await import("../../src/gameRepository.js");
 const { startJourney, advanceJourney } =
   await import("../../src/game/journey.js");
+const { purchaseAndEquip } = await import("../../src/game/catalog.js");
 const { validateBackup } = await import("../../src/game/backup.js");
 const date = "2026-09-06";
 const uid = "alice";
@@ -167,6 +168,13 @@ test("adventure completion persists the item and single consumed date together",
     current.profile.collection.some((item) => item.id === "top_courier"),
   );
   assert.equal(current.profile.journey.pendingDates.length, 0);
+  assert.deepEqual(current.profile.journey.lastResult, {
+    id: "trip",
+    node: 1,
+    route: "forest",
+    date,
+    seen: false,
+  });
 });
 test("chunked backup merge is resumable and does not add the same balance again", async () => {
   const saved = await gameSnapshot(uid);
@@ -224,4 +232,54 @@ test("editing an old date repairs missing day counters from real source rows", a
   assert.equal(saved.dayRecord.spent, 115);
   assert.equal(saved.dayRecord.entryCount, 2);
   assert.equal(saved.dayRecord.expenseCount, 2);
+});
+
+test("purchase-and-equip retries commit one debit with the worn outfit", async () => {
+  await gameTransaction(
+    uid,
+    (profile, record) => ({
+      profile: { ...profile, stars: { yellow: 20, purple: 0 } },
+      record,
+    }),
+    date,
+  );
+  await Promise.all(
+    ["buy-a", "buy-b"].map((id) =>
+      gameTransaction(
+        uid,
+        (profile, record) => ({
+          profile: purchaseAndEquip(profile, "top_starlight", id),
+          record,
+        }),
+        date,
+      ),
+    ),
+  );
+  const current = await readGame(uid, date);
+  assert.equal(current.profile.stars.yellow, 8);
+  assert.equal(current.profile.equipped.layered.top, "top_starlight");
+  assert.equal(
+    current.profile.collection.filter((item) => item.id === "top_starlight")
+      .length,
+    1,
+  );
+  assert.equal(
+    current.profile.walletLog.filter((item) =>
+      ["buy-a", "buy-b"].includes(item.id),
+    ).length,
+    1,
+  );
+  const before = await gameSnapshot(uid);
+  await assert.rejects(
+    gameTransaction(
+      uid,
+      (profile, record) => ({
+        profile: purchaseAndEquip(profile, "friend_cat", "too-poor"),
+        record,
+      }),
+      date,
+    ),
+    /還不夠/,
+  );
+  assert.deepEqual((await gameSnapshot(uid)).profile, before.profile);
 });

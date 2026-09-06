@@ -4,9 +4,18 @@ import { useApp } from "../../useAppStore";
 import { DEFAULT_CATEGORIES } from "../../gameLogic";
 import { calendarDate } from "../../game/ledger";
 import GameIcon from "../GameIcon";
+import { nextStep } from "../../game/guidance";
+import { JourneySteps } from "./JourneyUX";
+import { StarCurrency } from "./Chrome";
 export default function QuickEntry() {
   const { state, patch, saveEntry, navigate, recordAction } = useApp();
   const [saved, setSaved] = useState(false);
+  const [earnedDaily, setEarnedDaily] = useState(false);
+  const successRef = useRef(null);
+  const guide = nextStep(state.profile, state.dayRecord, state.date);
+  useEffect(() => {
+    if (saved) successRef.current?.focus();
+  }, [saved]);
   const draft = state.entryDraft;
   const dialogRef = useRef(null);
   const amountRef = useRef(null);
@@ -37,7 +46,11 @@ export default function QuickEntry() {
     event.preventDefault();
     if (saving.current) return;
     saving.current = true;
+    const firstToday =
+      draft.date === state.date &&
+      !state.profile.claimedMissions?.[`journal3:record:${state.date}`];
     if (await saveEntry(draft)) {
+      setEarnedDaily(firstToday);
       setSaved(true);
       sessionStorage.removeItem(`starpage-draft:${state.user.uid}`);
     }
@@ -112,7 +125,11 @@ export default function QuickEntry() {
           </button>
         </header>
         {saved ? (
-          <div className="star-entry-success">
+          <div
+            className="star-entry-success quest-entry-success"
+            tabIndex={-1}
+            ref={successRef}
+          >
             <span className="star-entry-seal">
               <GameIcon name="report" />
             </span>
@@ -129,14 +146,54 @@ export default function QuickEntry() {
               <br />
               {state.user.isLocal ? "已儲存在這個裝置" : "已儲存至雲端帳本"}
             </p>
+            {earnedDaily && (
+              <div className="quest-earned">
+                <StarCurrency amount={2} />
+                <span>今日記錄獎勵已收下</span>
+                <b>冒險 +1 次</b>
+              </div>
+            )}
+            <JourneySteps
+              step={guide.step}
+              onSelect={(index) => {
+                close();
+                navigate(
+                  index === 0
+                    ? "journal"
+                    : index === 1
+                      ? "adventure"
+                      : "collection",
+                  index === 2 ? { tab: "stamps" } : {},
+                );
+              }}
+            />
+            <p className="quest-entry-next">
+              {guide.step === 1
+                ? "下一步：幫精靈找星片，收下旅程印記。"
+                : guide.step === 0
+                  ? "補登已儲存。記錄今天的一筆，或確認今日零消費，就能準備冒險。"
+                  : "今天的冒險已完成，新記錄會繼續更新帳本。"}
+            </p>
             <button
-              className="star-button"
+              className="star-button quest-primary"
               onClick={() => {
                 close();
-                navigate("adventure");
+                navigate(
+                  guide.step === 1
+                    ? "adventure"
+                    : guide.step === 0
+                      ? "journal"
+                      : "collection",
+                  guide.step === 2 ? { tab: "stamps" } : {},
+                );
               }}
             >
-              繼續我的冒險 →
+              {guide.step === 1
+                ? "去冒險，找星片"
+                : guide.step === 0
+                  ? "回到今天的手帳"
+                  : "看看我的收藏"}{" "}
+              →
             </button>
             <button className="star-button star-button--quiet" onClick={close}>
               完成，回到剛才

@@ -215,12 +215,11 @@ export function advanceJourney(profile, id, expectedTurn, skill) {
     throw new Error("這段旅程已經結束，請查看最新進度。");
   if (active.turn !== expectedTurn)
     throw new Error("旅程剛剛有更新，已同步最新進度。");
-  if (!["cast", "friend", "quick"].includes(skill))
-    throw new Error("請選擇一個行動。");
-  if (skill === "friend" && !profile.equipped?.layered?.companion)
-    throw new Error("先邀請一位夥伴加入旅程。");
-  const damage = skill === "quick" ? 100 : skill === "friend" ? 55 : 40;
-  const hp = Math.max(0, active.hp - damage);
+  const hp = encounterStep(
+    active,
+    skill,
+    !!profile.equipped?.layered?.companion,
+  );
   if (hp > 0)
     return {
       ...profile,
@@ -244,6 +243,13 @@ export function advanceJourney(profile, id, expectedTurn, skill) {
       ...next.journey,
       completed: active.node,
       active: null,
+      lastResult: {
+        id: active.id,
+        node: active.node,
+        route: active.route,
+        date: active.date,
+        seen: false,
+      },
       pendingDates: next.journey.pendingDates.filter(
         (day) => day !== active.date,
       ),
@@ -255,4 +261,13 @@ export function advanceJourney(profile, id, expectedTurn, skill) {
     },
   };
   return next;
+}
+
+export function encounterStep(active, skill, hasCompanion = false) {
+  if (!["cast", "friend", "quick"].includes(skill))
+    throw new Error("請選擇一個行動。");
+  if (skill === "friend" && !hasCompanion)
+    throw new Error("先邀請一位夥伴加入旅程。");
+  const damage = skill === "quick" ? 100 : skill === "friend" ? 55 : 40;
+  return Math.max(0, active.hp - damage);
 }

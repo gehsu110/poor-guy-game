@@ -1,6 +1,7 @@
 import { useApp } from "../../useAppStore";
 import { ITEM_BY_ID, normalizeLook, owns } from "../../game/catalog";
-import { currentNode } from "../../game/journey";
+import { nextStep, collectionGoal } from "../../game/guidance";
+import { JourneySteps, HowToPlay } from "../../components/starpage/JourneyUX";
 import PaintedCharacter, {
   LittleFriend,
 } from "../../components/starpage/PaintedCharacter";
@@ -16,23 +17,25 @@ export default function HomeScreen() {
   const { state, navigate, openEntry } = useApp();
   const { profile, dayRecord, totalSpent } = state;
   const look = normalizeLook(profile.equipped?.layered);
-  const node = currentNode(profile);
+  const guide = nextStep(profile, dayRecord, state.date);
+  const goNext = () =>
+    guide.kind === "record"
+      ? openEntry()
+      : navigate(
+          guide.kind === "adventure" ? "adventure" : "collection",
+          guide.kind === "collection" ? { tab: "stamps" } : {},
+        );
   const recorded = dayRecord.entryCount > 0 || dayRecord.noSpend;
   const reviewed =
     dayRecord.reviewedAt &&
     dayRecord.reviewedRevision === (dayRecord.revision ?? 0);
   const remaining = (dayRecord.budget ?? profile.dailyBudget) - totalSpent;
-  const wish =
-    profile.wishlist
-      ?.map((id) => ITEM_BY_ID[id])
-      .find((item) => item?.artReady && !owns(profile, item.id)) ??
-    ITEM_BY_ID.top_starlight;
+  const wish = collectionGoal(profile);
   const friend = ITEM_BY_ID[look.companion];
   const garden = ITEM_BY_ID[look.garden];
-  const pending = profile.journey.pendingDates.length;
   const legacy = profile.equipped.visualStyle !== "layered";
   return (
-    <main className="star-home">
+    <main className="star-home quest-home">
       <header className="star-home-head">
         <button
           className="star-identity"
@@ -55,15 +58,24 @@ export default function HomeScreen() {
           <StarCurrency amount={profile.stars.yellow} />
         </button>
       </header>
-      <div className="star-home-intro">
-        <span className="star-eyebrow">A LITTLE EVERY DAY</span>
-        <h1>把日常，寫成冒險。</h1>
-        <p>
-          {profile.journey.completed
-            ? `已走過 ${profile.journey.completed} 段旅程，每一步都算數。`
-            : "從一筆記錄，遇見新的自己。"}
-        </p>
+      <div className="quest-home-title">
+        <div>
+          <h1>{guide.title}</h1>
+          <p>{guide.detail}</p>
+        </div>
+        <HowToPlay />
       </div>
+      <JourneySteps
+        step={guide.step}
+        onSelect={(index) =>
+          index === 0
+            ? openEntry()
+            : navigate(
+                index === 1 ? "adventure" : "collection",
+                index === 2 ? { tab: "stamps" } : {},
+              )
+        }
+      />
       <section className="star-home-stage" aria-label="我的庭院">
         <IllustratedScene />
         <span className="star-place">
@@ -110,17 +122,25 @@ export default function HomeScreen() {
           </div>
         )}
         <button
-          className="star-next-adventure"
-          onClick={() => navigate("adventure")}
+          className="star-next-adventure quest-home-next"
+          onClick={goNext}
         >
           <span className="star-next-adventure__icon">
-            <GameIcon name="tab-map" />
+            <GameIcon
+              name={
+                guide.kind === "record"
+                  ? "tab-record"
+                  : guide.kind === "adventure"
+                    ? "tab-map"
+                    : "report"
+              }
+            />
           </span>
           <span>
-            <small>{node.finished ? "旅程紀念" : node.chapter.name}</small>
-            <strong>{node.finished ? "回看你走過的故事" : node.name}</strong>
+            <small>接下來</small>
+            <strong>{guide.label}</strong>
           </span>
-          <span>{pending ? `${pending} 段待出發` : "去看看"} →</span>
+          <span>→</span>
         </button>
       </section>
       <section className="star-home-journal">
@@ -156,25 +176,45 @@ export default function HomeScreen() {
           {!recorded && <button onClick={() => openEntry()}>寫下第一筆</button>}
         </div>
       </section>
-      <button
-        className="star-wish-strip"
-        onClick={() =>
-          navigate("collection", { tab: "catalog", item: wish.id })
-        }
-      >
-        <GameIcon name="star" />
-        <span>
-          下一個心願 <b>{wish.name}</b>
-        </span>
-        <small>
-          {owns(profile, wish.id)
-            ? "已收藏"
-            : wish.cost
-              ? `還差 ${Math.max(0, wish.cost - (profile.stars[wish.currency ?? "yellow"] ?? 0))} ${wish.currency === "purple" ? "紫星" : "黃星"}`
-              : wish.source}{" "}
-          →
-        </small>
-      </button>
+      {wish && (
+        <button
+          className="star-wish-strip quest-wish"
+          onClick={() =>
+            navigate("collection", { tab: "catalog", item: wish.id })
+          }
+        >
+          <span className="quest-wish-art">
+            {wish.slot === "companion" ? (
+              <LittleFriend kind={wish.look} />
+            ) : (
+              <PaintedCharacter
+                look={{ ...look, top: wish.id }}
+                portrait
+                reduced
+              />
+            )}
+          </span>
+          <span>
+            下一個心願 <b>{wish.name}</b>
+          </span>
+          <small>
+            {owns(profile, wish.id)
+              ? "已收藏"
+              : wish.cost
+                ? `還差 ${Math.max(0, wish.cost - (profile.stars[wish.currency ?? "yellow"] ?? 0))} ${wish.currency === "purple" ? "紫星" : "黃星"}`
+                : wish.source}{" "}
+            →
+          </small>
+        </button>
+      )}
+      {guide.step === 2 && (
+        <button
+          className="quest-home-explore"
+          onClick={() => navigate("adventure")}
+        >
+          還想再玩？去自由探索 →
+        </button>
+      )}
     </main>
   );
 }

@@ -12,9 +12,15 @@ import PaintedCharacter, {
 } from "../../components/starpage/PaintedCharacter";
 import IllustratedScene, {
   GardenObject,
-  ForestSpirit,
 } from "../../components/starpage/IllustratedScene";
-import { CHAPTERS, ROUTES } from "../../game/journey";
+import JourneyAlbum from "../../components/starpage/JourneyAlbum";
+import { HowToPlay } from "../../components/starpage/JourneyUX";
+const COLLECTION_TABS = [
+  ["wardrobe", "造型"],
+  ["catalog", "圖鑑"],
+  ["shop", "小店"],
+  ["stamps", "旅程印記"],
+];
 import { PageHead, Tabs, StarCurrency } from "../../components/starpage/Chrome";
 function ItemArt({ item, look }) {
   if (item.slot === "companion") return <LittleFriend kind={item.look} />;
@@ -30,9 +36,14 @@ function ItemArt({ item, look }) {
 export default function CollectionScreen() {
   const { state, equip, buy, updateGame, navigate } = useApp();
   const requestedItem = ITEM_BY_ID[state.screenParams.item];
-  const initialItem = requestedItem?.artReady ? requestedItem : null;
+  const initialItem = requestedItem?.artReady
+    ? requestedItem
+    : state.screenParams.tab === "shop"
+      ? (ITEMS.find((item) => item.cost && !owns(state.profile, item.id)) ??
+        ITEMS.find((item) => item.cost))
+      : null;
   const [tab, setTab] = useState(
-    ["catalog", "shop"].includes(state.screenParams.tab)
+    ["catalog", "shop", "stamps"].includes(state.screenParams.tab)
       ? state.screenParams.tab
       : "wardrobe",
   );
@@ -67,22 +78,45 @@ export default function CollectionScreen() {
     setLook((current) => ({ ...current, [next.slot]: next.id }));
     setSlot(next.slot);
   }
+  function changeTab(next) {
+    setTab(next);
+    if (next === "shop" && !item?.cost)
+      select(
+        ITEMS.find((item) => item.cost && !owns(profile, item.id)) ??
+          ITEMS.find((item) => item.cost),
+      );
+  }
+  if (tab === "stamps")
+    return (
+      <main className="star-page star-collection quest-collection">
+        <PageHead eyebrow="屬於你的冒險手帳" title="把相遇，收成故事。">
+          <HowToPlay />
+        </PageHead>
+        <Tabs
+          label="收藏內容"
+          tabs={COLLECTION_TABS}
+          value={tab}
+          onChange={changeTab}
+        />
+        <JourneyAlbum
+          profile={profile}
+          highlight={state.screenParams.stamp}
+          onExplore={() => navigate("adventure")}
+        />
+      </main>
+    );
   return (
-    <main className="star-page star-collection">
-      <PageHead eyebrow="A LITTLE COLLECTION OF YOU" title="把喜歡的，收起來。">
+    <main className="star-page star-collection quest-collection">
+      <PageHead eyebrow="套裝、夥伴，還有旅途的紀念" title="把喜歡的，收起來。">
         <span className="star-count">
           {ownedCount} / {ITEMS.length}
         </span>
       </PageHead>
       <Tabs
         label="收藏內容"
-        tabs={[
-          ["wardrobe", "造型"],
-          ["catalog", "圖鑑"],
-          ["shop", "小店"],
-        ]}
+        tabs={COLLECTION_TABS}
         value={tab}
-        onChange={setTab}
+        onChange={changeTab}
       />
       <section className="star-fitting-room">
         <IllustratedScene />
@@ -162,12 +196,22 @@ export default function CollectionScreen() {
               state.busy ||
               (profile.stars[item.currency ?? "yellow"] ?? 0) < item.cost
             }
-            onClick={() => buy(item.id)}
+            onClick={async () => {
+              if (await buy(item.id, true))
+                setLook(
+                  normalizeLook({
+                    ...profile.equipped.layered,
+                    [item.slot]: item.id,
+                  }),
+                );
+            }}
           >
             <span>
               {(profile.stars[item.currency ?? "yellow"] ?? 0) < item.cost
                 ? "星幣還差一點"
-                : "把它收進衣櫃"}
+                : item.slot === "companion"
+                  ? "兌換並同行"
+                  : "兌換並穿上"}
             </span>
             <StarCurrency
               amount={item.cost}
@@ -200,6 +244,30 @@ export default function CollectionScreen() {
               ? "穿上這套搭配"
               : "這套搭配已穿上"}
         </button>
+      )}
+      {item?.cost && !owns(profile, item.id) && (
+        <div className="quest-purchase-hint">
+          <div>
+            目前有{" "}
+            <StarCurrency
+              amount={profile.stars[item.currency ?? "yellow"] ?? 0}
+              purple={item.currency === "purple"}
+            />{" "}
+            <span>
+              {Math.max(
+                0,
+                item.cost - (profile.stars[item.currency ?? "yellow"] ?? 0),
+              )
+                ? `還差 ${Math.max(0, item.cost - (profile.stars[item.currency ?? "yellow"] ?? 0))} 顆${item.currency === "purple" ? "紫星" : "黃星"}`
+                : "可以兌換了"}
+            </span>
+          </div>
+          <p>
+            {item.currency === "purple"
+              ? "完成章節或每週記錄 5 天，可以獲得紫星。"
+              : "每天記錄 +2 黃星，當日回顧再 +1；一天多筆記錄不會重複發獎。"}
+          </p>
+        </div>
       )}
       {changed && (
         <button
@@ -292,41 +360,12 @@ export default function CollectionScreen() {
         })}
       </div>
       {tab === "catalog" && (
-        <section className="star-stamp-album">
-          <div className="star-section-title">
-            <h2>旅程印記</h2>
-            <span>{profile.journey.stamps.length} / 15</span>
-          </div>
-          <p>每一次相遇，都替手帳留下一個小小的紀念。</p>
-          <div className="star-stamp-grid">
-            {profile.journey.stamps.map((stamp) => (
-              <article key={stamp.node} className="star-stamp-card">
-                <ForestSpirit variant={stamp.node - 1} defeated />
-                <small>第 {String(stamp.node).padStart(2, "0")} 段</small>
-                <strong>
-                  {
-                    CHAPTERS[Math.floor((stamp.node - 1) / 5)]?.nodes[
-                      (stamp.node - 1) % 5
-                    ]
-                  }
-                </strong>
-                <span>
-                  {ROUTES.find((route) => route.id === stamp.route)?.mark}
-                </span>
-              </article>
-            ))}
-            {profile.journey.stamps.length < 15 && (
-              <button
-                className="star-stamp-card star-stamp-next"
-                onClick={() => navigate("adventure")}
-              >
-                <span>✦</span>
-                <strong>下一次相遇</strong>
-                <small>沿著小徑出發 →</small>
-              </button>
-            )}
-          </div>
-        </section>
+        <button className="quest-album-link" onClick={() => setTab("stamps")}>
+          <span>
+            我的旅程印記 <b>{profile.journey.stamps.length} / 15</b>
+          </span>
+          <span>翻開相遇的故事 →</span>
+        </button>
       )}
       <section className="star-legacy-link">
         <strong>熟悉的收藏，也還在。</strong>

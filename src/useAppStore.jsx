@@ -15,7 +15,7 @@ import {
 } from "./gameRepository";
 import { calendarDate } from "./game/ledger";
 import { startJourney, advanceJourney } from "./game/journey";
-import { equipLook, purchase } from "./game/catalog";
+import { equipLook, purchase, purchaseAndEquip } from "./game/catalog";
 import { playGameSound } from "./gameAudio";
 import { AppContext as Ctx } from "./AppContext";
 const PAGES = [
@@ -32,7 +32,11 @@ const route = () => {
   const screen = url.searchParams.get("page");
   return {
     screen: PAGES.includes(screen) ? screen : "town",
-    screenParams: { tab: url.searchParams.get("tab") ?? undefined },
+    screenParams: {
+      tab: url.searchParams.get("tab") ?? undefined,
+      item: url.searchParams.get("item") ?? undefined,
+      stamp: Number(url.searchParams.get("stamp")) || undefined,
+    },
   };
 };
 const init = {
@@ -245,6 +249,10 @@ export function AppProvider({ children }) {
       url.searchParams.set("page", actual);
       if (params.tab) url.searchParams.set("tab", params.tab);
       else url.searchParams.delete("tab");
+      for (const key of ["item", "stamp"]) {
+        if (params[key]) url.searchParams.set(key, params[key]);
+        else url.searchParams.delete(key);
+      }
       history.pushState(null, "", url);
       dispatch({ type: "SET_SCREEN", screen: actual, params });
     },
@@ -394,10 +402,18 @@ export function AppProvider({ children }) {
     [updateGame],
   );
   const buy = useCallback(
-    (id) =>
+    (id, equipAfter = false) =>
       updateGame(
-        (profile) => purchase(profile, id, crypto.randomUUID()),
-        "收藏已放進衣櫃，可以穿上了。",
+        (profile) => {
+          return (equipAfter ? purchaseAndEquip : purchase)(
+            profile,
+            id,
+            crypto.randomUUID(),
+          );
+        },
+        equipAfter
+          ? "已兌換並裝備，首頁和冒險都會更新。"
+          : "收藏已放進衣櫃，可以穿上了。",
       ),
     [updateGame],
   );

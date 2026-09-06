@@ -30,8 +30,8 @@ export default function StorybookActor({ className = '', reduced = false, intera
   }, [])
   const content = <>
     <span className="storybook-actor__shadow" aria-hidden="true" />
-    <img className="storybook-actor__figure" style={{ visibility: quiet || loadedSource !== motionSource ? 'visible' : 'hidden' }} src={art.still} alt="薄荷帳本學徒" draggable="false" />
-    {!quiet && <img key={`${outfit}:${greeting || 'idle'}`} className="storybook-actor__figure storybook-actor__motion" src={motionSource} onLoad={() => setLoadedSource(motionSource)} onError={() => setLoadedSource(null)} alt="薄荷帳本學徒動畫" draggable="false" />}
+    <img className="storybook-actor__figure" style={{ visibility: quiet || loadedSource !== motionSource ? 'visible' : 'hidden' }} src={art.still} alt={outfit === 'star' ? '晚星制服冒險者' : '薄荷帳本學徒'} draggable="false" />
+    {!quiet && <img key={`${outfit}:${greeting || 'idle'}`} className="storybook-actor__figure storybook-actor__motion" src={motionSource} onLoad={() => setLoadedSource(motionSource)} onError={() => setLoadedSource(null)} alt={outfit === 'star' ? '晚星制服冒險者動畫' : '薄荷帳本學徒動畫'} draggable="false" />}
     {companion && <img className="storybook-actor__companion" src={STORYBOOK_ART.owl} alt="書頁小鴞" draggable="false" />}
     {greeting > 0 && <span className="storybook-actor__speech" role="status">{message}</span>}
   </>
