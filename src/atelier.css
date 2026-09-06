@@ -1,0 +1,1503 @@
+/* Wind Atelier: a scene and a character, with controls at its edges. */
+.world-shell {
+  --wind-dock-height: calc(70px + env(safe-area-inset-bottom));
+}
+.wind-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  flex: 0 0 auto;
+}
+.wind-dock {
+  position: absolute;
+  z-index: 20;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--wind-dock-height);
+  padding: 5px 14px env(safe-area-inset-bottom);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(transparent, #061c36d9 35%);
+  color: #fff;
+}
+.wind-dock button {
+  position: relative;
+  flex: 1;
+  max-width: 110px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  color: #d5e3ef;
+  min-height: 55px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 4px;
+  font: inherit;
+}
+.wind-dock button > span {
+  display: grid;
+  place-items: center;
+}
+.wind-dock .wind-icon {
+  width: 24px;
+  height: 24px;
+}
+.wind-dock b {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.wind-dock button.is-active {
+  color: #a7f5f4;
+}
+.wind-dock button.is-active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 25px;
+  height: 1px;
+  background: #a7f5f4;
+  box-shadow: 0 0 10px #b8fcff;
+}
+.wind-dock .star-nav__entry {
+  color: #102f46;
+  background: #f3ebd1;
+  border-radius: 50% 50% 36% 36%;
+  max-width: 62px;
+  min-height: 62px;
+  margin: -9px 12px 0;
+  box-shadow:
+    0 5px 20px #06253b3d,
+    inset 0 0 0 3px #fff8;
+}
+.wind-dock .star-nav__entry .wind-icon {
+  width: 25px;
+  height: 25px;
+}
+.wind-dock button:focus-visible,
+.wind-atelier button:focus-visible {
+  outline: 2px solid #b5ffff;
+  outline-offset: 3px;
+}
+.wind-dock button:active {
+  transform: translateY(2px);
+}
+.wind-atelier {
+  --wind-white: #f1f9ff;
+  color: var(--wind-white);
+  position: relative;
+  height: calc(100% - var(--wind-dock-height));
+  min-height: 580px;
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+}
+.world-shell .star-scroll:has(> .wind-atelier) {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.wind-atelier button {
+  font-family: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.wind-atelier button:disabled {
+  opacity: 0.65;
+}
+.wind-atelier::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #06386680 0,
+    transparent 28%,
+    transparent 50%,
+    #06213d40 65%,
+    #09203ae8 89%
+  );
+}
+.wind-topbar {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: calc(15px + env(safe-area-inset-top)) 20px 0;
+  height: calc(65px + env(safe-area-inset-top));
+}
+.wind-icon-button {
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: -9px;
+}
+.wind-wordmark {
+  flex: 1;
+  min-width: 0;
+}
+.wind-wordmark > span {
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  display: block;
+  opacity: 0.8;
+}
+.wind-wordmark h1 {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  margin: 1px 0 0;
+}
+.wind-balance {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  padding: 8px 0 8px 8px;
+  background: none;
+}
+.wind-balance .star-currency {
+  font-size: 16px;
+  gap: 5px;
+}
+.wind-balance .star-currency img {
+  width: 20px;
+  height: 20px;
+}
+.wind-mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 22px;
+  height: 43px;
+  position: relative;
+  z-index: 4;
+  border-bottom: 1px solid #d8f2ff26;
+}
+.wind-mode-bar > button {
+  position: relative;
+  border: 0;
+  background: none;
+  padding: 10px 0;
+  font-size: 13px;
+  opacity: 0.7;
+  min-height: 44px;
+}
+.wind-mode-bar > button[aria-pressed="true"] {
+  opacity: 1;
+}
+.wind-mode-bar > button[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #adfcf6;
+  box-shadow: 0 0 9px #91fbef;
+}
+.wind-mode-bar > span {
+  margin-left: auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.wind-mode-bar small {
+  color: #d0eaffb5;
+}
+.wind-look-caption {
+  position: absolute;
+  z-index: 3;
+  top: calc(128px + env(safe-area-inset-top));
+  left: 24px;
+  pointer-events: none;
+  max-width: 55%;
+  text-shadow: 0 2px 12px #0035659c;
+  animation: wind-caption 0.35s ease-out both;
+}
+.wind-look-caption > span {
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: #c7eeff;
+}
+.wind-look-caption h2 {
+  font-family: "Noto Serif TC", "Songti TC", serif;
+  font-size: clamp(23px, 5vw, 34px);
+  font-weight: 600;
+  margin: 7px 0;
+  letter-spacing: 0.08em;
+}
+.wind-look-caption p {
+  font-size: 11px;
+  margin: 0;
+  color: #e2f4ff;
+  letter-spacing: 0.04em;
+}
+.wind-hero-stage {
+  position: absolute;
+  z-index: 1;
+  top: 129px;
+  bottom: 153px;
+  left: 42%;
+  width: 95%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.wind-hero-stage > .painted-character {
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+.wind-body-slots {
+  position: absolute;
+  z-index: 5;
+  right: 17px;
+  top: calc(150px + env(safe-area-inset-top));
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.wind-body-slots > button {
+  min-width: 51px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-shadow: 0 2px 8px #0b325d;
+}
+.wind-body-slots > button > span {
+  height: 43px;
+  width: 43px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #def4ff69;
+  border-radius: 50%;
+  background: #1248713d;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.wind-body-slots .wind-icon {
+  width: 26px;
+  height: 26px;
+}
+.wind-body-slots b {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+}
+.wind-body-slots > button[aria-pressed="true"] > span {
+  border-color: #bafff9;
+  background: #c9fff926;
+  box-shadow: 0 0 20px #a2fff13d;
+  transform: scale(1.08);
+}
+.wind-body-slots > button[aria-pressed="true"] {
+  color: #c3fffb;
+}
+.wind-stage-tools {
+  position: absolute;
+  left: 20px;
+  bottom: 226px;
+  z-index: 6;
+  display: flex;
+  gap: 12px;
+}
+.wind-stage-tools > button {
+  padding: 7px 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  background: none;
+  text-shadow: 0 2px 8px #082947;
+}
+.wind-stage-tools span {
+  font-size: 10px;
+}
+.wind-stage-tools .wind-icon {
+  width: 21px;
+  height: 21px;
+}
+.wind-hero-friend {
+  position: absolute;
+  width: 18%;
+  height: 110px;
+  left: 58%;
+  bottom: 220px;
+  z-index: 3;
+}
+.wind-hero-friend .little-friend {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.wind-wardrobe-tray {
+  position: absolute;
+  z-index: 7;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 22px 7px;
+  background: linear-gradient(transparent, #10243ca3 30%);
+}
+.wind-tray-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 30px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.wind-tray-heading small {
+  font-size: 10px;
+  font-weight: 400;
+  color: #dae9f1aa;
+}
+.wind-tray-heading button {
+  border: 0;
+  background: none;
+  padding: 8px;
+  min-height: 44px;
+  min-width: 44px;
+  margin-right: -8px;
+}
+.wind-item-rail {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #b5dce850 transparent;
+  padding: 5px 2px 9px;
+  scroll-snap-type: x proximity;
+}
+.wind-item {
+  flex: 0 0 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  background: none;
+  border: none;
+  position: relative;
+  padding: 0 0 4px;
+  scroll-snap-align: start;
+  text-align: center;
+}
+.wind-item .wind-item-image {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  height: 87px;
+  background: linear-gradient(135deg, #ddf1ff1c, #91c9da06);
+  border: 1px solid #b5d3e640;
+  border-radius: 2px;
+  transition: border-color 0.2s;
+}
+.wind-item[aria-pressed="true"] .wind-item-image {
+  border-color: #a8fbf2;
+  box-shadow: inset 0 0 15px #a9eafa26;
+  background: linear-gradient(140deg, #c6f5f144, #79c6ff14);
+}
+.wind-item[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: 0;
+  height: 1px;
+  background: #b9fff5;
+}
+.wind-item .wind-item-image > img {
+  height: 92%;
+  width: 90%;
+  object-fit: contain;
+}
+.wind-item--top .wind-item-image > img {
+  position: absolute;
+  width: 210%;
+  max-width: none;
+  height: auto;
+  left: -55%;
+  top: -16%;
+}
+.wind-item-image > i {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  border-radius: 50%;
+  padding: 3px;
+  color: #11354d;
+  background: #b9fbec;
+}
+.wind-item-image > i .wind-icon {
+  width: 11px;
+  height: 11px;
+}
+.wind-item > strong {
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  letter-spacing: 0.015em;
+  margin-top: 2px;
+}
+.wind-item > small {
+  min-height: 16px;
+  font-size: 10px;
+  color: #c8e3ec;
+}
+.wind-item .star-currency {
+  font-size: 11px;
+  justify-content: center;
+  gap: 4px;
+}
+.wind-item .star-currency img {
+  width: 14px;
+  height: 14px;
+}
+.wind-item-none .wind-item-image {
+  background: none;
+  border-style: dashed;
+  color: #e0edf47a;
+}
+.wind-item-none .wind-item-image > .wind-icon {
+  height: 25px;
+  width: 25px;
+}
+.wind-equip-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid #c2dfec38;
+  padding: 10px 0 4px;
+  min-height: 63px;
+}
+.wind-equip-status {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.5;
+}
+.wind-equip-status strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wind-equip-status > span {
+  display: block;
+  font-size: 10px;
+  color: #d1e2eac2;
+}
+.wind-equip {
+  min-height: 43px;
+  min-width: 96px;
+  padding: 8px 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #fff6;
+  border-radius: 2px;
+  background: #f2ebd5;
+  color: #193446 !important;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 2px 14px #09213830;
+}
+.wind-equip .wind-icon {
+  width: 19px;
+  height: 19px;
+}
+.wind-equip .star-currency {
+  font-size: 13px;
+  gap: 4px;
+}
+.wind-equip .star-currency img {
+  width: 17px;
+  height: 17px;
+}
+.wind-equip:disabled {
+  background: #d2e4e621;
+  border-color: #abcbd03b;
+  color: #d9eaec !important;
+  box-shadow: none;
+}
+.wind-save-wish {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  width: 35px;
+  background: transparent;
+  border: 0;
+}
+.wind-save-wish[aria-pressed="true"] {
+  color: #ffc6ae;
+}
+.wind-save-wish[aria-pressed="true"] svg {
+  fill: #ffc6ae;
+}
+.wind-legacy-links {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #9994;
+  padding-top: 15px;
+  margin-top: 18px;
+}
+.wind-legacy-links > button {
+  background: none;
+  border: 0;
+  padding: 9px 0;
+  font-size: 12px;
+}
+.wind-album {
+  background: #f4f4eaef;
+  min-height: 100%;
+  padding-bottom: calc(var(--wind-dock-height) + 30px);
+}
+.wind-album .star-tabs {
+  background: transparent;
+}
+@keyframes wind-caption {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (min-width: 560px) {
+  .wind-atelier {
+    min-height: 540px;
+  }
+  .wind-topbar {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+  .wind-mode-bar {
+    padding-left: 34px;
+    padding-right: 34px;
+    gap: 30px;
+  }
+  .wind-look-caption {
+    left: 38px;
+    top: 140px;
+  }
+  .wind-hero-stage {
+    top: 122px;
+    bottom: 5px;
+    width: 65%;
+    left: 30%;
+  }
+  .wind-body-slots {
+    top: 133px;
+    right: 27px;
+    flex-direction: row;
+    gap: 16px;
+  }
+  .wind-body-slots > button > span {
+    height: 44px;
+    width: 44px;
+  }
+  .wind-wardrobe-tray {
+    bottom: 35px;
+    left: auto;
+    right: 27px;
+    width: 240px;
+    padding: 0;
+    background: linear-gradient(120deg, transparent, #102d4640);
+  }
+  .wind-item-rail {
+    gap: 11px;
+  }
+  .wind-item {
+    flex-basis: 108px;
+  }
+  .wind-item .wind-item-image {
+    height: 122px;
+  }
+  .wind-item > strong {
+    font-size: 11px;
+  }
+  .wind-item--top .wind-item-image > img {
+    width: 200%;
+    left: -50%;
+    top: -11%;
+  }
+  .wind-equip-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .wind-equip-status {
+    flex: 1 0 100%;
+    margin-bottom: 2px;
+  }
+  .wind-equip {
+    flex: 1;
+  }
+  .wind-save-wish {
+    order: 2;
+  }
+  .wind-tray-heading {
+    height: 40px;
+  }
+  .wind-stage-tools {
+    left: 34px;
+    bottom: 34px;
+  }
+  .wind-hero-friend {
+    left: 45%;
+    bottom: 35px;
+    width: 15%;
+  }
+}
+@media (min-width: 850px) {
+  .wind-hero-stage {
+    left: 38%;
+    width: 65%;
+    top: 100px;
+  }
+  .wind-wardrobe-tray {
+    right: 5%;
+    width: 290px;
+    bottom: 8%;
+  }
+  .wind-body-slots {
+    right: 5%;
+  }
+  .wind-look-caption {
+    top: 140px;
+    left: 5%;
+  }
+  .wind-item {
+    flex-basis: 125px;
+  }
+  .wind-item .wind-item-image {
+    height: 142px;
+  }
+}
+@media (max-width: 559px) and (max-height: 720px) {
+  .wind-atelier {
+    min-height: 535px;
+  }
+  .wind-topbar {
+    height: 55px;
+    padding-top: 7px;
+  }
+  .wind-mode-bar {
+    height: 37px;
+  }
+  .wind-look-caption {
+    top: 107px;
+  }
+  .wind-look-caption h2 {
+    font-size: 22px;
+  }
+  .wind-look-caption p {
+    display: none;
+  }
+  .wind-hero-stage {
+    top: 93px;
+    bottom: 133px;
+  }
+  .wind-body-slots {
+    top: 115px;
+    gap: 8px;
+    right: 13px;
+  }
+  .wind-body-slots > button > span {
+    width: 36px;
+    height: 36px;
+  }
+  .wind-body-slots .wind-icon {
+    width: 23px;
+    height: 23px;
+  }
+  .wind-body-slots b {
+    font-size: 10px;
+  }
+  .wind-item .wind-item-image {
+    height: 65px;
+  }
+  .wind-item {
+    flex-basis: 85px;
+  }
+  .wind-item--top .wind-item-image > img {
+    top: -18%;
+  }
+  .wind-wardrobe-tray {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .wind-tray-heading {
+    height: 24px;
+  }
+  .wind-item-rail {
+    padding-bottom: 5px;
+  }
+  .wind-stage-tools {
+    bottom: 199px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wind-atelier *,
+  .wind-dock * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.reduce-motion .wind-atelier *,
+.reduce-motion .wind-dock * {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+.wind-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background: #1a80bc;
+}
+.wind-backdrop .wind-scene {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 70%;
+}
+.wind-scene-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    #093d6320,
+    transparent 48%,
+    #061b3340 85%,
+    #071b35b0
+  );
+}
+.wind-scene-light {
+  position: absolute;
+  left: -30%;
+  top: -35%;
+  width: 90%;
+  height: 140%;
+  transform: rotate(-35deg);
+  background: linear-gradient(90deg, transparent, #f7fcff08, transparent);
+  animation: wind-light 9s ease-in-out infinite alternate;
+}
+.wind-sea-motes {
+  position: absolute;
+  inset: 0;
+}
+.wind-sea-motes i {
+  position: absolute;
+  top: calc(35% + var(--i) * 10%);
+  left: calc(7% + var(--i) * 19%);
+  width: 3px;
+  height: 3px;
+  background: #e1fff8;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ccffff;
+  animation: wind-mote calc(5s + var(--i) * 0.7s) ease-in-out infinite;
+  animation-delay: calc(var(--i) * -1.5s);
+}
+@keyframes wind-mote {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.8;
+  }
+  75% {
+    transform: translate(28px, -33px);
+    opacity: 0;
+  }
+}
+@keyframes wind-light {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wind-backdrop * {
+    animation: none !important;
+  }
+  .wind-sea-motes {
+    display: none;
+  }
+}
+.reduce-motion .wind-backdrop * {
+  animation: none !important;
+}
+.reduce-motion .wind-sea-motes {
+  display: none;
+}
+.wind-character {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.wind-paper-doll {
+  position: absolute;
+  height: 100%;
+  aspect-ratio: 1696 / 2528;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  isolation: isolate;
+}
+.wind-body-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.wind-body-motion {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+.wind-body-motion.is-playing {
+  opacity: 1;
+}
+.wind-attachment {
+  position: absolute;
+  z-index: 3;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  transform-origin: 50% 20%;
+}
+.wind-character-touch {
+  position: absolute;
+  z-index: 4;
+  top: 11%;
+  bottom: 8%;
+  left: 29%;
+  right: 23%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 40%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.wind-character-touch:focus-visible {
+  outline: 1px dashed #c0fff0;
+  outline-offset: 7px;
+}
+.wind-character-line {
+  position: absolute;
+  z-index: 5;
+  top: 21%;
+  left: 26%;
+  padding: 9px 14px;
+  border: 1px solid #effafdb8;
+  background: #133957e3;
+  color: #f8ffff;
+  box-shadow: 0 4px 15px #09223522;
+  border-radius: 16px 16px 16px 2px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: wind-speak 3.5s ease both;
+}
+.wind-magic-ring {
+  position: absolute;
+  z-index: 2;
+  left: 23%;
+  right: 10%;
+  bottom: 4%;
+  height: 8%;
+  border: 2px solid #bcffff;
+  border-radius: 50%;
+  box-shadow: 0 0 18px #c3fff1;
+  animation: wind-magic 1.2s ease-out both;
+  pointer-events: none;
+}
+.painted-portrait.wind-portrait img {
+  width: 365%;
+  max-width: none;
+  height: auto;
+  left: -135%;
+  top: -32%;
+}
+.wind-inspector {
+  position: fixed;
+  inset: 0;
+  padding: 0;
+  margin: auto;
+  width: min(100vw, 1000px);
+  height: 100dvh;
+  max-width: 100vw;
+  max-height: 100dvh;
+  border: 0;
+  background: radial-gradient(
+    ellipse at 45% 42%,
+    #b3e3e9,
+    #2c79a0 64%,
+    #113d62
+  );
+  color: #f1fcff;
+  overflow: hidden;
+}
+.wind-inspector::backdrop {
+  background: #071726e6;
+  backdrop-filter: blur(12px);
+}
+.wind-inspector header {
+  position: absolute;
+  top: env(safe-area-inset-top);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  z-index: 4;
+  background: linear-gradient(#13375175, transparent);
+}
+.wind-inspector header small {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+.wind-inspector h2 {
+  margin: 4px 0;
+  font-size: 19px;
+  font-weight: 500;
+}
+.wind-inspector header button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font-size: 30px;
+}
+.wind-inspector-stage {
+  position: absolute;
+  inset: 60px 0 72px;
+  overflow: hidden;
+}
+.wind-inspector-stage .wind-paper-doll {
+  transition: transform 0.4s ease;
+  transform-origin: 51% 12%;
+}
+.wind-inspector-stage .is-closeup .wind-paper-doll {
+  transform: translateX(-50%) scale(2.35);
+}
+.wind-inspector footer {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 15px calc(16px + env(safe-area-inset-bottom));
+  z-index: 4;
+  background: linear-gradient(transparent, #103657bb);
+}
+.wind-inspector footer button {
+  color: #f2faff;
+  border: 1px solid #c6efffb0;
+  padding: 11px 20px;
+  min-height: 44px;
+  border-radius: 3px;
+  background: #14476b55;
+  font-family: inherit;
+}
+@keyframes wind-speak {
+  0% {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  8%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes wind-magic {
+  from {
+    transform: scale(0.7);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wind-character *,
+  .wind-inspector * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .wind-magic-ring {
+    display: none;
+  }
+}
+.reduce-motion .wind-character *,
+.reduce-motion .wind-inspector * {
+  animation: none !important;
+  transition: none !important;
+}
+.reduce-motion .wind-magic-ring {
+  display: none;
+}
+.wind-scene-motion {
+  opacity: 0;
+}
+.wind-scene-motion.is-playing {
+  opacity: 1;
+}
+@media (max-width: 559px) {
+  .wind-hero-stage {
+    bottom: 200px;
+  }
+  .wind-look-caption p {
+    display: none;
+  }
+  .wind-stage-tools {
+    bottom: 262px;
+  }
+}
+@media (min-width: 560px) {
+  .wind-look-caption {
+    left: auto;
+    right: 27px;
+    width: 240px;
+    max-width: none;
+    top: 235px;
+  }
+  .wind-look-caption h2 {
+    font-size: 28px;
+  }
+  .wind-hero-stage {
+    top: 98px;
+  }
+}
+@media (min-width: 850px) {
+  .wind-look-caption {
+    right: 5%;
+    width: 290px;
+    top: 245px;
+  }
+  .wind-look-caption h2 {
+    font-size: 34px;
+  }
+}
+@media (max-width: 559px) and (max-height: 720px) {
+  .wind-hero-stage {
+    top: 88px;
+    bottom: 178px;
+  }
+  .wind-stage-tools {
+    bottom: 223px;
+  }
+}
+.wind-town {
+  color: #f2faff;
+  height: calc(100% - var(--wind-dock-height));
+  min-height: 535px;
+  position: relative;
+  overflow: hidden;
+}
+.wind-town button {
+  font-family: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.world-shell .star-scroll:has(> .wind-town) {
+  scrollbar-width: none;
+}
+.wind-home-hud {
+  position: absolute;
+  z-index: 4;
+  top: env(safe-area-inset-top);
+  left: 0;
+  right: 0;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(#12396370, transparent);
+}
+.wind-profile {
+  padding: 0;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  text-align: left;
+  border: 0;
+  background: none;
+  min-height: 48px;
+}
+.wind-profile-face {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #ecffff91;
+  background: #a2dfed38;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.wind-profile strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+.wind-profile small {
+  display: block;
+  font-size: 10px;
+  color: #dcf2fc;
+}
+.wind-home-place {
+  position: absolute;
+  z-index: 2;
+  top: 103px;
+  left: 25px;
+  text-shadow: 0 2px 10px #0d508080;
+}
+.wind-home-place > span {
+  letter-spacing: 0.2em;
+  font-size: 8px;
+}
+.wind-home-place h1 {
+  font-family: "Songti TC", serif;
+  font-size: 31px;
+  letter-spacing: 0.17em;
+  font-weight: 500;
+  margin: 5px 0;
+}
+.wind-home-place p {
+  font-size: 11px;
+  margin: 0;
+  color: #ddf4ff;
+}
+.wind-home-quest {
+  position: absolute;
+  left: 20px;
+  top: 211px;
+  z-index: 5;
+  padding: 11px 13px 11px 9px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: linear-gradient(100deg, #073967ba, #17678b26);
+  border: 0;
+  border-left: 2px solid #b0ffed;
+  text-align: left;
+  max-width: 260px;
+}
+.wind-home-quest > .wind-icon {
+  width: 20px;
+  height: 20px;
+  color: #d0fff6;
+}
+.wind-home-quest small {
+  display: block;
+  font-size: 9px;
+  color: #c4f7e8;
+  letter-spacing: 0.07em;
+}
+.wind-home-quest strong {
+  display: block;
+  font-weight: 500;
+  font-size: 13px;
+  margin-top: 3px;
+}
+.wind-home-quest > .wind-icon:last-child {
+  width: 15px;
+  margin-left: 8px;
+}
+.wind-home-hero {
+  position: absolute;
+  top: 240px;
+  bottom: 56px;
+  width: 100%;
+  left: -4%;
+}
+.wind-home-hero > * {
+  height: 100%;
+  width: 100%;
+}
+.wind-home-friend {
+  position: absolute;
+  width: 23%;
+  height: 18%;
+  right: 15%;
+  bottom: 78px;
+  z-index: 2;
+}
+.wind-home-friend .little-friend {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.wind-home-destinations {
+  position: absolute;
+  right: 17px;
+  top: 321px;
+  z-index: 4;
+  display: grid;
+  gap: 24px;
+}
+.wind-home-destinations > button {
+  border: 0;
+  background: none;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 0;
+}
+.wind-home-destinations > button > span {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: #144c7861;
+  border: 1px solid #d4f8ff88;
+  border-radius: 50%;
+}
+.wind-home-destinations .wind-icon {
+  width: 28px;
+  height: 28px;
+}
+.wind-home-destinations b {
+  font-size: 11px;
+  font-weight: 500;
+  text-shadow: 0 1px 7px #062e59;
+}
+.wind-home-destinations i {
+  position: absolute;
+  right: -4px;
+  top: -5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e9bb76;
+  color: #153551;
+  font-size: 11px;
+  font-style: normal;
+}
+.wind-home-help {
+  position: absolute;
+  left: 24px;
+  bottom: 114px;
+  z-index: 4;
+}
+.wind-home-help .quest-help-button {
+  color: #f0faff;
+  background: #0c3b6a22;
+  border: 0;
+  font-size: 11px;
+}
+.wind-home-ledger {
+  position: absolute;
+  bottom: 13px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  border: 0;
+  border-top: 1px solid #d7f2ff4f;
+  background: linear-gradient(90deg, #143a58a1, #0c2c495e);
+  padding: 9px 14px;
+  text-align: left;
+}
+.wind-home-ledger > span:first-of-type {
+  flex: 1;
+}
+.wind-home-ledger small {
+  font-size: 9px;
+  color: #ccebf6;
+  display: block;
+}
+.wind-home-ledger strong {
+  font-size: 14px;
+  display: block;
+  font-weight: 500;
+}
+.wind-home-ledger .wind-icon:last-child {
+  width: 17px;
+  margin-left: 6px;
+}
+.wind-home-ledger .is-over strong {
+  color: #ffd6bb;
+}
+@media (min-width: 560px) {
+  .wind-home-hud {
+    padding: 24px 32px;
+  }
+  .wind-home-place {
+    top: 130px;
+    left: 38px;
+  }
+  .wind-home-place h1 {
+    font-size: 39px;
+  }
+  .wind-home-quest {
+    top: 270px;
+    left: 35px;
+  }
+  .wind-home-hero {
+    top: 107px;
+    bottom: 58px;
+    left: 7%;
+  }
+  .wind-home-destinations {
+    right: 34px;
+    top: 206px;
+    gap: 27px;
+  }
+  .wind-home-ledger {
+    left: 34px;
+    right: 34px;
+    bottom: 14px;
+  }
+  .wind-home-help {
+    left: 35px;
+    bottom: 115px;
+  }
+}
+@media (max-width: 559px) and (max-height: 720px) {
+  .wind-home-place {
+    top: 91px;
+  }
+  .wind-home-place h1 {
+    font-size: 27px;
+  }
+  .wind-home-place p {
+    display: none;
+  }
+  .wind-home-quest {
+    top: 167px;
+  }
+  .wind-home-hero {
+    top: 200px;
+    bottom: 56px;
+  }
+  .wind-home-destinations {
+    top: 240px;
+    gap: 16px;
+  }
+  .wind-home-destinations > button > span {
+    width: 42px;
+    height: 42px;
+  }
+  .wind-home-help {
+    bottom: 90px;
+  }
+}
+.wind-item-rail:has(> .wind-item:nth-child(2):last-child) {
+  justify-content: center;
+}
+.wind-character-line {
+  top: auto;
+  bottom: 12%;
+  left: 50%;
+  max-width: min(300px, 92%);
+  width: max-content;
+  text-align: center;
+  white-space: normal;
+}
+@keyframes wind-speak {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 7px);
+  }
+  8%,
+  85% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+}
+.reduce-motion .wind-character-line {
+  transform: translateX(-50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wind-character-line {
+    transform: translateX(-50%);
+  }
+}
+.wind-paper-doll::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  bottom: 5.2%;
+  left: 36%;
+  width: 30%;
+  height: 1.7%;
+  background: #16314d58;
+  border-radius: 50%;
+  filter: blur(3px);
+}
+.wind-paper-doll:has(> .wind-body-motion.is-playing) > .wind-body-image {
+  visibility: hidden;
+}
+@media (min-width: 560px) {
+  .wind-look-caption {
+    color: #163c59;
+    text-shadow: 0 1px 12px #ffffffc4;
+  }
+  .wind-look-caption > span,
+  .wind-look-caption p {
+    color: #315770;
+  }
+  .wind-tray-heading {
+    color: #123853;
+    text-shadow: 0 1px 8px #fff;
+  }
+  .wind-tray-heading small {
+    color: #345c71;
+  }
+}

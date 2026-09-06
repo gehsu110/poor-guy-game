@@ -16,27 +16,26 @@ export default function CharacterInspector({ look, reduced, onClose }) {
   return (
     <dialog
       ref={dialog}
-      className="starwind-inspector"
+      className="wind-inspector"
       onCancel={(event) => {
         event.preventDefault();
         onClose();
       }}
-      aria-labelledby="starwind-inspector-title"
+      aria-labelledby="wind-inspector-title"
     >
       <header>
         <div>
-          <small>STARWIND · 造型預覽</small>
-          <h2 id="starwind-inspector-title">看看今天的旅人</h2>
+          <small>WIND ATELIER · 造型細節</small>
+          <h2 id="wind-inspector-title">今天的搭配</h2>
         </div>
         <button onClick={onClose} aria-label="關閉人物細節">
           ×
         </button>
       </header>
-      <div className="starwind-inspector-stage">
+      <div className="wind-inspector-stage">
         <PaintedCharacter
           look={look}
           interactive
-          controls
           reduced={reduced}
           successPulse={greet}
           closeup={closeup}
@@ -46,7 +45,7 @@ export default function CharacterInspector({ look, reduced, onClose }) {
         <button onClick={() => setCloseup(!closeup)}>
           {closeup ? "查看全身" : "近看細節"}
         </button>
-        <button onClick={() => setGreet((g) => g + 1)}>打個招呼</button>
+        <button onClick={() => setGreet((g) => g + 1)}>和旅人說話</button>
       </footer>
     </dialog>
   );

@@ -6,6 +6,7 @@ import "./adventure.css";
 import "./starpage.css";
 import "./quest-ux.css";
 import "./world.css";
+import "./atelier.css";
 import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(

@@ -4,7 +4,8 @@ import { nextStep } from "../../game/guidance";
 import PaintedCharacter, {
   LittleFriend,
 } from "../../components/starpage/PaintedCharacter";
-import { WorldHUD, RelicIcon } from "../../components/starpage/WorldUI";
+import WindIcon from "../../components/atelier/WindIcon";
+import { StarCurrency } from "../../components/starpage/Chrome";
 import { HowToPlay } from "../../components/starpage/JourneyUX";
 import StorybookActor from "../../components/StorybookActor";
 import PaperDollFigure from "../../components/PaperDollFigure";
@@ -26,52 +27,44 @@ export default function HomeScreen() {
           guide.kind === "collection" ? { tab: "stamps" } : {},
         );
   return (
-    <main className="world-stage world-town">
-      <WorldHUD />
-      <div className="world-place">
-        <span>THE LITTLE COURTYARD</span>
-        <h1>風鈴庭院</h1>
+    <main className="wind-town">
+      <header className="wind-home-hud">
+        <button
+          className="wind-profile"
+          onClick={() => navigate("settings")}
+          aria-label="個人資料與設定"
+        >
+          <span className="wind-profile-face">
+            <PaintedCharacter portrait look={look} reduced />
+          </span>
+          <span>
+            <strong>{profile.playerName}</strong>
+            <small>Lv. {profile.level} · 星頁旅人</small>
+          </span>
+        </button>
+        <button
+          className="wind-balance"
+          onClick={() => navigate("collection", { tab: "shop" })}
+          aria-label="星幣與小店"
+        >
+          <StarCurrency amount={profile.stars.yellow} />
+          <StarCurrency amount={profile.stars.purple} purple />
+        </button>
+      </header>
+      <div className="wind-home-place">
+        <span>THE WINDWARD TERRACE</span>
+        <h1>星風露台</h1>
+        <p>把今天，寫進旅途。</p>
       </div>
-      <button className="world-quest-note" onClick={next}>
-        <span className="world-quest-pin" />
-        <small>{guide.step === 2 ? "今日相遇 · 已完成" : "今日的冒險"}</small>
-        <strong>{guide.label}</strong>
-        <span className="world-quest-chevron">›</span>
-      </button>
-      <div className="world-town-help">
-        <HowToPlay />
-      </div>
-      <button
-        className="world-place-link world-place-link--adventure"
-        onClick={() => navigate("adventure")}
-      >
+      <button className="wind-home-quest" onClick={next}>
+        <WindIcon name={guide.step === 2 ? "check" : "sparkle"} />
         <span>
-          <RelicIcon kind="map" />
-          {profile.journey.pendingDates.length > 0 && (
-            <i>{profile.journey.pendingDates.length}</i>
-          )}
+          <small>{guide.step === 2 ? "今日相遇 · 已完成" : "今日的冒險"}</small>
+          <strong>{guide.label}</strong>
         </span>
-        <b>出發冒險</b>
+        <WindIcon name="arrow" />
       </button>
-      <button
-        className="world-place-link world-place-link--collection"
-        onClick={() => navigate("collection", { tab: "stamps" })}
-      >
-        <span>
-          <RelicIcon kind="bag" />
-        </span>
-        <b>我的收藏</b>
-      </button>
-      <button
-        className="world-place-link world-place-link--outfit"
-        onClick={() => navigate("collection")}
-      >
-        <span>
-          <RelicIcon kind="coat" />
-        </span>
-        <b>換個造型</b>
-      </button>
-      <div className="world-town-character">
+      <div className="wind-home-hero">
         {legacy ? (
           profile.equipped.visualStyle === "classic" ? (
             <PaperDollFigure
@@ -87,6 +80,7 @@ export default function HomeScreen() {
         ) : (
           <PaintedCharacter
             look={look}
+            staticPreview={!!state.entryDraft}
             successPulse={state.homeEffectPulse}
             interactive
             reduced={profile.preferences?.reduceMotion}
@@ -94,31 +88,47 @@ export default function HomeScreen() {
         )}
       </div>
       {friend && (
-        <div className="world-town-friend">
+        <div className="wind-home-friend">
           <LittleFriend kind={friend.look} />
         </div>
       )}
-      <p className="world-town-whisper">
-        {guide.step === 2
-          ? "今天的星光，已經收好了。"
-          : guide.step === 1
-            ? "帶上手帳，一起去找星光吧。"
-            : "把今天的故事，寫進手帳裡。"}
-      </p>
-      <button
-        className="world-pocket-ledger"
-        onClick={() => navigate("journal")}
-      >
-        <RelicIcon kind="book" />
+      <div className="wind-home-destinations">
+        <button onClick={() => navigate("adventure")}>
+          <span>
+            <WindIcon name="map" />
+            {profile.journey.pendingDates.length > 0 && (
+              <i>{profile.journey.pendingDates.length}</i>
+            )}
+          </span>
+          <b>章節冒險</b>
+        </button>
+        <button onClick={() => navigate("collection")}>
+          <span>
+            <WindIcon name="top" />
+          </span>
+          <b>換個造型</b>
+        </button>
+        <button onClick={() => navigate("collection", { tab: "stamps" })}>
+          <span>
+            <WindIcon name="companion" />
+          </span>
+          <b>相遇圖鑑</b>
+        </button>
+      </div>
+      <div className="wind-home-help">
+        <HowToPlay />
+      </div>
+      <button className="wind-home-ledger" onClick={() => navigate("journal")}>
+        <WindIcon name="journal" />
         <span>
           <small>今天的手帳</small>
           <strong>支出 ${totalSpent.toLocaleString("zh-TW")}</strong>
         </span>
         <span className={remaining < 0 ? "is-over" : ""}>
-          {remaining < 0 ? "超出" : "餘額"}
-          <b>${Math.abs(remaining).toLocaleString("zh-TW")}</b>
+          <small>{remaining < 0 ? "超出" : "可用餘額"}</small>
+          <strong>${Math.abs(remaining).toLocaleString("zh-TW")}</strong>
         </span>
-        <span>›</span>
+        <WindIcon name="arrow" />
       </button>
     </main>
   );

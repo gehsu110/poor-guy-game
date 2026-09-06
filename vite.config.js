@@ -41,6 +41,16 @@ export default defineConfig({
           "icons/*.png",
           "assets/courtyard-*.webp",
           "assets/apprentice-*.webp",
+          // Keep the lightweight wardrobe usable when videos are unavailable.
+          "assets/mint-*.webp",
+          "assets/night-*.webp",
+          "assets/beret-*.webp",
+          "assets/ribbon-*.webp",
+          "assets/book-*.webp",
+          "assets/satchel-*.webp",
+          "assets/owl-*.webp",
+          "assets/cat-*.webp",
+          "assets/terrace-*.webp",
         ],
         runtimeCaching: [
           {

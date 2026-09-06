@@ -1,15 +1,15 @@
 import { useApp } from "../../useAppStore";
 import GameIcon from "../GameIcon";
-import { RelicIcon } from "./RelicIcon";
+import WindIcon from "../atelier/WindIcon";
 export function StarNav() {
   const { state, navigate, openEntry } = useApp();
   return (
-    <nav className="world-dock" aria-label="主要導覽">
+    <nav className="wind-dock" aria-label="主要導覽">
       {[
         ["town", "庭院", "home"],
         ["adventure", "冒險", "map"],
         ["entry", "記帳", "book"],
-        ["journal", "手帳", "book"],
+        ["journal", "手帳", "journal"],
         ["collection", "收藏", "bag"],
       ].map(([id, label, icon]) => (
         <button
@@ -21,7 +21,7 @@ export function StarNav() {
           aria-label={id === "entry" ? "新增記帳" : label}
         >
           <span>
-            <RelicIcon kind={icon} />
+            <WindIcon name={icon} />
           </span>
           <b>{label}</b>
         </button>

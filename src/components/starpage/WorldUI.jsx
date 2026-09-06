@@ -5,6 +5,7 @@ import courtyardMotion from "../../assets/academy-art/storybook-v2/courtyard-liv
 import { createPortal } from "react-dom";
 import { useApp } from "../../useAppStore";
 import IllustratedScene from "./IllustratedScene";
+import AtelierBackdrop from "../atelier/AtelierBackdrop";
 import PaintedCharacter from "./PaintedCharacter";
 import { StarCurrency } from "./Chrome";
 import { HowToPlay } from "./JourneyUX";
@@ -12,6 +13,14 @@ import { HowToPlay } from "./JourneyUX";
 export { RelicIcon } from "./RelicIcon";
 
 export function WorldBackdrop({ className = "" }) {
+  const { state } = useApp();
+  return ["town", "collection"].includes(state.screen) ? (
+    <AtelierBackdrop />
+  ) : (
+    <CourtyardBackdrop className={className} />
+  );
+}
+function CourtyardBackdrop({ className = "" }) {
   const { state } = useApp();
   const systemReduced = useReducedMotion();
   const [visible, setVisible] = useState(!document.hidden);
