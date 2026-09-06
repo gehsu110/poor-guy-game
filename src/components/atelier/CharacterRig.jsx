@@ -3,6 +3,7 @@ import layout from "../../character/wind-rig-layout.json";
 import useCharacterImages from "./useCharacterImages";
 import { characterAttachment } from "../../atelierAssets";
 import AnimatedCharacter from "./AnimatedCharacter";
+import { attachmentPivot } from "../../character/attachmentGeometry.js";
 
 // One source coordinate system: clothing → prop → fingers, and a registered
 // head variant with its fitted hat. All attachments share their parent's motion.
@@ -18,11 +19,22 @@ export default function CharacterRig({
   const ready = status === "ready";
   const blinkReady =
     useCharacterImages(motion ? [outfit.blink] : []) === "ready";
-  const { canvas, head: headFrame, portrait: portraitFrame, waistY } = layout;
+  const { canvas, head: headFrame, portrait: portraitFrame } = layout;
   const view = portrait
     ? `${portraitFrame.x} ${portraitFrame.y} ${portraitFrame.width} ${portraitFrame.height}`
     : `0 0 ${canvas.width} ${canvas.height}`;
   const { x, y, width, height, angle } = prop ?? outfit.prop;
+  const pivot = attachmentPivot(prop ?? outfit.prop);
+  const accessory = prop && (
+    <image
+      href={prop.src}
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      transform={`rotate(${angle} ${pivot.x} ${pivot.y})`}
+    />
+  );
   const label = portrait
     ? "冒險者頭像"
     : outfit.sex === "male"
@@ -60,7 +72,7 @@ export default function CharacterRig({
               ? "男生星風旅人"
               : "女生星風旅人"
         }
-        data-motion={ready && motion ? "on" : "off"}
+        data-motion="off"
         data-assets={status}
         aria-busy={status === "loading"}
       >
@@ -97,17 +109,8 @@ export default function CharacterRig({
               transform={`translate(${headFrame.x} ${headFrame.y})`}
               fill="black"
             />
+            {prop?.replaceHand && <path d={prop.replaceHand} fill="black" />}
           </mask>
-          <clipPath id={`${id}-lower`}>
-            <rect
-              y={waistY}
-              width={canvas.width}
-              height={canvas.height - waistY}
-            />
-          </clipPath>
-          <clipPath id={`${id}-upper`}>
-            <rect width={canvas.width} height={waistY + 0.5} />
-          </clipPath>
         </defs>
         {!ready && (
           <image
@@ -118,31 +121,15 @@ export default function CharacterRig({
         )}
         {ready && !portrait && (
           <>
+            {prop?.behindBody && accessory}
             <image
               href={outfit.poster}
               width={canvas.width}
               height={canvas.height}
-              clipPath={`url(#${id}-lower)`}
+              mask={`url(#${id}-body)`}
             />
-            <g className="wind-rig-breath">
-              <g clipPath={`url(#${id}-upper)`}>
-                <image
-                  href={outfit.poster}
-                  width={canvas.width}
-                  height={canvas.height}
-                  mask={`url(#${id}-body)`}
-                />
-              </g>
-              {prop && (
-                <image
-                  href={prop.src}
-                  x={x}
-                  y={y}
-                  width={width}
-                  height={height}
-                  transform={`rotate(${angle} ${x + width / 2} ${y + 60})`}
-                />
-              )}
+            <g>
+              {!prop?.behindBody && accessory}
               {prop?.handInFront && (
                 <image
                   href={outfit.poster}
@@ -151,12 +138,7 @@ export default function CharacterRig({
                   clipPath={`url(#${id}-hand)`}
                 />
               )}
-              <g
-                className="wind-rig-head"
-                style={{ transformOrigin: outfit.neckPivot }}
-              >
-                {head}
-              </g>
+              {head}
             </g>
           </>
         )}

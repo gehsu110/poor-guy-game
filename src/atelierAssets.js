@@ -2,7 +2,9 @@ import owl from "./assets/academy-art/wind-atelier/owl.webp";
 import cat from "./assets/academy-art/wind-atelier/cat.webp";
 import mint from "./assets/academy-art/wind-atelier/mint.webp";
 import night from "./assets/academy-art/wind-atelier/night.webp";
-import book from "./assets/academy-art/wind-atelier/belt-journal.webp";
+import book from "./assets/academy-art/wind-atelier/book.webp";
+import heldBook from "./assets/academy-art/wind-atelier/handheld-journal.webp";
+import journalGrips from "./character/journal-grip.json";
 import satchel from "./assets/academy-art/wind-atelier/satchel.webp";
 export { default as ATELIER_SCENE } from "./assets/academy-art/wind-atelier/terrace.webp";
 export const ATELIER_OUTFITS = {
@@ -17,7 +19,7 @@ export const ATELIER_ITEMS = {
 };
 // Catalog thumbnails; fitted hats are part of the registered head variants below.
 export const ATELIER_ATTACHMENTS = {
-  prop_book: { src: book, handInFront: false },
+  prop_book: { src: heldBook, handInFront: false, behindBody: true },
   prop_satchel: { src: satchel, handInFront: true },
 };
 
@@ -146,25 +148,13 @@ export function atelierCharacter(look = {}) {
 import rigFemaleBraidBlink from "./assets/academy-art/wind-atelier/rig-female-braid-blink.webp";
 import rigMaleBraidBlink from "./assets/academy-art/wind-atelier/rig-male-braid-blink.webp";
 
-// The tab at the top of the journal connects to the waist of each outfit.
-// A belt-mounted item does not reuse the hand-on-hip occlusion mask.
-const BOOK_FITTINGS = {
-  female: {
-    top_mint: { x: 575, y: 914, width: 205, height: 314, angle: 5 },
-    top_starlight: { x: 590, y: 875, width: 195, height: 298, angle: -4 },
-  },
-  male: {
-    top_mint: { x: 620, y: 1028, width: 210, height: 321, angle: 3 },
-    top_starlight: { x: 580, y: 1008, width: 205, height: 314, angle: 3 },
-  },
-};
 export function characterAttachment(outfit, look) {
   const item = ATELIER_ATTACHMENTS[look?.prop];
   if (!item) return null;
   return {
     ...item,
     ...(look.prop === "prop_book"
-      ? BOOK_FITTINGS[outfit.sex][outfit.top]
+      ? journalGrips[outfit.sex][outfit.top]
       : outfit.prop),
   };
 }

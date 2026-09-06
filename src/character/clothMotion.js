@@ -1,3 +1,5 @@
+import { attachmentPoint, attachmentPivot } from "./attachmentGeometry.js";
+
 // These fields describe loose fabric in the shared 1696 × 2528 art frame.
 // Each outfit adds only its fabric weights, never videos for every worn item.
 const PROFILES = {
@@ -33,25 +35,19 @@ const smooth = (value) => {
 
 export function rigidAttachmentRegion(item) {
   if (!item || item.handInFront) return null;
-  const cx = item.x + item.width / 2;
-  const cy = item.y + 60;
-  const angle = (item.angle * Math.PI) / 180;
   const points = [
     [item.x, item.y],
     [item.x + item.width, item.y],
     [item.x, item.y + item.height],
     [item.x + item.width, item.y + item.height],
-  ].map(([x, y]) => [
-    cx + (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle),
-    cy + (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle),
-  ]);
+  ].map(([x, y]) => attachmentPoint(item, x, y));
   // Pad by two mesh cells so every triangle touching the journal moves rigidly.
   return {
-    left: Math.min(...points.map((p) => p[0])) - 72,
-    right: Math.max(...points.map((p) => p[0])) + 72,
-    top: Math.min(...points.map((p) => p[1])) - 72,
-    bottom: Math.max(...points.map((p) => p[1])) + 72,
-    breath: smooth((1600 - item.y) / 700),
+    left: Math.min(...points.map((p) => p.x)) - 72,
+    right: Math.max(...points.map((p) => p.x)) + 72,
+    top: Math.min(...points.map((p) => p.y)) - 72,
+    bottom: Math.max(...points.map((p) => p.y)) + 72,
+    breath: smooth((1600 - attachmentPivot(item).y) / 700),
   };
 }
 
