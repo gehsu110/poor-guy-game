@@ -209,23 +209,24 @@ export function startJourney(profile, route, operationId) {
     },
   };
 }
-export function advanceJourney(profile, id, expectedTurn, skill) {
+export function advanceJourney(profile, id, expectedTurn, skill, shardId) {
   const active = profile.journey.active;
   if (!active || active.id !== id)
     throw new Error("這段旅程已經結束，請查看最新進度。");
   if (active.turn !== expectedTurn)
     throw new Error("旅程剛剛有更新，已同步最新進度。");
-  const hp = encounterStep(
+  const { hp, foundShards } = resolveStarAction(
     active,
     skill,
     !!profile.equipped?.layered?.companion,
+    shardId,
   );
   if (hp > 0)
     return {
       ...profile,
       journey: {
         ...profile.journey,
-        active: { ...active, hp, turn: active.turn + 1 },
+        active: { ...active, hp, foundShards, turn: active.turn + 1 },
       },
     };
   const items = ITEMS.filter((item) => item.node === active.node).map(
@@ -270,4 +271,41 @@ export function encounterStep(active, skill, hasCompanion = false) {
     throw new Error("先邀請一位夥伴加入旅程。");
   const damage = skill === "quick" ? 100 : skill === "friend" ? 55 : 40;
   return Math.max(0, active.hp - damage);
+}
+
+export function foundShardIds(active) {
+  const count =
+    active.hp <= 0 ? 3 : Math.max(0, Math.floor((100 - active.hp) / 40));
+  const saved = [...new Set(active.foundShards ?? [])].filter(
+    (id) => Number.isInteger(id) && id >= 0 && id < 3,
+  );
+  return [...saved, ...[0, 1, 2].filter((id) => !saved.includes(id))].slice(
+    0,
+    count,
+  );
+}
+export function resolveStarAction(
+  active,
+  skill,
+  hasCompanion = false,
+  shardId,
+) {
+  const found = foundShardIds(active);
+  const target = shardId ?? [0, 1, 2].find((id) => !found.includes(id));
+  if (
+    skill === "cast" &&
+    (!Number.isInteger(target) ||
+      target < 0 ||
+      target > 2 ||
+      found.includes(target))
+  )
+    throw new Error("這片星光已經收好了，找找其他星片吧。");
+  const hp = encounterStep(active, skill, hasCompanion);
+  const count = hp <= 0 ? 3 : Math.max(0, Math.floor((100 - hp) / 40));
+  const order = [
+    ...found,
+    ...(target === undefined ? [] : [target]),
+    ...[0, 1, 2].filter((id) => !found.includes(id) && id !== target),
+  ];
+  return { hp, foundShards: order.slice(0, count) };
 }

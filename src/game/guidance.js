@@ -1,4 +1,4 @@
-import { currentNode } from "./journey.js";
+import { currentNode, foundShardIds } from "./journey.js";
 import { DISPLAY_ITEMS, ITEM_BY_ID, owns } from "./catalog.js";
 
 export function nextStep(profile, record = {}, date) {
@@ -51,9 +51,13 @@ export function collectionGoal(profile) {
 }
 
 export function searchProgress(active) {
-  const found =
-    active.hp <= 0 ? 3 : Math.max(0, Math.floor((100 - active.hp) / 40));
-  return { found, remaining: 3 - found, target: found };
+  const collected = foundShardIds(active);
+  return {
+    found: collected.length,
+    remaining: 3 - collected.length,
+    target: [0, 1, 2].find((id) => !collected.includes(id)),
+    collected,
+  };
 }
 
 export const ENCOUNTERS = [

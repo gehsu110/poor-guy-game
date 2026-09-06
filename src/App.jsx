@@ -8,6 +8,7 @@ import { parseAmount } from "./progression";
 import { StarNav } from "./components/starpage/Chrome";
 import PaintedCharacter from "./components/starpage/PaintedCharacter";
 import QuickEntry from "./components/starpage/QuickEntry";
+import { WorldBackdrop } from "./components/starpage/WorldUI";
 const HomeScreen = lazy(() => import("./screens/starpage/HomeScreen"));
 const AdventureScreen = lazy(
   () => import("./screens/starpage/AdventureScreen"),
@@ -172,7 +173,8 @@ function Content() {
   const legacy = ["profile", "shop"].includes(state.screen);
   return (
     <MotionConfig reducedMotion={reduce ? "always" : "never"}>
-      <div className="star-shell">
+      <div className="star-shell world-shell" data-screen={state.screen}>
+        <WorldBackdrop />
         <div className={legacy ? "star-legacy" : "star-scroll"} ref={scrollRef}>
           {legacy && (
             <button

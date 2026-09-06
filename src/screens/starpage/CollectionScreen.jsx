@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "../../useAppStore";
 import {
   DISPLAY_ITEMS as ITEMS,
@@ -10,60 +10,56 @@ import {
 import PaintedCharacter, {
   LittleFriend,
 } from "../../components/starpage/PaintedCharacter";
-import IllustratedScene, {
-  GardenObject,
-} from "../../components/starpage/IllustratedScene";
 import JourneyAlbum from "../../components/starpage/JourneyAlbum";
-import { HowToPlay } from "../../components/starpage/JourneyUX";
-const COLLECTION_TABS = [
+import { PageHead, Tabs, StarCurrency } from "../../components/starpage/Chrome";
+import {
+  WorldHeader,
+  RelicIcon,
+  WorldDialog,
+} from "../../components/starpage/WorldUI";
+const TABS = [
   ["wardrobe", "造型"],
-  ["catalog", "圖鑑"],
   ["shop", "小店"],
+  ["catalog", "圖鑑"],
   ["stamps", "旅程印記"],
 ];
-import { PageHead, Tabs, StarCurrency } from "../../components/starpage/Chrome";
 function ItemArt({ item, look }) {
-  if (item.slot === "companion") return <LittleFriend kind={item.look} />;
-  if (item.slot === "garden") return <GardenObject kind={item.look} />;
-  return (
-    <PaintedCharacter
-      look={{ ...look, [item.slot]: item.id }}
-      portrait={["hat", "hair"].includes(item.slot)}
-      reduced
-    />
+  return item.slot === "companion" ? (
+    <LittleFriend kind={item.look} />
+  ) : (
+    <PaintedCharacter look={{ ...look, [item.slot]: item.id }} reduced />
   );
 }
 export default function CollectionScreen() {
   const { state, equip, buy, updateGame, navigate } = useApp();
-  const requestedItem = ITEM_BY_ID[state.screenParams.item];
-  const initialItem = requestedItem?.artReady
-    ? requestedItem
+  const stageRef = useRef(null),
+    inventoryRef = useRef(null);
+  const profile = state.profile,
+    requested = ITEM_BY_ID[state.screenParams.item];
+  const initial = requested?.artReady
+    ? requested
     : state.screenParams.tab === "shop"
-      ? (ITEMS.find((item) => item.cost && !owns(state.profile, item.id)) ??
-        ITEMS.find((item) => item.cost))
+      ? (ITEMS.find((i) => i.cost && !owns(profile, i.id)) ??
+        ITEMS.find((i) => i.cost))
       : null;
   const [tab, setTab] = useState(
-    ["catalog", "shop", "stamps"].includes(state.screenParams.tab)
+    TABS.some(([id]) => id === state.screenParams.tab)
       ? state.screenParams.tab
       : "wardrobe",
   );
-  const [slot, setSlot] = useState(initialItem?.slot ?? "top");
+  const [slot, setSlot] = useState(initial?.slot ?? "top");
   const [look, setLook] = useState(
     normalizeLook(
-      initialItem
-        ? {
-            ...state.profile.equipped.layered,
-            [initialItem.slot]: initialItem.id,
-          }
-        : state.profile.equipped.layered,
+      initial
+        ? { ...profile.equipped.layered, [initial.slot]: initial.id }
+        : profile.equipped.layered,
     ),
   );
-  const [selected, setSelected] = useState(initialItem?.id ?? look[slot]);
-  const [action, setAction] = useState("idle");
-  const [actionKey, setActionKey] = useState(0);
-  const profile = state.profile;
-  const item = ITEM_BY_ID[selected];
-  const friend = ITEM_BY_ID[look.companion];
+  const [selected, setSelected] = useState(initial?.id ?? look[slot]);
+  const [greeting, setGreeting] = useState(0);
+  const [sourceOpen, setSourceOpen] = useState(false);
+  const item = ITEM_BY_ID[selected],
+    friend = ITEM_BY_ID[look.companion];
   const allOwned = Object.values(look).every((id) => !id || owns(profile, id));
   const changed =
     JSON.stringify(look) !==
@@ -72,32 +68,69 @@ export default function CollectionScreen() {
   const visible = ITEMS.filter((i) =>
     tab === "shop" ? !!i.cost : tab === "catalog" ? true : i.slot === slot,
   );
+  useEffect(() => {
+    if (!inventoryRef.current || !stageRef.current) return;
+    const measure = () =>
+      stageRef.current?.style.setProperty(
+        "--inventory-height",
+        `${inventoryRef.current?.getBoundingClientRect().height ?? 254}px`,
+      );
+    const observer = new ResizeObserver(measure);
+    observer.observe(inventoryRef.current);
+    measure();
+    return () => observer.disconnect();
+  }, [tab]);
   const ownedCount = ITEMS.filter((i) => owns(profile, i.id)).length;
   function select(next) {
+    if (window.innerHeight < 700)
+      requestAnimationFrame(() =>
+        inventoryRef.current?.scrollIntoView({
+          block: "center",
+          behavior:
+            profile.preferences?.reduceMotion ||
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+              ? "auto"
+              : "smooth",
+        }),
+      );
     setSelected(next.id);
-    setLook((current) => ({ ...current, [next.slot]: next.id }));
     setSlot(next.slot);
+    setLook((current) => ({
+      ...Object.fromEntries(
+        Object.entries(current).map(([key, id]) => [
+          key,
+          !id || owns(profile, id) ? id : profile.equipped.layered[key],
+        ]),
+      ),
+      [next.slot]: next.id,
+    }));
   }
   function changeTab(next) {
     setTab(next);
     if (next === "shop" && !item?.cost)
       select(
-        ITEMS.find((item) => item.cost && !owns(profile, item.id)) ??
-          ITEMS.find((item) => item.cost),
+        ITEMS.find((i) => i.cost && !owns(profile, i.id)) ??
+          ITEMS.find((i) => i.cost),
       );
+  }
+  const owned = !item || owns(profile, item.id),
+    balance = item ? (profile.stars[item.currency ?? "yellow"] ?? 0) : 0;
+  const shortfall = item?.cost ? Math.max(0, item.cost - balance) : 0;
+  async function wear() {
+    if (!owned && item.cost) {
+      if (await buy(item.id, true))
+        setLook(
+          normalizeLook({ ...profile.equipped.layered, [item.slot]: item.id }),
+        );
+    } else if (allOwned) await equip(look);
   }
   if (tab === "stamps")
     return (
-      <main className="star-page star-collection quest-collection">
-        <PageHead eyebrow="屬於你的冒險手帳" title="把相遇，收成故事。">
-          <HowToPlay />
+      <main className="star-page world-album-page">
+        <PageHead eyebrow="旅途裡的收藏簿" title="相遇的印記">
+          <span className="star-count">{profile.journey.stamps.length}/15</span>
         </PageHead>
-        <Tabs
-          label="收藏內容"
-          tabs={COLLECTION_TABS}
-          value={tab}
-          onChange={changeTab}
-        />
+        <Tabs label="收藏內容" tabs={TABS} value={tab} onChange={changeTab} />
         <JourneyAlbum
           profile={profile}
           highlight={state.screenParams.stamp}
@@ -106,240 +139,132 @@ export default function CollectionScreen() {
       </main>
     );
   return (
-    <main className="star-page star-collection quest-collection">
-      <PageHead eyebrow="套裝、夥伴，還有旅途的紀念" title="把喜歡的，收起來。">
-        <span className="star-count">
-          {ownedCount} / {ITEMS.length}
-        </span>
-      </PageHead>
-      <Tabs
-        label="收藏內容"
-        tabs={COLLECTION_TABS}
-        value={tab}
-        onChange={changeTab}
-      />
-      <section className="star-fitting-room">
-        <IllustratedScene />
-        <span className="star-fitting-label">
-          {changed ? "正在試穿" : "目前的搭配"}
-        </span>
-        <div className="star-fitting-character">
-          <PaintedCharacter
-            key={actionKey}
-            look={look}
-            action={action}
-            reduced={profile.preferences?.reduceMotion}
-          />
-        </div>
-        {friend && (
-          <div className="star-fitting-friend">
-            <LittleFriend kind={friend.look} />
-          </div>
-        )}
-        {look.garden && (
-          <div className="star-fitting-garden">
-            <GardenObject kind={ITEM_BY_ID[look.garden].look} />
-          </div>
-        )}
-        <div className="star-motion-switch">
-          {[
-            ["idle", "待機"],
-            ["greet", "招呼"],
-          ].map(([id, name]) => (
-            <button
-              key={id}
-              aria-pressed={action === id}
-              onClick={() => {
-                setAction(id);
-                setActionKey((key) => key + 1);
-              }}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-      </section>
-      <section className="star-fitting-info">
-        <div>
-          <span className="star-eyebrow">
-            {item ? SLOTS.find((s) => s.id === item.slot).label : "MY LOOK"}
-          </span>
-          <h2>{item?.name ?? "今天的搭配"}</h2>
-          <p>{item?.desc ?? "挑選今天的套裝，再邀一位夥伴同行。"}</p>
-        </div>
-        {item && !owns(profile, item.id) && (
-          <button
-            className="star-heart"
-            aria-label={
-              profile.wishlist?.includes(item.id) ? "移出心願" : "加入心願"
-            }
-            aria-pressed={!!profile.wishlist?.includes(item.id)}
-            disabled={state.busy}
-            onClick={() =>
-              updateGame((p) => ({
-                ...p,
-                wishlist: p.wishlist?.includes(item.id)
-                  ? p.wishlist.filter((id) => id !== item.id)
-                  : [...(p.wishlist ?? []), item.id],
-              }))
-            }
-          >
-            {profile.wishlist?.includes(item.id) ? "♥" : "♡"}
-          </button>
-        )}
-      </section>
-      {item && !owns(profile, item.id) ? (
-        item.cost ? (
-          <button
-            className="star-button star-buy"
-            disabled={
-              state.busy ||
-              (profile.stars[item.currency ?? "yellow"] ?? 0) < item.cost
-            }
-            onClick={async () => {
-              if (await buy(item.id, true))
-                setLook(
-                  normalizeLook({
-                    ...profile.equipped.layered,
-                    [item.slot]: item.id,
-                  }),
-                );
-            }}
-          >
-            <span>
-              {(profile.stars[item.currency ?? "yellow"] ?? 0) < item.cost
-                ? "星幣還差一點"
-                : item.slot === "companion"
-                  ? "兌換並同行"
-                  : "兌換並穿上"}
-            </span>
-            <StarCurrency
-              amount={item.cost}
-              purple={item.currency === "purple"}
-            />
-          </button>
-        ) : (
-          <div className="star-source-note">
-            {item.source}後自動取得{" "}
-            <button
-              onClick={() =>
-                navigate(item.days ? "journal" : "adventure", {
-                  tab: item.days ? "goals" : undefined,
-                })
-              }
-            >
-              查看進度 →
-            </button>
-          </div>
-        )
-      ) : (
+    <main className="world-stage world-collection" ref={stageRef}>
+      <WorldHeader
+        title={
+          tab === "shop"
+            ? "星光小店"
+            : tab === "catalog"
+              ? "我的寶物圖鑑"
+              : "旅人的造型間"
+        }
+        subtitle={`已收藏 ${ownedCount} / ${ITEMS.length} 件`}
+        onBack={() => navigate("town")}
+      >
         <button
-          className="star-button"
-          disabled={state.busy || !allOwned || !changed}
-          onClick={() => equip(look)}
+          className="world-wallet"
+          aria-label="查看小店"
+          onClick={() => changeTab("shop")}
         >
-          {!allOwned
-            ? "搭配中還有未取得的收藏"
-            : changed
-              ? "穿上這套搭配"
-              : "這套搭配已穿上"}
+          <StarCurrency amount={profile.stars.yellow} />
+          <StarCurrency amount={profile.stars.purple} purple />
         </button>
-      )}
-      {item?.cost && !owns(profile, item.id) && (
-        <div className="quest-purchase-hint">
-          <div>
-            目前有{" "}
-            <StarCurrency
-              amount={profile.stars[item.currency ?? "yellow"] ?? 0}
-              purple={item.currency === "purple"}
-            />{" "}
-            <span>
-              {Math.max(
-                0,
-                item.cost - (profile.stars[item.currency ?? "yellow"] ?? 0),
-              )
-                ? `還差 ${Math.max(0, item.cost - (profile.stars[item.currency ?? "yellow"] ?? 0))} 顆${item.currency === "purple" ? "紫星" : "黃星"}`
-                : "可以兌換了"}
-            </span>
-          </div>
-          <p>
-            {item.currency === "purple"
-              ? "完成章節或每週記錄 5 天，可以獲得紫星。"
-              : "每天記錄 +2 黃星，當日回顧再 +1；一天多筆記錄不會重複發獎。"}
-          </p>
+      </WorldHeader>
+      <div className="world-collection-tabs">
+        <Tabs label="收藏內容" tabs={TABS} value={tab} onChange={changeTab} />
+      </div>
+      <div className="world-outfit-name">
+        <span>{changed ? "試穿中" : "目前造型"}</span>
+        <h2>{item?.name ?? "今天的搭配"}</h2>
+        <p>{item?.desc ?? "替旅程選一個喜歡的模樣。"}</p>
+      </div>
+      <div className="world-fitting-pedestal" aria-hidden="true" />
+      <div className="world-fitting-actor">
+        <PaintedCharacter
+          key={greeting}
+          look={look}
+          action={greeting ? "greet" : "idle"}
+          interactive
+          reduced={profile.preferences?.reduceMotion}
+        />
+      </div>
+      {friend && (
+        <div className="world-fitting-friend">
+          <LittleFriend kind={friend.look} />
         </div>
       )}
+      <button
+        className="world-fitting-greet"
+        onClick={() => setGreeting((g) => g + 1)}
+        aria-label="預覽角色招呼動作"
+      >
+        <RelicIcon kind="star" />
+        <span>打個招呼</span>
+      </button>
       {changed && (
         <button
-          className="star-text-button"
+          className="world-fitting-reset"
           onClick={() => {
             setLook(normalizeLook(profile.equipped.layered));
             setSelected(profile.equipped.layered[slot]);
           }}
         >
-          還原目前搭配
+          還原搭配
         </button>
       )}
-      {tab === "wardrobe" && (
-        <div className="star-slot-tabs" aria-label="收藏類別">
-          {SLOTS.map((s) => (
-            <button
-              key={s.id}
-              aria-pressed={slot === s.id}
-              onClick={() => {
-                setSlot(s.id);
-                setSelected(look[s.id]);
-              }}
-            >
-              {s.label}
-            </button>
-          ))}
+      <section
+        className="world-inventory"
+        ref={inventoryRef}
+        aria-label="收藏與裝備"
+      >
+        <div className="world-inventory-head">
+          {tab === "wardrobe" ? (
+            <div className="world-slot-switch">
+              {SLOTS.map((s) => (
+                <button
+                  key={s.id}
+                  aria-pressed={slot === s.id}
+                  onClick={() => {
+                    setSlot(s.id);
+                    setSelected(look[s.id]);
+                  }}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <strong>
+              {tab === "shop" ? "挑一件喜歡的寶物" : "我的收藏"}{" "}
+              <small>
+                {ownedCount}/{ITEMS.length}
+              </small>
+            </strong>
+          )}
+          <button
+            className="world-currency-help"
+            onClick={() => setSourceOpen(true)}
+          >
+            星幣怎麼取得？
+          </button>
         </div>
-      )}
-      {tab === "shop" && (
-        <>
-          <div className="star-shop-wallet">
-            <span>我的星幣</span>
-            <StarCurrency amount={profile.stars.yellow} />
-            <StarCurrency amount={profile.stars.purple} purple />
-          </div>
-          <p className="star-form-hint">
-            記錄一天 +2 黃星，回顧再 +1；每週累積 5 天 +5 黃星與 1
-            紫星。喜歡的衣服，慢慢存就能得到。
-          </p>
-        </>
-      )}
-      <div className="star-item-grid">
-        {tab === "wardrobe" &&
-          ["hat", "companion", "garden"].includes(slot) && (
+        <div className="world-item-strip">
+          {tab === "wardrobe" && slot === "companion" && (
             <button
-              className="star-item-card star-item-none"
-              aria-pressed={!look[slot]}
+              className="world-item world-item-none"
+              aria-pressed={!look.companion}
               onClick={() => {
-                setLook((current) => ({ ...current, [slot]: null }));
+                setLook((l) => ({ ...l, companion: null }));
                 setSelected(null);
               }}
             >
               <span>＋</span>
-              <strong>不裝備</strong>
+              <strong>獨自出發</strong>
             </button>
           )}
-        {visible.map((raw) => {
-          const i = ITEM_BY_ID[raw.id];
-          const owned = owns(profile, i.id);
-          return (
+          {visible.map((i) => (
             <button
-              className={`star-item-card ${profile.wishlist?.includes(i.id) ? "is-wish" : ""}`}
               key={i.id}
+              className="world-item"
               aria-pressed={selected === i.id}
               onClick={() => select(i)}
             >
-              <div className="star-item-art">
+              <div>
                 <ItemArt item={i} look={look} />
               </div>
               <strong>{i.name}</strong>
               <small>
-                {owned ? (
+                {owns(profile, i.id) ? (
                   "已收藏"
                 ) : i.cost ? (
                   <StarCurrency
@@ -350,33 +275,120 @@ export default function CollectionScreen() {
                   i.source
                 )}
               </small>
-              {profile.wishlist?.includes(i.id) && (
-                <span className="star-item-wish" aria-label="心願收藏">
-                  ♥
-                </span>
-              )}
+              {selected === i.id && <b>✓</b>}
             </button>
-          );
-        })}
-      </div>
-      {tab === "catalog" && (
-        <button className="quest-album-link" onClick={() => setTab("stamps")}>
-          <span>
-            我的旅程印記 <b>{profile.journey.stamps.length} / 15</b>
-          </span>
-          <span>翻開相遇的故事 →</span>
-        </button>
-      )}
-      <section className="star-legacy-link">
-        <strong>熟悉的收藏，也還在。</strong>
-        <p>舊套裝、配件、星幣和票券完整保留。</p>
-        <div>
-          <button onClick={() => navigate("profile", { tab: "wardrobe" })}>
-            舊版造型收藏 →
-          </button>
-          <button onClick={() => navigate("shop")}>舊票與兌換櫃 →</button>
+          ))}
+        </div>
+        <div className="world-equipment-action">
+          {!owned && !item.cost ? (
+            <>
+              <p>{item.source}後自動取得</p>
+              <button
+                className="world-primary"
+                onClick={() => navigate("journal", { tab: "goals" })}
+              >
+                看看成長進度 ›
+              </button>
+            </>
+          ) : (
+            <>
+              <p>
+                {!owned
+                  ? shortfall
+                    ? `還差 ${shortfall} 顆${item.currency === "purple" ? "紫星" : "黃星"} · 目前有 ${balance} 顆`
+                    : `目前有 ${balance} 顆，兌換後直接裝備`
+                  : changed
+                    ? "喜歡的話，就穿上出發吧。"
+                    : "這個模樣，已經陪你出發了。"}
+              </p>
+              <div>
+                <button
+                  className="world-primary"
+                  disabled={
+                    state.busy ||
+                    (!owned ? shortfall > 0 : !changed || !allOwned)
+                  }
+                  onClick={wear}
+                >
+                  {!owned
+                    ? item.slot === "companion"
+                      ? "兌換並同行"
+                      : "兌換並穿上"
+                    : !allOwned
+                      ? "請先取得收藏"
+                      : changed
+                        ? "穿上這套搭配"
+                        : "已穿上"}
+                  {!owned && (
+                    <StarCurrency
+                      amount={item.cost}
+                      purple={item.currency === "purple"}
+                    />
+                  )}
+                </button>
+                {!owned && (
+                  <button
+                    className="world-wishlist"
+                    aria-label={
+                      profile.wishlist?.includes(item.id)
+                        ? "移出心願"
+                        : "加入心願"
+                    }
+                    aria-pressed={!!profile.wishlist?.includes(item.id)}
+                    disabled={state.busy}
+                    onClick={() =>
+                      updateGame((p) => ({
+                        ...p,
+                        wishlist: p.wishlist?.includes(item.id)
+                          ? p.wishlist.filter((id) => id !== item.id)
+                          : [...(p.wishlist ?? []), item.id],
+                      }))
+                    }
+                  >
+                    {profile.wishlist?.includes(item.id) ? "♥" : "♡"}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </section>
+      <div className="world-legacy-collection">
+        <button onClick={() => navigate("profile", { tab: "wardrobe" })}>
+          經典造型收藏
+        </button>
+        <button onClick={() => navigate("shop")}>舊票兌換櫃</button>
+      </div>
+      {sourceOpen && (
+        <WorldDialog
+          title="把日常變成星光"
+          onClose={() => setSourceOpen(false)}
+        >
+          <div className="world-currency-guide">
+            <p>
+              <StarCurrency amount={2} /> 如實記錄一天，或確認零消費。
+            </p>
+            <p>
+              <StarCurrency amount={1} /> 回顧今天的手帳。
+            </p>
+            <p>
+              <StarCurrency amount={1} purple /> 完成一章旅程，或本週記錄 5 天。
+            </p>
+            <small>
+              每週記錄 5 天還有 5 黃星。每天的獎勵只發一次，多記幾筆不會多領。
+            </small>
+            <button
+              className="world-primary"
+              onClick={() => {
+                setSourceOpen(false);
+                navigate("journal", { tab: "goals" });
+              }}
+            >
+              翻開我的成長手帳 ›
+            </button>
+          </div>
+        </WorldDialog>
+      )}
     </main>
   );
 }

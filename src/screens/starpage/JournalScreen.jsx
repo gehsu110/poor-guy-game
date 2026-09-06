@@ -82,7 +82,7 @@ export default function JournalScreen() {
         : rows;
   return (
     <main className="star-page star-journal">
-      <PageHead eyebrow="MY EVERYDAY JOURNAL" title="我的手帳">
+      <PageHead eyebrow="旅人的隨身手帳" title="我的手帳">
         <span className="star-journal-date">
           {state.date.slice(5).replace("-", " / ")}
         </span>

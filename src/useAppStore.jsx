@@ -379,12 +379,12 @@ export function AppProvider({ children }) {
     [updateGame],
   );
   const actJourney = useCallback(
-    (id, turn, skill) =>
+    (id, turn, skill, shardId) =>
       run(async (current) => {
         const result = await gameTransaction(
           current.user.uid,
           (profile, record) => ({
-            profile: advanceJourney(profile, id, turn, skill),
+            profile: advanceJourney(profile, id, turn, skill, shardId),
             record,
           }),
         );

@@ -131,3 +131,39 @@ test("purchase and equip charge once and preserve other worn items", () => {
     /還不夠/,
   );
 });
+
+test("stars can be collected in any order and persist across reloads without duplication", () => {
+  let profile = startJourney(recorded(), "library", "ordered-trip");
+  profile = advanceJourney(profile, "ordered-trip", 0, "cast", 2);
+  assert.deepEqual(profile.journey.active.foundShards, [2]);
+  assert.equal(searchProgress(profile.journey.active).target, 0);
+  profile = JSON.parse(JSON.stringify(profile));
+  assert.throws(
+    () => advanceJourney(profile, "ordered-trip", 1, "cast", 2),
+    /已經收好/,
+  );
+  assert.throws(() => advanceJourney(profile, "ordered-trip", 1, "cast", 3));
+  assert.throws(() => advanceJourney(profile, "ordered-trip", 1, "cast", -1));
+  assert.throws(() => advanceJourney(profile, "ordered-trip", 1, "cast", 0.5));
+  profile = advanceJourney(profile, "ordered-trip", 1, "cast", 1);
+  assert.deepEqual(profile.journey.active.foundShards, [2, 1]);
+  profile = advanceJourney(profile, "ordered-trip", 2, "cast", 0);
+  assert.equal(profile.journey.active, null);
+  assert.equal(profile.journey.completed, 1);
+  assert.equal(profile.journey.stamps.length, 1);
+  assert.equal(profile.journey.usedDates.length, 1);
+});
+test("legacy saved progress and the easy action stay compatible with selectable stars", () => {
+  const profile = startJourney(recorded(), "forest", "legacy-trip");
+  profile.journey.active.hp = 20;
+  profile.journey.active.turn = 2;
+  assert.deepEqual(searchProgress(profile.journey.active).collected, [0, 1]);
+  assert.throws(
+    () => advanceJourney(profile, "legacy-trip", 2, "cast", 0),
+    /已經收好/,
+  );
+  assert.equal(
+    advanceJourney(profile, "legacy-trip", 2, "quick").journey.completed,
+    1,
+  );
+});

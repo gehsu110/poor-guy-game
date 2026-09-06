@@ -1,15 +1,16 @@
 import { useApp } from "../../useAppStore";
 import GameIcon from "../GameIcon";
+import { RelicIcon } from "./RelicIcon";
 export function StarNav() {
   const { state, navigate, openEntry } = useApp();
   return (
-    <nav className="star-nav" aria-label="主要導覽">
+    <nav className="world-dock" aria-label="主要導覽">
       {[
-        ["town", "首頁", "tab-today"],
-        ["adventure", "冒險", "tab-map"],
-        ["entry", "記帳", "tab-record"],
-        ["journal", "手帳", "report"],
-        ["collection", "收藏", "wardrobe"],
+        ["town", "庭院", "home"],
+        ["adventure", "冒險", "map"],
+        ["entry", "記帳", "book"],
+        ["journal", "手帳", "book"],
+        ["collection", "收藏", "bag"],
       ].map(([id, label, icon]) => (
         <button
           key={id}
@@ -20,7 +21,7 @@ export function StarNav() {
           aria-label={id === "entry" ? "新增記帳" : label}
         >
           <span>
-            <GameIcon name={icon} />
+            <RelicIcon kind={icon} />
           </span>
           <b>{label}</b>
         </button>

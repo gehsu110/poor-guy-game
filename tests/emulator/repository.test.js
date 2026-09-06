@@ -283,3 +283,47 @@ test("purchase-and-equip retries commit one debit with the worn outfit", async (
   );
   assert.deepEqual((await gameSnapshot(uid)).profile, before.profile);
 });
+
+test("selected scene objects persist and concurrent selection of the same star cannot advance twice", async () => {
+  await commitLedger(uid, command("star-day"), date);
+  await gameTransaction(
+    uid,
+    (profile, record) => ({
+      profile: startJourney(profile, "forest", "scene-trip"),
+      record,
+    }),
+    date,
+  );
+  const select = () =>
+    gameTransaction(
+      uid,
+      (profile, record) => ({
+        profile: advanceJourney(profile, "scene-trip", 0, "cast", 2),
+        record,
+      }),
+      date,
+    );
+  const outcomes = await Promise.allSettled([select(), select()]);
+  assert.equal(
+    outcomes.filter((result) => result.status === "fulfilled").length,
+    1,
+  );
+  const saved = await readGame(uid, date);
+  assert.deepEqual(saved.profile.journey.active.foundShards, [2]);
+  assert.equal(saved.profile.journey.active.turn, 1);
+  assert.equal(saved.profile.journey.active.hp, 60);
+  assert.equal(saved.profile.journey.pendingDates.length, 1);
+  assert.equal(saved.profile.journey.stamps.length, 0);
+  await assert.rejects(
+    gameTransaction(
+      uid,
+      (profile, record) => ({
+        profile: advanceJourney(profile, "scene-trip", 1, "cast", 2),
+        record,
+      }),
+      date,
+    ),
+    /已經收好/,
+  );
+  assert.equal((await readGame(uid, date)).profile.journey.active.hp, 60);
+});

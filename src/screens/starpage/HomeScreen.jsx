@@ -1,220 +1,125 @@
 import { useApp } from "../../useAppStore";
-import { ITEM_BY_ID, normalizeLook, owns } from "../../game/catalog";
-import { nextStep, collectionGoal } from "../../game/guidance";
-import { JourneySteps, HowToPlay } from "../../components/starpage/JourneyUX";
+import { ITEM_BY_ID, normalizeLook } from "../../game/catalog";
+import { nextStep } from "../../game/guidance";
 import PaintedCharacter, {
   LittleFriend,
 } from "../../components/starpage/PaintedCharacter";
-import IllustratedScene, {
-  GardenObject,
-} from "../../components/starpage/IllustratedScene";
-import { StarCurrency } from "../../components/starpage/Chrome";
-import GameIcon from "../../components/GameIcon";
+import { WorldHUD, RelicIcon } from "../../components/starpage/WorldUI";
+import { HowToPlay } from "../../components/starpage/JourneyUX";
 import StorybookActor from "../../components/StorybookActor";
 import PaperDollFigure from "../../components/PaperDollFigure";
 import { getPaperDollAssets } from "../../paperDoll";
+
 export default function HomeScreen() {
   const { state, navigate, openEntry } = useApp();
   const { profile, dayRecord, totalSpent } = state;
-  const look = normalizeLook(profile.equipped?.layered);
+  const look = normalizeLook(profile.equipped.layered);
+  const friend = ITEM_BY_ID[look.companion];
   const guide = nextStep(profile, dayRecord, state.date);
-  const goNext = () =>
+  const remaining = (dayRecord.budget ?? profile.dailyBudget) - totalSpent;
+  const legacy = profile.equipped.visualStyle !== "layered";
+  const next = () =>
     guide.kind === "record"
       ? openEntry()
       : navigate(
           guide.kind === "adventure" ? "adventure" : "collection",
           guide.kind === "collection" ? { tab: "stamps" } : {},
         );
-  const recorded = dayRecord.entryCount > 0 || dayRecord.noSpend;
-  const reviewed =
-    dayRecord.reviewedAt &&
-    dayRecord.reviewedRevision === (dayRecord.revision ?? 0);
-  const remaining = (dayRecord.budget ?? profile.dailyBudget) - totalSpent;
-  const wish = collectionGoal(profile);
-  const friend = ITEM_BY_ID[look.companion];
-  const garden = ITEM_BY_ID[look.garden];
-  const legacy = profile.equipped.visualStyle !== "layered";
   return (
-    <main className="star-home quest-home">
-      <header className="star-home-head">
-        <button
-          className="star-identity"
-          onClick={() => navigate("settings")}
-          aria-label="個人資料與設定"
-        >
-          <span className="star-avatar">
-            <PaintedCharacter look={look} portrait reduced />
-          </span>
-          <span>
-            <strong>{profile.playerName}</strong>
-            <small>Lv. {profile.level} · 星頁冒險者</small>
-          </span>
-        </button>
-        <button
-          className="star-wallet"
-          onClick={() => navigate("collection", { tab: "shop" })}
-          aria-label="查看星幣與小店"
-        >
-          <StarCurrency amount={profile.stars.yellow} />
-        </button>
-      </header>
-      <div className="quest-home-title">
-        <div>
-          <h1>{guide.title}</h1>
-          <p>{guide.detail}</p>
-        </div>
+    <main className="world-stage world-town">
+      <WorldHUD />
+      <div className="world-place">
+        <span>THE LITTLE COURTYARD</span>
+        <h1>風鈴庭院</h1>
+      </div>
+      <button className="world-quest-note" onClick={next}>
+        <span className="world-quest-pin" />
+        <small>{guide.step === 2 ? "今日相遇 · 已完成" : "今日的冒險"}</small>
+        <strong>{guide.label}</strong>
+        <span className="world-quest-chevron">›</span>
+      </button>
+      <div className="world-town-help">
         <HowToPlay />
       </div>
-      <JourneySteps
-        step={guide.step}
-        onSelect={(index) =>
-          index === 0
-            ? openEntry()
-            : navigate(
-                index === 1 ? "adventure" : "collection",
-                index === 2 ? { tab: "stamps" } : {},
-              )
-        }
-      />
-      <section className="star-home-stage" aria-label="我的庭院">
-        <IllustratedScene />
-        <span className="star-place">
-          <i />
-          風鈴庭院
-        </span>
-        <button
-          className="star-dress-link"
-          onClick={() => navigate("collection")}
-        >
-          <GameIcon name="wardrobe" />
-          <span>換個造型</span>
-        </button>
-        <div className="star-home-character">
-          {legacy ? (
-            profile.equipped.visualStyle === "classic" ? (
-              <PaperDollFigure
-                assets={getPaperDollAssets(profile.equipped.appearance)}
-              />
-            ) : (
-              <StorybookActor
-                outfit={profile.equipped.storybookOutfit}
-                reduced={profile.preferences?.reduceMotion}
-                interactive
-              />
-            )
-          ) : (
-            <PaintedCharacter
-              look={look}
-              successPulse={state.homeEffectPulse}
-              interactive
-              reduced={profile.preferences?.reduceMotion}
-            />
+      <button
+        className="world-place-link world-place-link--adventure"
+        onClick={() => navigate("adventure")}
+      >
+        <span>
+          <RelicIcon kind="map" />
+          {profile.journey.pendingDates.length > 0 && (
+            <i>{profile.journey.pendingDates.length}</i>
           )}
-        </div>
-        {friend && (
-          <div className="star-home-friend">
-            <LittleFriend kind={friend.look} />
-          </div>
-        )}
-        {garden && (
-          <div className="star-home-garden">
-            <GardenObject kind={garden.look} />
-          </div>
-        )}
-        <button
-          className="star-next-adventure quest-home-next"
-          onClick={goNext}
-        >
-          <span className="star-next-adventure__icon">
-            <GameIcon
-              name={
-                guide.kind === "record"
-                  ? "tab-record"
-                  : guide.kind === "adventure"
-                    ? "tab-map"
-                    : "report"
-              }
+        </span>
+        <b>出發冒險</b>
+      </button>
+      <button
+        className="world-place-link world-place-link--collection"
+        onClick={() => navigate("collection", { tab: "stamps" })}
+      >
+        <span>
+          <RelicIcon kind="bag" />
+        </span>
+        <b>我的收藏</b>
+      </button>
+      <button
+        className="world-place-link world-place-link--outfit"
+        onClick={() => navigate("collection")}
+      >
+        <span>
+          <RelicIcon kind="coat" />
+        </span>
+        <b>換個造型</b>
+      </button>
+      <div className="world-town-character">
+        {legacy ? (
+          profile.equipped.visualStyle === "classic" ? (
+            <PaperDollFigure
+              assets={getPaperDollAssets(profile.equipped.appearance)}
             />
-          </span>
-          <span>
-            <small>接下來</small>
-            <strong>{guide.label}</strong>
-          </span>
-          <span>→</span>
-        </button>
-      </section>
-      <section className="star-home-journal">
-        <button
-          className="star-home-journal__title"
-          onClick={() => navigate("journal")}
-        >
-          <span className="star-book-icon">
-            <GameIcon name="report" />
-          </span>
-          <span>
-            <strong>今日手帳</strong>
-            <small>
-              {recorded
-                ? reviewed
-                  ? "已記錄，也好好回顧了"
-                  : "已留下記錄 · 可以回顧了"
-                : "今天，還有一頁空白"}
-            </small>
-          </span>
-          <span>打開 →</span>
-        </button>
-        <div className="star-home-money">
-          <span>
-            今日支出<strong>NT$ {totalSpent.toLocaleString("zh-TW")}</strong>
-          </span>
-          <span>
-            {remaining < 0 ? "超出預算" : "今日剩餘"}
-            <strong className={remaining < 0 ? "star-danger" : ""}>
-              NT$ {Math.abs(remaining).toLocaleString("zh-TW")}
-            </strong>
-          </span>
-          {!recorded && <button onClick={() => openEntry()}>寫下第一筆</button>}
+          ) : (
+            <StorybookActor
+              outfit={profile.equipped.storybookOutfit}
+              reduced={profile.preferences?.reduceMotion}
+              interactive
+            />
+          )
+        ) : (
+          <PaintedCharacter
+            look={look}
+            successPulse={state.homeEffectPulse}
+            interactive
+            reduced={profile.preferences?.reduceMotion}
+          />
+        )}
+      </div>
+      {friend && (
+        <div className="world-town-friend">
+          <LittleFriend kind={friend.look} />
         </div>
-      </section>
-      {wish && (
-        <button
-          className="star-wish-strip quest-wish"
-          onClick={() =>
-            navigate("collection", { tab: "catalog", item: wish.id })
-          }
-        >
-          <span className="quest-wish-art">
-            {wish.slot === "companion" ? (
-              <LittleFriend kind={wish.look} />
-            ) : (
-              <PaintedCharacter
-                look={{ ...look, top: wish.id }}
-                portrait
-                reduced
-              />
-            )}
-          </span>
-          <span>
-            下一個心願 <b>{wish.name}</b>
-          </span>
-          <small>
-            {owns(profile, wish.id)
-              ? "已收藏"
-              : wish.cost
-                ? `還差 ${Math.max(0, wish.cost - (profile.stars[wish.currency ?? "yellow"] ?? 0))} ${wish.currency === "purple" ? "紫星" : "黃星"}`
-                : wish.source}{" "}
-            →
-          </small>
-        </button>
       )}
-      {guide.step === 2 && (
-        <button
-          className="quest-home-explore"
-          onClick={() => navigate("adventure")}
-        >
-          還想再玩？去自由探索 →
-        </button>
-      )}
+      <p className="world-town-whisper">
+        {guide.step === 2
+          ? "今天的星光，已經收好了。"
+          : guide.step === 1
+            ? "帶上手帳，一起去找星光吧。"
+            : "把今天的故事，寫進手帳裡。"}
+      </p>
+      <button
+        className="world-pocket-ledger"
+        onClick={() => navigate("journal")}
+      >
+        <RelicIcon kind="book" />
+        <span>
+          <small>今天的手帳</small>
+          <strong>支出 ${totalSpent.toLocaleString("zh-TW")}</strong>
+        </span>
+        <span className={remaining < 0 ? "is-over" : ""}>
+          {remaining < 0 ? "超出" : "餘額"}
+          <b>${Math.abs(remaining).toLocaleString("zh-TW")}</b>
+        </span>
+        <span>›</span>
+      </button>
     </main>
   );
 }

@@ -112,7 +112,7 @@ export default function SettingsScreen() {
   }
   return (
     <main className="star-page star-settings">
-      <PageHead eyebrow="YOUR ADVENTURER" title="個人資料與設定">
+      <PageHead eyebrow="旅人資料" title="個人資料與設定">
         <button className="star-text-button" onClick={() => navigate("town")}>
           回首頁
         </button>
@@ -175,12 +175,14 @@ export default function SettingsScreen() {
               role="switch"
               checked={!!profile.preferences?.[key]}
               disabled={state.busy}
-              onChange={(e) =>
+              onChange={(e) => {
+                // Capture the input before the asynchronous transaction rerenders this switch.
+                const checked = e.currentTarget.checked;
                 updateGame((p) => ({
                   ...p,
-                  preferences: { ...p.preferences, [key]: e.target.checked },
-                }))
-              }
+                  preferences: { ...p.preferences, [key]: checked },
+                }));
+              }}
             />
           </label>
         ))}
