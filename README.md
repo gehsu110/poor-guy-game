@@ -29,3 +29,5 @@ npm run check
 視覺規格位於 [`docs/VISUAL_SYSTEM.md`](docs/VISUAL_SYSTEM.md)。
 
 本次改版盤點與驗證範圍：[收藏冒險改版紀錄](docs/collection-overhaul.md)。美術母版、動作來源和轉檔規則：[薄荷帳本素材紀錄](docs/storybook-art-production.md)。
+
+下一輪玩法、自由換裝、導覽與底層重整：[全面改版盤點與提案（2026-09-06）](docs/game-redesign-audit-2026-09-06.md)。此文件區分目前已完成的能力與尚未實作的建議。

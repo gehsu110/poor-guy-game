@@ -1,5 +1,7 @@
 # 窮鬼勇者 (expense-quest) — CLAUDE.md
 
+> 歷史規格：以下描述原版的「整套角色動畫」架構，不能當作新版自由換裝的完成標準。視覺決策以 `docs/VISUAL_SYSTEM.md` 為準；2026-09-06 全面盤點與重整提案見 `docs/game-redesign-audit-2026-09-06.md`。
+
 ## 專案概述
 
 React + Vite PWA 記帳 RPG。核心設計：記帳 = 戰鬥、服裝 = 場景替換。
