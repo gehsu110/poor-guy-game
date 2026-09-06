@@ -6,6 +6,7 @@ import {
   DISPLAY_SLOTS as SLOTS,
   normalizeLook,
   owns,
+  ownedPreviewLook,
 } from "../../game/catalog";
 import PaintedCharacter, {
   LittleFriend,
@@ -15,14 +16,28 @@ import { PageHead, Tabs, StarCurrency } from "../../components/starpage/Chrome";
 import { WorldDialog } from "../../components/starpage/WorldUI";
 import CharacterInspector from "../../components/atelier/CharacterInspector";
 import WindIcon from "../../components/atelier/WindIcon";
-import { ATELIER_ITEMS } from "../../atelierAssets";
+import { ATELIER_ITEMS, atelierCharacter } from "../../atelierAssets";
 const TABS = [
   ["wardrobe", "造型"],
   ["shop", "小店"],
   ["catalog", "圖鑑"],
   ["stamps", "旅程印記"],
 ];
-function ItemArt({ item }) {
+function ItemArt({ item, look }) {
+  if (["top", "hair", "hat"].includes(item.slot)) {
+    const preview = atelierCharacter({
+      ...look,
+      [item.slot]: item.id,
+      ...(item.slot === "hair" ? { hat: null } : {}),
+    });
+    return (
+      <img
+        src={item.slot === "top" ? preview.poster : preview.head}
+        alt=""
+        draggable="false"
+      />
+    );
+  }
   return item.slot === "companion" ? (
     <LittleFriend kind={item.look} />
   ) : (
@@ -92,9 +107,15 @@ export default function CollectionScreen() {
       return;
     }
     if (!owned && item.cost) {
-      if (await buy(item.id, true))
+      if (await buy(item.id, true, look))
         setLook(
-          normalizeLook({ ...profile.equipped.layered, [item.slot]: item.id }),
+          ownedPreviewLook(
+            {
+              ...profile,
+              collection: [...(profile.collection ?? []), { id: item.id }],
+            },
+            look,
+          ),
         );
     } else if (allOwned) await equip(look);
   }
@@ -149,6 +170,24 @@ export default function CollectionScreen() {
           {ownedCount}
           <small> / {ITEMS.length}</small>
         </span>
+      </div>
+      <div
+        className="wind-character-choice"
+        role="group"
+        aria-label="選擇旅人角色"
+      >
+        {[
+          ["body_female", "女生"],
+          ["body_male", "男生"],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            aria-pressed={look.body === id}
+            onClick={() => setLook((current) => ({ ...current, body: id }))}
+          >
+            {label}
+          </button>
+        ))}
       </div>
       <div className="wind-look-caption" key={look.top}>
         <span>{changed ? "FITTING · 試穿中" : "YOUR LOOK · 目前造型"}</span>
@@ -256,7 +295,7 @@ export default function CollectionScreen() {
               onClick={() => select(i)}
             >
               <span className="wind-item-image">
-                <ItemArt item={i} />
+                <ItemArt item={i} look={look} />
                 {selected === i.id && (
                   <i>
                     <WindIcon name="check" />

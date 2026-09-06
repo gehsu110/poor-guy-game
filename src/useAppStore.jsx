@@ -402,13 +402,14 @@ export function AppProvider({ children }) {
     [updateGame],
   );
   const buy = useCallback(
-    (id, equipAfter = false) =>
+    (id, equipAfter = false, trialLook) =>
       updateGame(
         (profile) => {
           return (equipAfter ? purchaseAndEquip : purchase)(
             profile,
             id,
             crypto.randomUUID(),
+            trialLook,
           );
         },
         equipAfter

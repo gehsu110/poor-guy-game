@@ -1,4 +1,5 @@
 export const SLOTS = [
+  { id: "body", label: "角色" },
   { id: "hair", label: "髮型" },
   { id: "top", label: "上衣" },
   { id: "bottom", label: "下身" },
@@ -9,9 +10,24 @@ export const SLOTS = [
 ];
 export const ITEMS = [
   {
+    id: "body_female",
+    slot: "body",
+    name: "女生旅人",
+    starter: true,
+    artReady: true,
+  },
+  {
+    id: "body_male",
+    slot: "body",
+    name: "男生旅人",
+    starter: true,
+    artReady: true,
+  },
+  {
     id: "hair_chestnut",
     slot: "hair",
     name: "栗色短髮",
+    artReady: true,
     look: "short",
     starter: true,
     desc: "被庭院微風吹亂的柔軟短髮。",
@@ -19,10 +35,11 @@ export const ITEMS = [
   {
     id: "hair_braid",
     slot: "hair",
-    name: "可可雙辮",
+    name: "可可編髮",
+    artReady: true,
     look: "braid",
     starter: true,
-    desc: "繫上小緞帶，帶著好心情出門。",
+    desc: "女生是編髮盤髮，男生是側編束髮；帽飾可以繼續搭配。",
   },
   {
     id: "top_mint",
@@ -160,8 +177,11 @@ export const ITEMS = [
 export const ITEM_BY_ID = Object.fromEntries(
   ITEMS.map((item) => [item.id, { currency: "yellow", ...item }]),
 );
-export const DISPLAY_ITEMS = ITEMS.filter((item) => item.artReady);
+export const DISPLAY_ITEMS = ITEMS.filter(
+  (item) => item.artReady && item.slot !== "body",
+);
 export const DISPLAY_SLOTS = [
+  { id: "hair", label: "髮型" },
   { id: "top", label: "套裝" },
   { id: "hat", label: "帽飾" },
   { id: "prop", label: "隨身物" },
@@ -172,6 +192,7 @@ const LEGACY_EQUIVALENTS = {
   friend_owl: "storybook_ledger_owl",
 };
 export const DEFAULT_LOOK = {
+  body: "body_female",
   hair: "hair_chestnut",
   top: "top_mint",
   bottom: "bottom_shorts",
@@ -242,10 +263,19 @@ export function purchase(profile, id, operationId) {
 }
 
 // Purchase and equipment share one repository transaction; retries never charge twice.
-export function purchaseAndEquip(profile, id, operationId) {
+export function ownedPreviewLook(profile, trialLook) {
+  const saved = normalizeLook(profile.equipped?.layered);
+  return Object.fromEntries(
+    Object.entries(normalizeLook(trialLook)).map(([slot, id]) => [
+      slot,
+      !id || owns(profile, id) ? id : saved[slot],
+    ]),
+  );
+}
+export function purchaseAndEquip(profile, id, operationId, trialLook) {
   const purchased = purchase(profile, id, operationId);
   return equipLook(purchased, {
-    ...profile.equipped.layered,
+    ...ownedPreviewLook(purchased, trialLook ?? profile.equipped.layered),
     [ITEM_BY_ID[id].slot]: id,
   });
 }

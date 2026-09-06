@@ -75,3 +75,54 @@ test("a real accessory purchase preserves outfit, charges once, and cannot be eq
   assert.equal(removed.equipped.layered.prop, null);
   assert.equal(profile.stars.yellow, 20);
 });
+
+test("existing saves keep their look while either traveler and hairstyle survive reload without extra charges", () => {
+  const original = fresh();
+  assert.equal(original.equipped.layered.body, "body_female");
+  for (const body of ["body_female", "body_male"])
+    for (const hair of ["hair_chestnut", "hair_braid"]) {
+      const worn = equipLook(original, {
+        ...original.equipped.layered,
+        body,
+        hair,
+        top: "top_starlight",
+        hat: null,
+      });
+      const reloaded = initializeJourney(
+        JSON.parse(JSON.stringify(worn)),
+        {},
+        "2026-09-07",
+      );
+      assert.equal(reloaded.equipped.layered.body, body);
+      assert.equal(reloaded.equipped.layered.hair, hair);
+      assert.equal(reloaded.equipped.layered.top, "top_starlight");
+      assert.equal(reloaded.equipped.layered.hat, null);
+      assert.deepEqual(reloaded.stars, original.stars);
+      assert.deepEqual(reloaded.collection, original.collection);
+    }
+  assert.equal(normalizeLook({ body: "top_starlight" }).body, "body_female");
+});
+
+test("buying an accessory keeps owned trial choices but never equips another unpaid item", () => {
+  const profile = fresh();
+  const trial = {
+    ...profile.equipped.layered,
+    body: "body_male",
+    hair: "hair_braid",
+    hat: "hat_ribbon",
+    prop: "prop_satchel",
+    companion: "friend_cat",
+  };
+  const bought = purchaseAndEquip(profile, "prop_satchel", "trial-buy", trial);
+  assert.equal(bought.equipped.layered.body, "body_male");
+  assert.equal(bought.equipped.layered.hair, "hair_braid");
+  assert.equal(bought.equipped.layered.hat, "hat_ribbon");
+  assert.equal(bought.equipped.layered.prop, "prop_satchel");
+  assert.equal(bought.equipped.layered.companion, null);
+  assert.equal(bought.stars.yellow, 14);
+  assert.equal(bought.stars.purple, 3);
+  const retry = purchaseAndEquip(bought, "prop_satchel", "trial-retry", trial);
+  assert.equal(retry.stars.yellow, 14);
+  assert.equal(retry.walletLog.length, 1);
+  assert.equal(retry.equipped.layered.companion, null);
+});

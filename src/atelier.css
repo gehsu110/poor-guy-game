@@ -885,19 +885,6 @@
   z-index: 1;
   pointer-events: none;
 }
-.wind-body-motion {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  z-index: 2;
-  opacity: 0;
-  pointer-events: none;
-}
-.wind-body-motion.is-playing {
-  opacity: 1;
-}
 .wind-attachment {
   position: absolute;
   z-index: 3;
@@ -1481,9 +1468,6 @@
   border-radius: 50%;
   filter: blur(3px);
 }
-.wind-paper-doll:has(> .wind-body-motion.is-playing) > .wind-body-image {
-  visibility: hidden;
-}
 @media (min-width: 560px) {
   .wind-look-caption {
     color: #163c59;
@@ -1499,5 +1483,195 @@
   }
   .wind-tray-heading small {
     color: #345c71;
+  }
+}
+
+/* Registered 2D rig: shared waist pivot keeps hands and props together. */
+.wind-rig {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.wind-rig-breath {
+  transform-origin: 850px 1100px;
+}
+.wind-rig[data-motion="on"] .wind-rig-breath {
+  animation: wind-rig-breathe 5s ease-in-out infinite;
+}
+@keyframes wind-rig-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.002, 1.0025);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wind-rig * {
+    animation: none !important;
+  }
+}
+
+.wind-rig-blink {
+  opacity: 0;
+  animation: wind-rig-blink 6.2s step-end infinite;
+}
+.wind-rig[data-motion="on"] .wind-rig-head {
+  animation: wind-rig-nod 7s ease-in-out infinite;
+}
+@keyframes wind-rig-blink {
+  0%,
+  92%,
+  96%,
+  100% {
+    opacity: 0;
+  }
+  93%,
+  95% {
+    opacity: 1;
+  }
+}
+@keyframes wind-rig-nod {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(0.18deg);
+  }
+}
+
+.wind-character-choice {
+  position: absolute;
+  z-index: 6;
+  top: 111px;
+  left: 20px;
+  display: flex;
+  padding: 2px;
+  border-radius: 24px;
+  background: #123e6073;
+  backdrop-filter: blur(12px);
+  border: 1px solid #dcf4ff55;
+}
+.wind-character-choice button {
+  min-height: 40px;
+  min-width: 56px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 21px;
+  background: transparent;
+  color: #e1f2fc;
+  font-size: 12px;
+}
+.wind-character-choice button[aria-pressed="true"] {
+  background: #e3f5f3;
+  color: #183f50;
+}
+.wind-character-choice button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 3px;
+}
+.wind-item--hair .wind-item-image > img,
+.wind-item--hat .wind-item-image > img {
+  position: absolute;
+  width: 165%;
+  max-width: none;
+  height: auto;
+  left: -35%;
+  top: -4%;
+}
+.wind-body-slots {
+  gap: 9px;
+}
+.wind-look-caption {
+  top: 166px;
+}
+@media (min-width: 560px) {
+  .wind-character-choice {
+    left: 32px;
+    top: 116px;
+  }
+  .wind-body-slots {
+    right: 27px;
+    gap: 10px;
+  }
+  .wind-body-slots > button {
+    min-width: 46px;
+  }
+  .wind-body-slots > button > span {
+    width: 42px;
+    height: 42px;
+  }
+  .wind-look-caption {
+    top: 235px;
+  }
+}
+@media (max-width: 559px) {
+  .wind-look-caption {
+    max-width: 42%;
+  }
+  .wind-look-caption h2 {
+    font-size: 22px;
+  }
+  .wind-look-caption > span {
+    font-size: 7px;
+  }
+  .wind-look-caption p {
+    display: none;
+  }
+  .wind-body-slots > button {
+    min-height: 52px;
+  }
+}
+@media (max-width: 559px) and (max-height: 720px) {
+  .wind-character-choice {
+    top: 91px;
+    left: 15px;
+  }
+  .wind-character-choice button {
+    min-width: 47px;
+    min-height: 40px;
+  }
+  .wind-look-caption {
+    top: 141px;
+    left: 17px;
+  }
+  .wind-look-caption h2 {
+    font-size: 19px;
+  }
+  .wind-body-slots {
+    top: 137px;
+    gap: 2px;
+  }
+}
+.wind-inspector-stage .is-closeup .wind-paper-doll {
+  transform: translateX(-50%) scale(2);
+  transform-origin: 50% 0%;
+}
+
+.wind-character-choice button {
+  min-height: 44px;
+}
+@media (max-width: 559px) and (max-height: 720px) {
+  .wind-character-choice button {
+    min-height: 44px;
+  }
+  .wind-body-slots {
+    top: 100px;
+    gap: 4px;
+  }
+  .wind-body-slots > button {
+    min-height: 44px;
+    gap: 0;
+  }
+  .wind-body-slots > button > span {
+    width: 30px;
+    height: 30px;
+  }
+  .wind-body-slots b {
+    font-size: 9px;
+    line-height: 14px;
   }
 }

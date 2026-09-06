@@ -1,0 +1,426 @@
+{
+  "jobs": {
+    "female-ribbon-alpha": {
+      "jobId": "ec1210d3-9c66-4ddc-b2af-2699ecdc1e62",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "female-braid-ribbon-alpha": {
+      "jobId": "72a98acd-7deb-4a8c-b360-f0717a672cd7",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "female-ribbon": {
+      "jobId": "6af3bce4-ba5a-4176-b421-95080ef75a5a",
+      "model": "nano_banana_2",
+      "prompt": "Precise local edit, preserve EXACTLY the reference character face, head angle, expression, chestnut hair color, neck, shoulders, clothes, drawing style, all pixel locations and canvas composition. No zoom, no moving character. Pure white background. Add a small mint teal ribbon hair clip with a tiny gold star center, securely pinned to the hair just above the visible ear on viewer RIGHT. Modest elegant size, follows head perspective and curves, short ribbon tails stay within hair above collar. No other additions.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "male-alpha": {
+      "jobId": "120bb97d-df64-46d0-b2fb-73f54be9bcdd",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "female-beret": {
+      "jobId": "e72eb38a-fa39-4329-881c-6c43b43011be",
+      "model": "nano_banana_2",
+      "prompt": "Precise localized wardrobe edit. Preserve EXACTLY this same character face, chestnut bob hairstyle, head angle, eye gaze, neck, collar, clothing, drawing style, framing and image coordinates. Add a fitted soft IVORY BERET with a small antique gold compass pin. The hat is tilted with the same perspective as the head, snugly fitted around the crown, fabric rests on top of her hair. Keep her face and bangs visible. Realistic wearable beret size only slightly wider than her head, no floating gap, NO large dark underside, no visor, no captain cap. Occlude the top hair naturally under the hat and show contact shadow at the hat band. Pure white unchanged background. Do not zoom or move character, do not redraw clothing.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "female-blink": {
+      "jobId": "20d8b7a4-571b-490e-9b84-96d9431b62cd",
+      "model": "nano_banana_2",
+      "prompt": "Precise local facial expression edit only. Keep EXACT original composition, all pixel positions, framing, head angle, face shape, hair, clothing, color, lighting and line style. No zoom, no changes beyond both eyelids. Close both eyes naturally in a brief relaxed blink; delicate closed eyelid lines and same eyelashes. Mouth remains identical. Not a smile pose.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "female-braid-alpha": {
+      "jobId": "8e9717fb-2a06-4833-a3c0-0acc5d72a06c",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male-braid-ribbon-alpha": {
+      "jobId": "1a5f3221-04a3-42ea-97f7-ffce110fcbe8",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male": {
+      "jobId": "9786aac8-9c43-49f8-bef0-d18c5d892d82",
+      "model": "nano_banana_2",
+      "prompt": "Create the male counterpart of this original young adult anime traveler, in EXACTLY the same high quality crisp anime illustration style, proportions, ivory navy mint palette and soft daylight. A handsome young adult man, short chestnut layered hair, teal eyes, gentle confident expression. Athletic slender natural male proportions, full length navy tailored trousers and elegant navy gold boots, ivory shirt and short mint shoulder cape, restrained gold compass accents. Full body including boots, front three-quarter pose with his LEFT hand resting on his hip (on viewer RIGHT), other arm relaxed down. NO hat, no bag, no book. Preserve the exact camera, full body scale, head and foot heights and white 2:3 canvas margins of the reference. One character only, pure white background, original design, no text, no inset.",
+      "aspectRatio": "2:3",
+      "resolution": "2k"
+    },
+    "male-braid-alpha": {
+      "jobId": "71fed91c-e913-4028-8683-ce1c0e04adfc",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male-braid-ribbon": {
+      "jobId": "c9bd9ec2-083f-498c-ad89-57275d332b04",
+      "model": "nano_banana_2",
+      "prompt": "Precise localized edit. Preserve exactly the reference male character face, expression, head angle, braided swept-back hairstyle, neck, clothing, lighting, line style, every pixel position and canvas composition. No zoom or repositioning. Add a SMALL muted teal ribbon hair clip with a tiny gold star center at the temple on viewer RIGHT. Short ribbon tails stay within hair area, correct perspective, elegant modest size. No hat.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "male-braid": {
+      "jobId": "cadcb88a-4532-4000-8b64-f200f2946d80",
+      "model": "nano_banana_2",
+      "prompt": "Precise local edit, preserve EXACTLY the reference character face, head angle, expression, chestnut hair color, neck, shoulders, clothes, drawing style, all pixel locations and canvas composition. No zoom, no moving character. Pure white background. Change only the hairstyle to a handsome swept-back chestnut style with a small braid at the temple and tidy tied knot behind the head. Natural masculine anime hairstyle, keep forehead and eyes visible. All hair is above the collar; no long ponytail. No hat, no hair accessories.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "male-night-alpha": {
+      "jobId": "1a299308-8170-4840-b5e0-1608a53b08c1",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male-beret": {
+      "jobId": "9bbe4a2f-00f0-468d-bd36-24cfd3fc38f0",
+      "model": "nano_banana_2",
+      "prompt": "Precise local edit, preserve EXACTLY the reference character face, head angle, expression, chestnut hair color, neck, shoulders, clothes, drawing style, all pixel locations and canvas composition. No zoom, no moving character. Pure white background. Add a fitted soft ivory BERET with a small antique gold compass pin, snug on the hair crown with correct head perspective and contact shadow. Keep bangs and face visible, subtle thin hat band, no dark underside, no visor, no captain cap.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "male-blink": {
+      "jobId": "697dcf86-cda4-4fce-8a7f-f39aa0c35b92",
+      "model": "nano_banana_2",
+      "prompt": "Precise local facial expression edit only. Keep EXACT original composition, all pixel positions, framing, head angle, face shape, hair, clothing, color, lighting and line style. No zoom, no changes beyond both eyelids. Close both eyes naturally in a brief relaxed blink. Mouth remains identical.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "female-braid": {
+      "jobId": "75db1f48-eb7f-4bcf-8134-0bd2f86b10df",
+      "model": "nano_banana_2",
+      "prompt": "Precise localized hairstyle edit of the supplied original anime portrait. Preserve EXACT same face, eye gaze, eye color, face proportions, expression, head angle, neck, collar, shoulders, lighting, illustration style, framing and ALL image coordinates. Change ONLY the chestnut bob hairstyle into a beautiful compact braided crown updo, natural side swept bangs, two soft tiny face framing locks, woven braid wrapped at the back of the head. Hair must remain within the head area above the collar, no long pigtails. NO hat, NO ribbon, NO accessories added. Keep every clothing pixel and white background composition identical. Do not zoom, do not move, do not crop differently.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "male-braid-beret": {
+      "jobId": "1b489f95-0635-4e3c-9653-11549d0d3ffd",
+      "model": "nano_banana_2",
+      "prompt": "Precise localized edit. Preserve exactly the reference male character face, expression, head angle, braided swept-back hairstyle, neck, clothing, lighting, line style, every pixel position and canvas composition. No zoom or repositioning. Add a fitted soft ivory BERET with a small antique gold compass pin. Hat fits head crown snugly, follows head perspective with subtle contact shadow, no floating gap, NO dark underside, no visor. Keep short braided hairstyle visible below hat.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "male-braid-blink": {
+      "jobId": "ef699366-97d5-4493-9f3e-3181a5619ae3",
+      "model": "nano_banana_2",
+      "prompt": "Precise local facial expression edit ONLY: close both eyes in a relaxed natural blink, keep mouth unchanged. Preserve exact head angle, braided hairstyle, face proportions, neck, clothes, lighting, all image pixel coordinates, framing and white background. No zoom, no moving, no changes except eyelids and eyelashes.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "female-braid-beret": {
+      "jobId": "4746329d-d120-477d-97fb-8fcf5682de78",
+      "model": "nano_banana_2",
+      "prompt": "Precise local edit, preserve EXACTLY the reference character face, head angle, expression, chestnut hair color, neck, shoulders, clothes, drawing style, all pixel locations and canvas composition. No zoom, no moving character. Pure white background. Add a fitted soft ivory BERET with a small antique gold compass pin, snug on the hair crown with correct head perspective and contact shadow. Keep bangs and face visible, subtle thin hat band, no dark underside, no visor, no captain cap. Preserve the braided crown updo hairstyle below the hat.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "female-braid-blink": {
+      "jobId": "66e1d8bf-0730-417e-889a-145c6977e880",
+      "model": "nano_banana_2",
+      "prompt": "Precise local facial expression edit ONLY: close both eyes in a relaxed natural blink, keep mouth unchanged. Preserve exact head angle, braided hairstyle, face proportions, neck, clothes, lighting, all image pixel coordinates, framing and white background. No zoom, no moving, no changes except eyelids and eyelashes.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "female-braid-ribbon": {
+      "jobId": "e316a307-1db5-464b-bd6f-0048310de223",
+      "model": "nano_banana_2",
+      "prompt": "Precise local edit, preserve EXACTLY the reference character face, head angle, expression, chestnut hair color, neck, shoulders, clothes, drawing style, all pixel locations and canvas composition. No zoom, no moving character. Pure white background. Add a small mint teal ribbon hair clip with a tiny gold star center, securely pinned to the hair just above the visible ear on viewer RIGHT. Modest elegant size, follows head perspective and curves, short ribbon tails stay within hair above collar. No other additions. Preserve the braided crown updo hairstyle.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    },
+    "female-braid-beret-alpha": {
+      "jobId": "db3a77ea-cb37-4036-98cf-47e41a01d5df",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "female-beret-alpha": {
+      "jobId": "7a9ee631-9398-49f0-b964-e8c582f38821",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male-ribbon-alpha": {
+      "jobId": "6ea47521-23c3-4426-838d-45fae8f34224",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male-beret-alpha": {
+      "jobId": "6f821e3c-1bba-4c4c-9441-139a1b364761",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male-night": {
+      "jobId": "df634b32-daf6-437c-a7e0-c01cf0042a8a",
+      "model": "nano_banana_2",
+      "prompt": "Change ONLY the outfit of this SAME original young adult male anime traveler. Preserve exact face, hair, body proportions, pose including left hand on hip on viewer RIGHT, camera framing, lighting and white background. Replace mint outfit with an elegant midnight navy formal adventurer ensemble: tailored navy high collar long split tail coat, refined gold embroidery and compass details, ivory inner shirt, dark fitted trousers, navy gold boots. Color and art quality matches female Wind Atelier evening outfit. No cape, no hat, no book, no bag. Full body, entire boots visible, exactly same canvas coordinates.",
+      "aspectRatio": "2:3",
+      "resolution": "2k"
+    },
+    "male-braid-beret-alpha": {
+      "jobId": "6a26185d-dece-4e3e-ad90-33402462361e",
+      "model": "image_background_remover",
+      "prompt": null,
+      "aspectRatio": null,
+      "resolution": null
+    },
+    "male-ribbon": {
+      "jobId": "46bef9c8-ef47-475e-b3c4-19e21608fba7",
+      "model": "nano_banana_2",
+      "prompt": "Precise local facial expression edit only. Keep EXACT original composition, all pixel positions, framing, head angle, face shape, hair, clothing, color, lighting and line style. No zoom, no changes beyond both eyelids. Keep eyes open. Add a SMALL muted teal ribbon clip with a tiny gold star center securely attached to hair at the temple on viewer RIGHT. Very short ribbon tails, elegant modest size, follows head perspective. No hat.",
+      "aspectRatio": "4:3",
+      "resolution": "2k"
+    }
+  },
+  "registration": {
+    "female-beret": {
+      "matches": 185,
+      "inliers": 169,
+      "matrix": [
+        [
+          0.9972262015607412,
+          0.00032637160997571685,
+          1.074062981554481
+        ],
+        [
+          -0.00032637160997571685,
+          0.9972262015607412,
+          0.7946700208975279
+        ]
+      ]
+    },
+    "female-braid": {
+      "matches": 137,
+      "inliers": 119,
+      "matrix": [
+        [
+          0.9959833057980336,
+          0.0001038567021987459,
+          1.5965491166609416
+        ],
+        [
+          -0.0001038567021987459,
+          0.9959833057980336,
+          1.1867043314423116
+        ]
+      ]
+    },
+    "female-ribbon": {
+      "matches": 180,
+      "inliers": 169,
+      "matrix": [
+        [
+          0.9971477436130084,
+          0.0002721207268656512,
+          1.1491116505380454
+        ],
+        [
+          -0.0002721207268656512,
+          0.9971477436130084,
+          0.8236559200053549
+        ]
+      ]
+    },
+    "female-braid-beret": {
+      "matches": 119,
+      "inliers": 104,
+      "matrix": [
+        [
+          0.995109362570635,
+          0.00037068012821867295,
+          1.5152429447627298
+        ],
+        [
+          -0.00037068012821867295,
+          0.995109362570635,
+          1.1759412312009556
+        ]
+      ]
+    },
+    "female-braid-ribbon": {
+      "matches": 121,
+      "inliers": 93,
+      "matrix": [
+        [
+          0.9953456519630753,
+          0.0011104977968046234,
+          1.0004077747552487
+        ],
+        [
+          -0.0011104977968046234,
+          0.9953456519630753,
+          1.4418669425921273
+        ]
+      ]
+    },
+    "male-beret": {
+      "matches": 253,
+      "inliers": 240,
+      "matrix": [
+        [
+          0.996140787586634,
+          0.0005165923930947125,
+          1.4413269785312295
+        ],
+        [
+          -0.0005165923930947125,
+          0.996140787586634,
+          1.2934216978513602
+        ]
+      ]
+    },
+    "male-braid": {
+      "matches": 167,
+      "inliers": 146,
+      "matrix": [
+        [
+          0.9977753387956807,
+          0.0013197988634093306,
+          0.33380629494176395
+        ],
+        [
+          -0.0013197988634093306,
+          0.9977753387956807,
+          0.8866907695741113
+        ]
+      ]
+    },
+    "male-ribbon": {
+      "matches": 206,
+      "inliers": 176,
+      "matrix": [
+        [
+          0.9983354607524545,
+          0.0004208803735321642,
+          0.5730761435788359
+        ],
+        [
+          -0.0004208803735321642,
+          0.9983354607524545,
+          0.20361443800381326
+        ]
+      ]
+    },
+    "female-blink": {
+      "matches": 156,
+      "inliers": 134,
+      "matrix": [
+        [
+          0.9975811573661137,
+          -0.0006884032750421149,
+          1.4463963221261635
+        ],
+        [
+          0.0006884032750421149,
+          0.9975811573661137,
+          0.11486599353320126
+        ]
+      ]
+    },
+    "male-blink": {
+      "matches": 218,
+      "inliers": 193,
+      "matrix": [
+        [
+          0.9971846248088722,
+          0.0005374083292018951,
+          1.0195197876014115
+        ],
+        [
+          -0.0005374083292018951,
+          0.9971846248088722,
+          0.8488734443217307
+        ]
+      ]
+    },
+    "male-braid-beret": {
+      "matches": 138,
+      "inliers": 114,
+      "matrix": [
+        [
+          0.9957039211898008,
+          0.0017287545888081757,
+          0.6663182101046113
+        ],
+        [
+          -0.0017287545888081757,
+          0.9957039211898008,
+          1.5872599705201693
+        ]
+      ]
+    },
+    "male-braid-ribbon": {
+      "matches": 140,
+      "inliers": 111,
+      "matrix": [
+        [
+          0.9968231986781745,
+          0.0014390829781598653,
+          0.3209777655680624
+        ],
+        [
+          -0.0014390829781598653,
+          0.9968231986781745,
+          0.8018152965926448
+        ]
+      ]
+    },
+    "female-braid-blink": {
+      "matches": 80,
+      "inliers": 65,
+      "matrix": [
+        [
+          0.9958991719800886,
+          -0.0008873520178451447,
+          1.7377329963400823
+        ],
+        [
+          0.0008873520178451447,
+          0.9958991719800886,
+          0.20183396530045392
+        ]
+      ]
+    },
+    "male-braid-blink": {
+      "matches": 122,
+      "inliers": 104,
+      "matrix": [
+        [
+          0.9963056138243627,
+          0.001386642945355588,
+          0.6292902785817867
+        ],
+        [
+          -0.001386642945355588,
+          0.9963056138243627,
+          1.0027805679168504
+        ]
+      ]
+    }
+  }
+}

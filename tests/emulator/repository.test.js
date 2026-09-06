@@ -249,7 +249,12 @@ test("purchase-and-equip retries commit one debit with the worn outfit", async (
       gameTransaction(
         uid,
         (profile, record) => ({
-          profile: purchaseAndEquip(profile, "top_starlight", id),
+          profile: purchaseAndEquip(profile, "top_starlight", id, {
+            ...profile.equipped.layered,
+            body: "body_male",
+            hair: "hair_braid",
+            hat: "hat_ribbon",
+          }),
           record,
         }),
         date,
@@ -259,6 +264,9 @@ test("purchase-and-equip retries commit one debit with the worn outfit", async (
   const current = await readGame(uid, date);
   assert.equal(current.profile.stars.yellow, 8);
   assert.equal(current.profile.equipped.layered.top, "top_starlight");
+  assert.equal(current.profile.equipped.layered.body, "body_male");
+  assert.equal(current.profile.equipped.layered.hair, "hair_braid");
+  assert.equal(current.profile.equipped.layered.hat, "hat_ribbon");
   assert.equal(
     current.profile.collection.filter((item) => item.id === "top_starlight")
       .length,

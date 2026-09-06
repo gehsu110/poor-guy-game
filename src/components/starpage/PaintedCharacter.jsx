@@ -1,11 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useReducedMotion } from "framer-motion";
-import {
-  ATELIER_OUTFITS,
-  ATELIER_ATTACHMENTS,
-  ATELIER_FRIENDS,
-} from "../../atelierAssets";
-import AnimatedLayer from "../atelier/AnimatedLayer";
+import CharacterRig from "../atelier/CharacterRig";
+import { atelierCharacter, ATELIER_FRIENDS } from "../../atelierAssets";
 
 export function LittleFriend({ kind = "owl", className = "" }) {
   return (
@@ -34,9 +30,16 @@ export default function PaintedCharacter({
   closeup = false,
 }) {
   const systemReduced = useReducedMotion();
+  const [visible, setVisible] = useState(() => !document.hidden);
+  useEffect(() => {
+    const sync = () => setVisible(!document.hidden);
+    document.addEventListener("visibilitychange", sync);
+    return () => document.removeEventListener("visibilitychange", sync);
+  }, []);
   const [greeting, setGreeting] = useState(0);
-  const outfit = ATELIER_OUTFITS[look?.top] ?? ATELIER_OUTFITS.top_mint;
+  const outfit = atelierCharacter(look);
   const motion =
+    visible &&
     !reduced &&
     !systemReduced &&
     !staticPreview &&
@@ -45,48 +48,28 @@ export default function PaintedCharacter({
   if (portrait)
     return (
       <div className={`painted-portrait wind-portrait ${className}`}>
-        <img src={outfit.poster} alt="冒險者頭像" draggable="false" />
+        <CharacterRig
+          key={`${outfit.poster}:${outfit.head}`}
+          outfit={outfit}
+          look={look}
+          motion={false}
+          portrait
+        />
       </div>
     );
   return (
     <div
       className={`painted-character wind-character ${closeup ? "is-closeup" : ""} ${className}`}
       data-action={action}
+      data-motion={motion ? "on" : "off"}
     >
       <div className="wind-paper-doll">
-        <img
-          className="wind-body-image"
-          src={outfit.poster}
-          alt="星風旅人"
-          draggable="false"
+        <CharacterRig
+          key={`${outfit.poster}:${outfit.head}`}
+          outfit={outfit}
+          look={look}
+          motion={motion}
         />
-        {outfit.motion && (
-          <AnimatedLayer
-            key={outfit.motion}
-            src={outfit.motion}
-            enabled={motion}
-            transparent
-            className="wind-body-motion"
-          />
-        )}
-        {[look?.hat, look?.prop].map(
-          (id) =>
-            ATELIER_ATTACHMENTS[id] && (
-              <img
-                key={id}
-                className={`wind-attachment wind-attachment--${id}`}
-                src={ATELIER_ATTACHMENTS[id].src}
-                alt=""
-                draggable="false"
-                style={{
-                  left: ATELIER_ATTACHMENTS[id].left,
-                  top: ATELIER_ATTACHMENTS[id].top,
-                  width: ATELIER_ATTACHMENTS[id].width,
-                  rotate: ATELIER_ATTACHMENTS[id].rotate,
-                }}
-              />
-            ),
-        )}
         {(action === "cast" || action === "victory" || successPulse > 0) && (
           <span
             key={`${action}:${successPulse}`}
