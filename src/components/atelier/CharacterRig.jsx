@@ -1,4 +1,6 @@
-import { useId, useState, useEffect } from "react";
+import { useId } from "react";
+import layout from "../../character/wind-rig-layout.json";
+import useCharacterImages from "./useCharacterImages";
 import { ATELIER_ATTACHMENTS } from "../../atelierAssets";
 
 // One source coordinate system: clothing → prop → fingers, and a registered
@@ -10,40 +12,30 @@ export default function CharacterRig({
   portrait = false,
 }) {
   const id = useId().replaceAll(":", "");
-  const [headReady, setHeadReady] = useState(false);
-  useEffect(() => {
-    let active = true;
-    const image = new window.Image();
-    image.src = outfit.head;
-    image
-      .decode()
-      .then(() => {
-        if (active) setHeadReady(true);
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
-  }, [outfit.head]);
-  const prop = ATELIER_ATTACHMENTS[look?.prop];
+  const prop = portrait ? null : ATELIER_ATTACHMENTS[look?.prop];
+  const status = useCharacterImages([outfit.poster, outfit.head, prop?.src]);
+  const ready = status === "ready";
+  const blinkReady =
+    useCharacterImages(motion ? [outfit.blink] : []) === "ready";
+  const { canvas, head: headFrame, portrait: portraitFrame, waistY } = layout;
+  const view = portrait
+    ? `${portraitFrame.x} ${portraitFrame.y} ${portraitFrame.width} ${portraitFrame.height}`
+    : `0 0 ${canvas.width} ${canvas.height}`;
   const { x, y, width, height, angle } = outfit.prop;
   const head = (
-    <g
-      transform="translate(425 65)"
-      visibility={headReady ? "visible" : "hidden"}
-    >
+    <g transform={`translate(${headFrame.x} ${headFrame.y})`}>
       <image
         href={outfit.head}
-        width="800"
-        height="600"
+        width={headFrame.width}
+        height={headFrame.height}
         clipPath={`url(#${id}-head)`}
       />
-      {motion && (
+      {motion && blinkReady && (
         <image
           className="wind-rig-blink"
           href={outfit.blink}
-          width="800"
-          height="600"
+          width={headFrame.width}
+          height={headFrame.height}
           clipPath={`url(#${id}-eyes)`}
         />
       )}
@@ -52,7 +44,7 @@ export default function CharacterRig({
   return (
     <svg
       className="wind-rig"
-      viewBox={portrait ? "625 85 460 480" : "0 0 1696 2528"}
+      viewBox={view}
       role="img"
       aria-label={
         portrait
@@ -61,7 +53,9 @@ export default function CharacterRig({
             ? "男生星風旅人"
             : "女生星風旅人"
       }
-      data-motion={motion ? "on" : "off"}
+      data-motion={ready && motion ? "on" : "off"}
+      data-assets={status}
+      aria-busy={status === "loading"}
     >
       <defs>
         <clipPath id={`${id}-head`}>
@@ -87,38 +81,49 @@ export default function CharacterRig({
           maskUnits="userSpaceOnUse"
           x="0"
           y="0"
-          width="1696"
-          height="2528"
+          width={canvas.width}
+          height={canvas.height}
         >
-          <rect width="1696" height="2528" fill="white" />
+          <rect width={canvas.width} height={canvas.height} fill="white" />
           <path
             d={outfit.headClip}
-            transform="translate(425 65)"
+            transform={`translate(${headFrame.x} ${headFrame.y})`}
             fill="black"
           />
         </mask>
         <clipPath id={`${id}-lower`}>
-          <rect y="1100" width="1696" height="1428" />
+          <rect
+            y={waistY}
+            width={canvas.width}
+            height={canvas.height - waistY}
+          />
         </clipPath>
         <clipPath id={`${id}-upper`}>
-          <rect width="1696" height="1100.5" />
+          <rect width={canvas.width} height={waistY + 0.5} />
         </clipPath>
       </defs>
-      {!portrait && (
+      {!ready && (
+        <image
+          href={outfit.poster}
+          width={canvas.width}
+          height={canvas.height}
+        />
+      )}
+      {ready && !portrait && (
         <>
           <image
             href={outfit.poster}
-            width="1696"
-            height="2528"
+            width={canvas.width}
+            height={canvas.height}
             clipPath={`url(#${id}-lower)`}
           />
           <g className="wind-rig-breath">
             <g clipPath={`url(#${id}-upper)`}>
               <image
                 href={outfit.poster}
-                width="1696"
-                height="2528"
-                mask={headReady ? `url(#${id}-body)` : undefined}
+                width={canvas.width}
+                height={canvas.height}
+                mask={`url(#${id}-body)`}
               />
             </g>
             {prop && (
@@ -134,8 +139,8 @@ export default function CharacterRig({
             {prop && (
               <image
                 href={outfit.poster}
-                width="1696"
-                height="2528"
+                width={canvas.width}
+                height={canvas.height}
                 clipPath={`url(#${id}-hand)`}
               />
             )}
@@ -148,7 +153,8 @@ export default function CharacterRig({
           </g>
         </>
       )}
-      {portrait && head}
+      {ready && portrait && head}
+      {status === "error" && <title>造型暫時無法載入，顯示完整基礎人物</title>}
     </svg>
   );
 }

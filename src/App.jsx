@@ -7,6 +7,7 @@ import { useGameAudio } from "./gameAudio";
 import { parseAmount } from "./progression";
 import { StarNav } from "./components/starpage/Chrome";
 import PaintedCharacter from "./components/starpage/PaintedCharacter";
+import { ATELIER_OUTFITS } from "./atelierAssets";
 import QuickEntry from "./components/starpage/QuickEntry";
 import { WorldBackdrop } from "./components/starpage/WorldUI";
 const HomeScreen = lazy(() => import("./screens/starpage/HomeScreen"));
@@ -31,9 +32,13 @@ const SCREENS = {
 };
 function LoadingScreen() {
   return (
-    <div className="star-loading">
+    <div className="star-loading" role="status" aria-live="polite">
       <div>
-        <PaintedCharacter reduced staticPreview />
+        <img
+          src={ATELIER_OUTFITS.top_mint.poster}
+          alt=""
+          className="star-loading-portrait"
+        />
       </div>
       <p>正在翻開你的故事…</p>
     </div>

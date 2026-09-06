@@ -1,0 +1,7 @@
+{
+  "id": "wind-atelier-v1",
+  "canvas": { "width": 1696, "height": 2528 },
+  "head": { "x": 425, "y": 65, "width": 800, "height": 600 },
+  "portrait": { "x": 625, "y": 85, "width": 460, "height": 480 },
+  "waistY": 1100
+}

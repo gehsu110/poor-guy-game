@@ -16,7 +16,7 @@
 - 髮型有栗色短髮、可可編髮，女生為編髮盤髮，男生為側編束髮。既有 `hair_braid` 識別碼沿用，補上正式圖像。
 - 頭部以同一臉部母版製作：2 角色 × 2 髮型 ×（不戴帽飾／貝雷帽／青葉緞帶）= 12 種配戴圖。它們是**預先繪製的頭部配戴變體**；資料可分別選髮型和帽飾，不宣稱頭髮與帽子有獨立骨架或任意三維遮擋。新服裝不用再生成所有完整人物組合。
 - 動作改為共同腰部支點的微幅呼吸、頭部微幅擺動，以及 4 種髮型各自製作的眨眼。腳底不移動，配件與手部隨同一上身動作；不再播放會自行長出布片的全身生成影片。這仍不是完整行走或戰鬥骨架。
-- 頭圖先用 `Image.decode()` 解碼；完成前保留同一人物的完整身體底圖，避免出現無頭角色。SVG 的快取 `load` 事件不可靠，已改為明確解碼流程。
+- 頭、身體與隨身物一起用 `Image.decode()` 準備，全部完成才切換至分件畫面；準備中或失敗顯示完整人物底圖。眨眼獨立準備，失敗不影響頭身。換裝不沿用上一組素材的完成狀態。載入頁改用完整單張插畫。
 - 首頁、冒險、收藏、頭像和人物細節共用相同部件。近看採靜態高清圖，完整保留帽頂。減少動態、省流量、背景分頁及記帳面板會停用人物待機動作。
 - 兌換並穿上仍為一次資料交易，會保留已擁有的試穿角色、髮型、帽飾；其他尚未取得的試穿品回到存檔造型，不會免費裝備或多扣星幣。
 
@@ -26,7 +26,7 @@
 
 來源母版是上一輪 `hero.png`／`hero-alpha.png` 與 `night.png`／`night-alpha.png`。頭部基準框為原畫布 `(425, 65, 800, 600)`。同臉部／領口特徵以 SIFT 與 RANSAC 做小幅等比座標對正，保留透明圖的相同變換；不是重新繪製身體或縮放配件來掩蓋角度錯誤。手部遮擋由原圖膚色輪廓與手部範圍限制建立，已在放大預覽檢查。
 
-所有 18 張新增 WebP 合計 1,308,026 bytes，位於 `src/assets/academy-art/wind-atelier/rig-*.webp`，2 張完整男生套裝、12 張頭部配戴圖、4 張眨眼來源。頭圖 800 × 600、男生套裝寬 1200；WebP 品質 93。實際使用的靜態圖加入 PWA 預快取，以支援離線換装。
+首輪 18 張新增 WebP 合計 1,308,026 bytes（下方短髮修正後大小有變動），位於 `src/assets/academy-art/wind-atelier/rig-*.webp`，2 張完整男生套裝、12 張頭部配戴圖、4 張眨眼來源。頭圖 800 × 600、男生套裝寬 1200；WebP 品質 93。實際使用的靜態圖加入 PWA 預快取，以支援離線換装。
 
 完整生成提示、成功工作識別碼及座標變換參數見 [製作提示與定位紀錄](./wind-atelier-rig-prompts.json)。生產暫存與檢查影格保留在 `tmp/wind-rig-20260906/`；程式不依賴該目錄。
 
@@ -40,3 +40,23 @@
 - 驗證記帳面板開啟時人物動態停用；減少動態沒有眨眼圖層，呼吸和頭部動畫皆為 `none`，恢復後三種待機動畫正常啟用。原生 637 × 784 預覽最後無 console error／warning，且人物 `<video>` 數量為 0。
 
 - 最終 Git 暫存內容於獨立目錄執行 `npm run check`：ESLint、58 項測試、Vite 建置均通過；PWA 預快取 55 項（5595.11 KiB）。Firestore 模擬器 11 項測試通過。
+
+## 載入頁頭身分離的後續修正
+
+先前「只等待頭圖解碼」沒有修正素材本身的錯誤。原始構圖為 1696 × 2528，但去背輸出已縮為 1373 × 2048；首輪匯出男女短髮時直接套用 `(425, 65, 800, 600)` 裁切，縮小的頭圖被放回原尺寸身體，導致脖子附近明顯斷開。戴帽的註冊變體走另一條製作流程，所以只看戴帽畫面會漏掉問題。
+
+現在短髮頭部由已提交的完整人物 WebP 重製：先恢復共同畫布，再裁切。共同尺寸存於 `src/character/wind-rig-layout.json`，實際 SVG renderer 與 `tools/export_character_crop.py` 同時使用。禁止再用舊暫存 `export.py` 覆蓋新版成品。
+
+可重現指令（在專案根目錄執行，Python 需安裝 Pillow）：
+
+```sh
+python3 tools/export_character_crop.py src/assets/academy-art/wind-atelier/mint.webp src/assets/academy-art/wind-atelier/rig-female-short.webp
+python3 tools/export_character_crop.py src/assets/academy-art/wind-atelier/rig-male.webp src/assets/academy-art/wind-atelier/rig-male-short.webp
+python3 -m unittest discover -s tools -p 'test_character_crop.py'
+```
+
+此修正沒有把 12 種整頭變體變成真正獨立的髮型／帽飾。長期擴充規則另見 [人物擴充規格](./character-extensibility.md)。
+
+本次實機重新整理確認載入頁為完整單張插畫；男女短髮取下帽飾後分別放大檢查領口，男生編髮加帽飾試穿檢查切換，最後還原原存檔造型。驗證只試穿，未購買商品或新增帳目。
+
+本次最終暫存內容在獨立目錄通過 `npm run check`（ESLint、60 項程式測試、Vite 建置）及 3 項 Python 素材裁切測試。PWA 預快取 55 項（5585.71 KiB）。實際瀏覽器還原後的必要素材為 `ready`，console 無錯誤／警告。本次沒有改動資料交易，未重跑 Firestore 模擬器。
