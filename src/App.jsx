@@ -1,212 +1,245 @@
-import { useGameAudio } from './gameAudio'
-import { Component, lazy, Suspense, useEffect, useState } from 'react'
-import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion'
-import { AppProvider, useApp } from './useAppStore'
-import { updateProfile } from './firebase'
-import TownScreen from './screens/TownScreen'
-import { RewardReveal } from './components/AdventureUI'
-import { parseAmount } from './progression'
-import { useRegisterSW } from 'virtual:pwa-register/react'
-const BattleScreen = lazy(() => import('./screens/BattleScreen'))
-const MapScreen = lazy(() => import('./screens/MapScreen'))
-const ShopScreen = lazy(() => import('./screens/ShopScreen'))
-const ProfileScreen = lazy(() => import('./screens/ProfileScreen'))
-const QuestScreen = lazy(() => import('./screens/QuestScreen'))
-const MissionScreen = lazy(() => import('./screens/MissionScreen'))
-import { STORYBOOK_ART } from './storybookAssets'
-
-const SCREEN_MAP = {
-  town:    TownScreen,
-  battle:  BattleScreen,
-  map:     MapScreen,
-  shop:    ShopScreen,
+import { Component, Suspense, lazy, useEffect, useRef, useState } from "react";
+import { MotionConfig, useReducedMotion } from "framer-motion";
+import { createPortal } from "react-dom";
+import { useRegisterSW } from "virtual:pwa-register/react";
+import { AppProvider, useApp } from "./useAppStore";
+import { useGameAudio } from "./gameAudio";
+import { parseAmount } from "./progression";
+import { StarNav } from "./components/starpage/Chrome";
+import PaintedCharacter from "./components/starpage/PaintedCharacter";
+import QuickEntry from "./components/starpage/QuickEntry";
+const HomeScreen = lazy(() => import("./screens/starpage/HomeScreen"));
+const AdventureScreen = lazy(
+  () => import("./screens/starpage/AdventureScreen"),
+);
+const JournalScreen = lazy(() => import("./screens/starpage/JournalScreen"));
+const CollectionScreen = lazy(
+  () => import("./screens/starpage/CollectionScreen"),
+);
+const SettingsScreen = lazy(() => import("./screens/starpage/SettingsScreen"));
+const ProfileScreen = lazy(() => import("./screens/ProfileScreen"));
+const ShopScreen = lazy(() => import("./screens/ShopScreen"));
+const SCREENS = {
+  town: HomeScreen,
+  adventure: AdventureScreen,
+  journal: JournalScreen,
+  collection: CollectionScreen,
+  settings: SettingsScreen,
   profile: ProfileScreen,
-  quest:   QuestScreen,
-  missions: MissionScreen,
-}
-
+  shop: ShopScreen,
+};
 function LoadingScreen() {
   return (
-    <div className="academy-splash">
-      <img src={STORYBOOK_ART.courtyard} alt="" draggable="false" />
-      <div className="academy-splash__shade" />
-      <div className="academy-splash__brand">
-        <div className="academy-splash__mark">
-          <span className="academy-icon academy-icon--star" />
-        </div>
-        <div className="academy-splash__title">窮鬼勇者</div>
-        <div className="academy-splash__sub">記帳打怪，守住預算</div>
+    <div className="star-loading">
+      <div>
+        <PaintedCharacter reduced />
       </div>
-      <motion.div
-        className="academy-splash__loading"
-        animate={{ opacity: [0.4, 1, 0.4] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      >
-        <span />
-        <span />
-        <span />
-      </motion.div>
+      <p>正在翻開你的故事…</p>
     </div>
-  )
+  );
 }
-
-function StarterRegistrationCard({ profile, user, dispatch, refresh }) {
-  const [nameInput, setNameInput] = useState(['窮鬼勇者', '新手勇者'].includes(profile?.playerName) ? '' : (profile?.playerName ?? ''))
-  const [gender, setGender] = useState(profile?.avatarGender ?? 'girl')
-  const [budget, setBudget] = useState(String(profile?.dailyBudget ?? 1000))
-  const [error, setError] = useState('')
-  const [saving, setSaving] = useState(false)
-
-  async function finish() {
-    if (saving) return
-    const dailyBudget = parseAmount(budget)
-    if (!dailyBudget) { setError('請輸入大於 0 的每日預算'); return }
-    setSaving(true)
-    const playerName = nameInput.trim().slice(0, 12) || '新手勇者'
-    const data = {
-      playerName,
-      dailyBudget,
-      avatarGender: gender,
-      nameConfirmed: true,
-      onboardingDone: true,
-    }
-    try {
-      if (user) await updateProfile(user.uid, data)
-      dispatch({ type: 'UPDATE_PROFILE', data })
-      await refresh()
-    } catch (e) { setError(e.message) }
-    finally { setSaving(false) }
-  }
-
+function Onboarding() {
+  const { state, updateGame } = useApp();
+  const [name, setName] = useState("");
+  const [budget, setBudget] = useState(String(state.profile.dailyBudget));
+  const [error, setError] = useState("");
   return (
-    <motion.div
-      className="academy-onboarding"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="academy-onboarding__panel"
-        initial={{ y: 18, scale: 0.98 }}
-        animate={{ y: 0, scale: 1 }}
+    <div className="star-modal-backdrop">
+      <section
+        className="star-entry"
+        role="dialog"
+        aria-modal="true"
+        aria-label="開始星頁旅程"
       >
-        <div className="academy-onboarding__crest">
-          <span className="academy-icon academy-icon--star" />
+        <span className="star-eyebrow">WELCOME TO YOUR LITTLE ADVENTURE</span>
+        <h2>帶著手帳，一起出發。</h2>
+        <div style={{ height: 170, margin: "auto", width: 140 }}>
+          <PaintedCharacter look={state.profile.equipped.layered} />
         </div>
-        <div className="academy-onboarding__kicker">學院登錄處</div>
-        <div className="academy-onboarding__title">建立冒險者資料</div>
-        <div className="academy-onboarding__text">
-          名字會顯示在主畫面與遠征紀錄。主角外觀是角色版本偏好，之後可在設定更換。
-        </div>
-
-        <input
-          className="academy-name-input"
-          value={nameInput}
-          maxLength={12}
-          onChange={e => setNameInput(e.target.value)}
-          aria-label="冒險者名字"
-          placeholder="例如：小小勇者"
-        />
-
-        <div className="academy-onboarding__label">主角外觀</div>
-        <div className="academy-starter-switch">
-          {[
-            { key: 'girl', label: '女主角' },
-            { key: 'boy', label: '男主角' },
-          ].map(option => (
-            <button
-              key={option.key}
-              className={gender === option.key ? 'is-active' : ''}
-              onClick={() => setGender(option.key)}
-            >
-              <span>{option.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <label className="onboarding-budget"><span>每日預算 NT$<small className="block">先選舒服的額度，之後可調整</small></span><input aria-label="每日預算" inputMode="decimal" value={budget} onChange={e => setBudget(e.target.value)} /></label>
-        {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
-        <button className="academy-small-button w-full" disabled={saving} onClick={finish}>
-          開始記帳冒險
-        </button>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-function OnboardingOverlay() {
-  const { state, dispatch, refresh } = useApp()
-  const { profile, user } = state
-
-  if (!profile || profile.nameConfirmed) return null
-
-  return <StarterRegistrationCard profile={profile} user={user} dispatch={dispatch} refresh={refresh} />
-}
-
-function AppContent() {
-  const { state } = useApp()
-  useGameAudio(state.profile?.preferences)
-  const { loading, screen, notification } = state
-  const systemReduced = useReducedMotion()
-  const reduceMotion = !!systemReduced || !!state.profile?.preferences?.reduceMotion
-  useEffect(() => { document.documentElement.classList.toggle('reduce-motion', reduceMotion); return () => document.documentElement.classList.remove('reduce-motion') }, [reduceMotion])
-
-  if (loading) return <LoadingScreen />
-  if (state.error) return <div className="app-recovery"><h1>冒險暫停一下</h1><p>{state.error}</p><button className="journal-primary" onClick={() => location.reload()}>重新連線</button><p>原有存檔仍保留，沒有被清除。</p></div>
-
-  const Screen = SCREEN_MAP[screen] ?? TownScreen
-
-  return (
-    <MotionConfig reducedMotion={reduceMotion ? 'always' : 'never'}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={screen}
-          className="w-full h-full"
-          initial={{ opacity: 0, x: reduceMotion ? 0 : 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: reduceMotion ? 0 : -20 }}
-          transition={{ duration: 0.2 }}
+        <label className="star-field">
+          你的名字
+          <input
+            aria-label="冒險者名字"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="小小旅人"
+            maxLength={12}
+          />
+        </label>
+        <label className="star-field">
+          每日預算 · NT$
+          <input
+            aria-label="每日預算"
+            inputMode="decimal"
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+          />
+        </label>
+        <p className="star-form-hint">
+          先用舒服的額度開始。旅途中慢慢收藏套裝與夥伴，記帳金額不影響戰力。
+        </p>
+        {error && <p role="alert">{error}</p>}
+        <button
+          className="star-button"
+          disabled={state.busy}
+          onClick={() => {
+            const amount = parseAmount(budget);
+            if (!amount) {
+              setError("請輸入有效預算。");
+              return;
+            }
+            updateGame((profile) => ({
+              ...profile,
+              nameConfirmed: true,
+              onboardingDone: true,
+              playerName: name.trim() || "小小旅人",
+              dailyBudget: amount,
+              equipped: {
+                ...profile.equipped,
+                layered: profile.equipped.layered,
+              },
+            }));
+          }}
         >
-          <Suspense fallback={<LoadingScreen />}><Screen /></Suspense>
-        </motion.div>
-      </AnimatePresence>
-      <AnimatePresence>
-        <OnboardingOverlay key="onboarding" />
-        {notification && (
-          <motion.div
-            key="notification"
-            className="academy-toast"
-            role="status" aria-live="polite"
-            initial={{ y: -18, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -18, opacity: 0 }}
-          >
-            {notification.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <RewardReveal />
-      <UpdateNotice />
+          開始我的旅程
+        </button>
+      </section>
+    </div>
+  );
+}
+function Recovery({ message }) {
+  function rawBackup() {
+    const raw = localStorage.getItem("expense-quest:local:v2");
+    if (!raw) return;
+    const url = URL.createObjectURL(
+      new Blob([raw], { type: "application/json" }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "expense-quest-recovery.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  return (
+    <div className="app-recovery">
+      <h1>先把這一頁保留好</h1>
+      <p>{message}</p>
+      <button className="star-button" onClick={() => location.reload()}>
+        重新載入
+      </button>
+      <button className="star-text-button" onClick={rawBackup}>
+        匯出此裝置的原始存檔
+      </button>
+      <p>已保存的資料沒有被清除。</p>
+    </div>
+  );
+}
+function Content() {
+  const { state, navigate } = useApp();
+  useGameAudio(state.profile?.preferences);
+  const systemReduced = useReducedMotion();
+  const reduce = !!systemReduced || !!state.profile?.preferences?.reduceMotion;
+  const scrollRef = useRef(null);
+  const positions = useRef({});
+  const pageKey = `${state.screen}:${state.screenParams.tab ?? ""}`;
+  useEffect(() => {
+    document.documentElement.classList.toggle("reduce-motion", reduce);
+    return () => document.documentElement.classList.remove("reduce-motion");
+  }, [reduce]);
+  useEffect(() => {
+    const scroll = scrollRef.current;
+    if (!scroll) return;
+    scroll.scrollTop = positions.current[pageKey] ?? 0;
+    const saved = positions.current;
+    return () => {
+      saved[pageKey] = scroll.scrollTop;
+    };
+  }, [pageKey, state.loading]);
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (!state.loading) return;
+    const timer = setTimeout(() => setSlow(true), 15000);
+    return () => clearTimeout(timer);
+  }, [state.loading]);
+  if (state.loading)
+    return slow ? (
+      <Recovery message="連線比預期久，請檢查網路後重試。" />
+    ) : (
+      <LoadingScreen />
+    );
+  if (state.error) return <Recovery message={state.error} />;
+  const Screen = SCREENS[state.screen] ?? HomeScreen;
+  const legacy = ["profile", "shop"].includes(state.screen);
+  return (
+    <MotionConfig reducedMotion={reduce ? "always" : "never"}>
+      <div className="star-shell">
+        <div className={legacy ? "star-legacy" : "star-scroll"} ref={scrollRef}>
+          {legacy && (
+            <button
+              className="star-legacy-banner"
+              onClick={() => navigate("collection")}
+            >
+              ← 回星頁收藏 · 舊版造型與票券保留於此
+            </button>
+          )}
+          <Suspense fallback={<LoadingScreen />}>
+            <Screen key={`${pageKey}:${state.screenParams.item ?? ""}`} />
+          </Suspense>
+        </div>
+        <StarNav />
+        {!state.profile.nameConfirmed && <Onboarding />}
+        {state.entryDraft && <QuickEntry key={state.entryDraft.id} />}
+        <UpdateNotice />
+        {state.notification &&
+          createPortal(
+            <div className="star-toast" role="status" aria-live="polite">
+              {state.notification.message}
+            </div>,
+            document.body,
+          )}
+      </div>
     </MotionConfig>
-  )
+  );
 }
-
 function UpdateNotice() {
-  const { needRefresh: [needRefresh], updateServiceWorker } = useRegisterSW()
-  const { state } = useApp()
-  if (!needRefresh || state.screen === 'battle' || state.busy) return null
-  return <div className="pwa-update" role="status"><span>新版本已準備好</span><button onClick={() => updateServiceWorker(true)}>更新遊戲</button></div>
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker,
+  } = useRegisterSW();
+  const { state } = useApp();
+  if (
+    !needRefresh ||
+    state.busy ||
+    state.entryDraft ||
+    state.profile?.journey?.active
+  )
+    return null;
+  return (
+    <div className="pwa-update" role="status">
+      <span>新的一頁已準備好</span>
+      <button onClick={() => updateServiceWorker(true)}>更新遊戲</button>
+    </div>
+  );
 }
-class GameErrorBoundary extends Component {
-  state = { failed: false }
-  static getDerivedStateFromError() { return { failed: true } }
-  render() { return this.state.failed ? <div className="app-recovery"><h1>冒險需要重新整隊</h1><p>畫面載入遇到問題，已保存的資料仍保留。</p><button className="journal-primary" onClick={() => location.reload()}>重新載入</button></div> : this.props.children }
+class ErrorBoundary extends Component {
+  state = { error: null };
+  static getDerivedStateFromError(error) {
+    return { error: error.message };
+  }
+  render() {
+    return this.state.error ? (
+      <Recovery message={this.state.error} />
+    ) : (
+      this.props.children
+    );
+  }
 }
-
 export default function App() {
   return (
-    <GameErrorBoundary><AppProvider>
-      <AppContent />
-    </AppProvider></GameErrorBoundary>
-  )
+    <ErrorBoundary>
+      <AppProvider>
+        <Content />
+      </AppProvider>
+    </ErrorBoundary>
+  );
 }

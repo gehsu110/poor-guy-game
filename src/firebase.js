@@ -6,13 +6,14 @@ import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, linkWi
 import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, documentId, runTransaction } from 'firebase/firestore'
 
 // 請複製 .env.example 為 .env 並填入你的 Firebase 設定
+const runtimeEnv = import.meta.env ?? globalThis.process?.env ?? {}
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey:            runtimeEnv.VITE_FIREBASE_API_KEY,
+  authDomain:        runtimeEnv.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         runtimeEnv.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     runtimeEnv.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: runtimeEnv.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             runtimeEnv.VITE_FIREBASE_APP_ID,
 }
 
 export const firebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId)

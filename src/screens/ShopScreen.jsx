@@ -686,7 +686,7 @@ export default function ShopScreen() {
   const { profile, user, screenParams } = state
   const requestedPaperPart = EXCHANGE_ITEMS.find(item => item.id === screenParams?.previewItemId && item.type === 'paperPart') ?? null
   const [gachaResult, setGachaResult] = useState(null)
-  const [tab, setTab] = useState(screenParams?.tab ?? 'daily')
+  const [tab, setTab] = useState(profile.schemaVersion >= 3 && (!screenParams?.tab || screenParams.tab === 'daily') ? 'gacha' : screenParams?.tab ?? 'daily')
   const [exchangeCategory, setExchangeCategory] = useState(screenParams?.category ?? 'all')
   const [isDrawing, setIsDrawing] = useState(false)
   const shopLock = useRef(false)
@@ -729,6 +729,7 @@ export default function ShopScreen() {
     if (await runShop(fresh => openSupply(fresh, results, isGold))) setGachaResult(results)
   }
   async function claimDailySupply(item) {
+    if (profile.schemaVersion >= 3) return notify('日常星幣已整合到星頁手帳。')
     if (await runShop(fresh => claimShopSupply(fresh, today, item))) notify(`${item.name} 已領取`)
   }
   async function buyExchange(item) {
@@ -766,7 +767,7 @@ export default function ShopScreen() {
           </div>
         </div>
         <div className="academy-tabs academy-shop-tabs mb-3">
-          <button className={tab === 'daily' ? 'is-active' : ''} onClick={() => setTab('daily')}>每日</button>
+          {profile.schemaVersion < 3 && <button className={tab === 'daily' ? 'is-active' : ''} onClick={() => setTab('daily')}>每日</button>}
           <button className={tab === 'gacha' ? 'is-active' : ''} onClick={() => setTab('gacha')}>抽獎</button>
           <button className={tab === 'exchange' ? 'is-active' : ''} onClick={() => setTab('exchange')}>兌換</button>
           <button className={tab === 'collection' ? 'is-active' : ''} onClick={() => setTab('collection')}>收藏</button>

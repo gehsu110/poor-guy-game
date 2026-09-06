@@ -152,10 +152,7 @@ export const DEFAULT_CATEGORIES = [
 
 // ─── 工具 ─────────────────────────────────────────────────────────────────────
 
-export function todayStr() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-}
+export { calendarDate as todayStr } from './game/date.js'
 
 export function formatMoney(n) {
   return n.toLocaleString('zh-TW')
