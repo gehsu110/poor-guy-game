@@ -17,17 +17,24 @@ import {
   RelicIcon,
   WorldDialog,
 } from "../../components/starpage/WorldUI";
+import { STARWIND_THUMBNAILS } from "../../starwindAssets";
+import CharacterInspector from "../../components/starwind/CharacterInspector";
 const TABS = [
   ["wardrobe", "造型"],
   ["shop", "小店"],
   ["catalog", "圖鑑"],
   ["stamps", "旅程印記"],
 ];
-function ItemArt({ item, look }) {
+function ItemArt({ item }) {
   return item.slot === "companion" ? (
     <LittleFriend kind={item.look} />
   ) : (
-    <PaintedCharacter look={{ ...look, [item.slot]: item.id }} reduced />
+    <img
+      className="starwind-item-art"
+      src={STARWIND_THUMBNAILS[item.id]}
+      alt={item.name}
+      draggable="false"
+    />
   );
 }
 export default function CollectionScreen() {
@@ -58,6 +65,7 @@ export default function CollectionScreen() {
   const [selected, setSelected] = useState(initial?.id ?? look[slot]);
   const [greeting, setGreeting] = useState(0);
   const [sourceOpen, setSourceOpen] = useState(false);
+  const [inspecting, setInspecting] = useState(false);
   const item = ITEM_BY_ID[selected],
     friend = ITEM_BY_ID[look.companion];
   const allOwned = Object.values(look).every((id) => !id || owns(profile, id));
@@ -171,13 +179,28 @@ export default function CollectionScreen() {
       <div className="world-fitting-pedestal" aria-hidden="true" />
       <div className="world-fitting-actor">
         <PaintedCharacter
-          key={greeting}
+          staticPreview={inspecting}
+          successPulse={greeting}
           look={look}
           action={greeting ? "greet" : "idle"}
           interactive
+          controls
           reduced={profile.preferences?.reduceMotion}
         />
       </div>
+      <button
+        className="starwind-detail-button"
+        onClick={() => setInspecting(true)}
+      >
+        <span aria-hidden="true">⤢</span>放大查看
+      </button>
+      {inspecting && (
+        <CharacterInspector
+          look={look}
+          reduced={profile.preferences?.reduceMotion}
+          onClose={() => setInspecting(false)}
+        />
+      )}
       {friend && (
         <div className="world-fitting-friend">
           <LittleFriend kind={friend.look} />
@@ -239,19 +262,26 @@ export default function CollectionScreen() {
           </button>
         </div>
         <div className="world-item-strip">
-          {tab === "wardrobe" && slot === "companion" && (
-            <button
-              className="world-item world-item-none"
-              aria-pressed={!look.companion}
-              onClick={() => {
-                setLook((l) => ({ ...l, companion: null }));
-                setSelected(null);
-              }}
-            >
-              <span>＋</span>
-              <strong>獨自出發</strong>
-            </button>
-          )}
+          {tab === "wardrobe" &&
+            ["companion", "hat", "prop"].includes(slot) && (
+              <button
+                className="world-item world-item-none"
+                aria-pressed={!look[slot]}
+                onClick={() => {
+                  setLook((l) => ({ ...l, [slot]: null }));
+                  setSelected(null);
+                }}
+              >
+                <span>＋</span>
+                <strong>
+                  {slot === "hat"
+                    ? "取下帽飾"
+                    : slot === "prop"
+                      ? "不帶隨身物"
+                      : "獨自出發"}
+                </strong>
+              </button>
+            )}
           {visible.map((i) => (
             <button
               key={i.id}
@@ -260,7 +290,7 @@ export default function CollectionScreen() {
               onClick={() => select(i)}
             >
               <div>
-                <ItemArt item={i} look={look} />
+                <ItemArt item={i} />
               </div>
               <strong>{i.name}</strong>
               <small>

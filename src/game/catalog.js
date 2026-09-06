@@ -3,7 +3,7 @@ export const SLOTS = [
   { id: "top", label: "上衣" },
   { id: "bottom", label: "下身" },
   { id: "hat", label: "帽飾" },
-  { id: "prop", label: "手持" },
+  { id: "prop", label: "隨身物" },
   { id: "companion", label: "夥伴" },
   { id: "garden", label: "庭院" },
 ];
@@ -27,7 +27,7 @@ export const ITEMS = [
   {
     id: "top_mint",
     slot: "top",
-    name: "薄荷學徒裝",
+    name: "薄荷旅人套裝",
     artReady: true,
     look: "mint",
     starter: true,
@@ -45,11 +45,11 @@ export const ITEMS = [
   {
     id: "top_starlight",
     slot: "top",
-    name: "晚星制服",
+    name: "晚星禮服套裝",
     artReady: true,
     look: "star",
     cost: 12,
-    desc: "星繡外套、海軍領與百褶褲裙，附寫帳與招呼動作的完整套裝。",
+    desc: "靛藍星繡長外套與奶油裙襬，帽飾和隨身物可以自由搭配。",
   },
   {
     id: "bottom_shorts",
@@ -71,6 +71,7 @@ export const ITEMS = [
     id: "hat_beret",
     slot: "hat",
     name: "奶油貝雷帽",
+    artReady: true,
     look: "beret",
     starter: true,
     desc: "一枚小金星，替每一天留下記號。",
@@ -78,10 +79,11 @@ export const ITEMS = [
   {
     id: "hat_ribbon",
     slot: "hat",
-    name: "梅紫蝴蝶結",
+    name: "青葉緞帶",
+    artReady: true,
     look: "ribbon",
     starter: true,
-    desc: "可以搭配短髮，也能別在雙辮旁。",
+    desc: "青綠緞帶與小金花扣，別在旅人的髮側。",
   },
   {
     id: "hat_leaf",
@@ -95,9 +97,19 @@ export const ITEMS = [
     id: "prop_book",
     slot: "prop",
     name: "星頁手帳",
+    artReady: true,
     look: "book",
     starter: true,
     desc: "收好你的記錄，也收好新的故事。",
+  },
+  {
+    id: "prop_satchel",
+    slot: "prop",
+    name: "栗糖旅行包",
+    artReady: true,
+    look: "satchel",
+    cost: 6,
+    desc: "金扣與栗色皮革的小提包，陪你收藏路上的風景。",
   },
   {
     id: "prop_wand",
@@ -151,6 +163,8 @@ export const ITEM_BY_ID = Object.fromEntries(
 export const DISPLAY_ITEMS = ITEMS.filter((item) => item.artReady);
 export const DISPLAY_SLOTS = [
   { id: "top", label: "套裝" },
+  { id: "hat", label: "帽飾" },
+  { id: "prop", label: "隨身物" },
   { id: "companion", label: "夥伴" },
 ];
 const LEGACY_EQUIVALENTS = {
@@ -178,7 +192,7 @@ export function normalizeLook(look = {}) {
   return Object.fromEntries(
     SLOTS.map(({ id }) => [
       id,
-      look[id] === null && ["hat", "companion", "garden"].includes(id)
+      look[id] === null && ["hat", "prop", "companion", "garden"].includes(id)
         ? null
         : ITEM_BY_ID[look[id]]?.slot === id
           ? look[id]

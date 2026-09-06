@@ -1,6 +1,9 @@
-import StorybookActor from "../StorybookActor";
-import { STORYBOOK_ART, STORYBOOK_OUTFIT_ART } from "../../storybookAssets";
+import { useMemo } from "react";
+import { useReducedMotion } from "framer-motion";
+import { STORYBOOK_ART } from "../../storybookAssets";
+import { STARWIND_OUTFITS, STARWIND_ACCESSORIES } from "../../starwindAssets";
 import { ForestSpirit } from "./IllustratedScene";
+import ModelViewport from "../starwind/ModelViewport";
 
 export function LittleFriend({ kind = "owl", className = "" }) {
   return kind === "cat" ? (
@@ -15,8 +18,7 @@ export function LittleFriend({ kind = "owl", className = "" }) {
   );
 }
 
-// These are complete outfit performances, not interchangeable body parts.
-// The rig prototype stays separate until painted parts meet the same standard.
+// Costumes are complete skinned models. Headwear and props are separate bone attachments.
 export default function PaintedCharacter({
   look,
   action = "idle",
@@ -25,29 +27,51 @@ export default function PaintedCharacter({
   className = "",
   portrait = false,
   successPulse,
+  controls = false,
+  staticPreview = false,
+  closeup = false,
 }) {
-  const outfit = look?.top === "top_starlight" ? "star" : "mint";
+  const preferReduced = useReducedMotion();
+  const outfit = STARWIND_OUTFITS[look?.top] ?? STARWIND_OUTFITS.top_mint;
+  const hat = look?.hat,
+    prop = look?.prop;
+  const accessories = useMemo(
+    () => ({
+      hat: STARWIND_ACCESSORIES[hat],
+      prop: STARWIND_ACCESSORIES[prop],
+    }),
+    [hat, prop],
+  );
   if (portrait)
     return (
-      <div className={`painted-portrait ${className}`}>
-        <img
-          src={STORYBOOK_OUTFIT_ART[outfit].still}
-          alt="冒險者頭像"
-          draggable="false"
-        />
+      <div className={`painted-portrait starwind-portrait ${className}`}>
+        <img src={outfit.portrait} alt="冒險者頭像" draggable="false" />
       </div>
     );
   return (
     <div className={`painted-character ${className}`} data-action={action}>
-      <StorybookActor
-        outfit={outfit}
-        interactive={interactive}
-        reduced={reduced}
-        successPulse={
-          successPulse ||
-          (action === "greet" || action === "victory" ? action : null)
-        }
-      />
+      {staticPreview ? (
+        <img
+          className="starwind-poster"
+          src={outfit.poster}
+          alt="套裝人物預覽"
+          draggable="false"
+        />
+      ) : (
+        <ModelViewport
+          url={outfit.url}
+          accessories={accessories}
+          portrait={closeup}
+          poster={closeup ? outfit.portrait : outfit.poster}
+          interactive={interactive}
+          reduced={reduced || !!preferReduced}
+          greet={
+            successPulse ??
+            (action === "greet" || action === "victory" ? action : 0)
+          }
+          controls={controls}
+        />
+      )}
       {action === "cast" && (
         <span className="painted-book-glow" aria-hidden="true" />
       )}

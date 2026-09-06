@@ -107,6 +107,8 @@ test("collection goals only suggest available, unowned art and support completed
   profile.wishlist = ["missing", "top_courier", "top_starlight"];
   assert.equal(collectionGoal(profile).id, "top_starlight");
   profile.collection.push({ id: "storybook_star_uniform" });
+  assert.equal(collectionGoal(profile).id, "prop_satchel");
+  profile.collection.push({ id: "prop_satchel" });
   assert.equal(collectionGoal(profile).id, "friend_owl");
   profile.collection.push(...DISPLAY_ITEMS.map((item) => ({ id: item.id })));
   assert.equal(collectionGoal(profile), null);

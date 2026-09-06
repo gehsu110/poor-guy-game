@@ -1,0 +1,191 @@
+.starwind-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+}
+.starwind-viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.25s;
+  touch-action: pan-y;
+}
+.starwind-viewport canvas.is-ready {
+  opacity: 1;
+}
+.starwind-viewport[data-interactive="true"] canvas {
+  touch-action: none;
+  cursor: grab;
+}
+.starwind-viewport[data-interactive="true"] canvas:active {
+  cursor: grabbing;
+}
+.starwind-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.starwind-loading {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff9e3;
+  font-size: 12px;
+}
+.starwind-rotation-controls {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: #fff4d2;
+  font-size: 11px;
+  text-shadow: 0 1px 4px #20372f;
+}
+.starwind-rotation-controls button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #e8dbaa8a;
+  background: #263e4599;
+  color: #fff5d5;
+  font-size: 25px;
+}
+.painted-portrait.starwind-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  left: 0;
+  top: 0;
+}
+.starwind-item-art {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.starwind-detail-button {
+  position: absolute;
+  right: 19px;
+  top: 230px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #fff5d5;
+  background: #294147c9;
+  border: 1px solid #d9c69a99;
+  border-radius: 50%;
+  width: 58px;
+  height: 58px;
+  font-size: 11px;
+}
+.starwind-detail-button span {
+  font-size: 20px;
+  line-height: 23px;
+  margin-top: 3px;
+}
+.starwind-inspector {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    #a5b8b4 0%,
+    #567c7d 45%,
+    #203f48 100%
+  );
+  padding: max(18px, env(safe-area-inset-top)) 18px
+    max(18px, env(safe-area-inset-bottom));
+  color: #fff7db;
+}
+.starwind-inspector header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.starwind-inspector h2 {
+  margin: 4px 0;
+  font-size: 23px;
+}
+.starwind-inspector header button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #ecdfb3;
+  border-radius: 50%;
+  background: #25404a66;
+  color: #fff7db;
+  font-size: 24px;
+}
+.starwind-inspector-stage {
+  flex: 1;
+  min-height: 0;
+}
+.starwind-inspector footer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+.starwind-inspector footer button {
+  min-height: 44px;
+  padding: 8px 24px;
+  border: 1px solid #dbc79b;
+  border-radius: 24px;
+  background: #fff5d7;
+  color: #2d4850;
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) {
+  .starwind-viewport canvas {
+    transition: none;
+  }
+}
+.starwind-viewport:before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: 6%;
+  left: 36%;
+  width: 28%;
+  height: 3%;
+  border-radius: 50%;
+  background: #152a2680;
+  filter: blur(5px);
+  pointer-events: none;
+}
+.starwind-poster {
+  padding: 7% 0;
+  box-sizing: border-box;
+}
+.starwind-inspector {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+}
+
+.starwind-viewport[data-portrait="true"]:before {
+  display: none;
+}
+.starwind-viewport canvas:focus-visible {
+  outline: 2px solid #f8db95;
+  outline-offset: -4px;
+  border-radius: 12px;
+}

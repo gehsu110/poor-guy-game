@@ -2384,3 +2384,100 @@
     );
   }
 }
+
+/* Starwind: give the taller character room, instead of shrinking it into a card. */
+.world-town-character {
+  height: 55%;
+  max-height: 540px;
+}
+.world-collection .world-outfit-name {
+  top: 136px;
+}
+.world-collection .world-outfit-name p {
+  display: none;
+}
+.world-collection .world-fitting-actor {
+  top: 185px;
+  bottom: calc(
+    var(--inventory-height, 254px) + 122px + env(safe-area-inset-bottom)
+  );
+  height: auto;
+  max-height: none;
+  width: 90%;
+}
+.world-collection .world-fitting-pedestal {
+  bottom: calc(
+    var(--inventory-height, 254px) + 138px + env(safe-area-inset-bottom)
+  );
+  width: 185px;
+  height: 30px;
+}
+.world-collection .world-slot-switch {
+  gap: 4px;
+}
+.world-collection .world-slot-switch button {
+  min-height: 44px;
+}
+.world-collection .world-item {
+  height: 104px;
+}
+.world-collection .world-item > div {
+  height: 65px;
+}
+.world-collection .world-item-none > span {
+  height: 65px;
+}
+.world-collection .world-inventory {
+  padding-top: 4px;
+}
+.world-collection .world-inventory-head {
+  margin-bottom: 0;
+}
+@media (min-width: 560px) {
+  .world-collection .world-outfit-name {
+    left: 22px;
+    right: auto;
+    top: 145px;
+    text-align: left;
+  }
+  .world-collection .world-inventory {
+    left: auto;
+    width: 250px;
+    bottom: 115px;
+  }
+  .world-collection .world-inventory-head {
+    flex-direction: column;
+    gap: 0;
+  }
+  .world-collection .world-currency-help {
+    min-height: 28px;
+  }
+  .world-collection .world-fitting-actor {
+    left: 29%;
+    width: 58%;
+    top: 195px;
+    bottom: 115px;
+  }
+  .world-collection .world-fitting-pedestal {
+    left: 29%;
+    bottom: 146px;
+  }
+  .world-collection .starwind-detail-button {
+    top: 180px;
+    right: 23px;
+  }
+  .world-collection .world-fitting-greet {
+    top: 275px;
+    right: 23px;
+  }
+  .world-collection .world-fitting-reset {
+    bottom: 110px;
+  }
+}
+@media (max-height: 700px) and (max-width: 559px) {
+  .world-collection .world-fitting-actor {
+    top: 185px;
+    bottom: calc(var(--inventory-height, 254px) + 126px);
+    min-height: 150px;
+  }
+}

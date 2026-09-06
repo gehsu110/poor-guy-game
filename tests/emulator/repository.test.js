@@ -26,7 +26,8 @@ const {
 } = await import("../../src/gameRepository.js");
 const { startJourney, advanceJourney } =
   await import("../../src/game/journey.js");
-const { purchaseAndEquip } = await import("../../src/game/catalog.js");
+const { purchaseAndEquip, equipLook } =
+  await import("../../src/game/catalog.js");
 const { validateBackup } = await import("../../src/game/backup.js");
 const date = "2026-09-06";
 const uid = "alice";
@@ -326,4 +327,51 @@ test("selected scene objects persist and concurrent selection of the same star c
     /已經收好/,
   );
   assert.equal((await readGame(uid, date)).profile.journey.active.hp, 60);
+});
+
+test("independent accessories persist in cloud storage without duplicate charges or restoring a removed prop", async () => {
+  await gameTransaction(
+    uid,
+    (profile, record) => ({
+      profile: { ...profile, stars: { yellow: 20, purple: 1 } },
+      record,
+    }),
+    date,
+  );
+  await Promise.all(
+    [1, 2].map((i) =>
+      gameTransaction(
+        uid,
+        (profile, record) => ({
+          profile: purchaseAndEquip(profile, "prop_satchel", `bag-${i}`),
+          record,
+        }),
+        date,
+      ),
+    ),
+  );
+  let saved = await readGame(uid, date);
+  assert.equal(saved.profile.stars.yellow, 14);
+  assert.equal(
+    saved.profile.collection.filter((i) => i.id === "prop_satchel").length,
+    1,
+  );
+  await gameTransaction(
+    uid,
+    (profile, record) => ({
+      profile: equipLook(profile, {
+        ...profile.equipped.layered,
+        hat: "hat_ribbon",
+        prop: null,
+      }),
+      record,
+    }),
+    date,
+  );
+  await migrateGame(uid, date);
+  saved = await readGame(uid, date);
+  assert.equal(saved.profile.equipped.layered.hat, "hat_ribbon");
+  assert.equal(saved.profile.equipped.layered.prop, null);
+  assert.equal(saved.profile.stars.yellow, 14);
+  assert.equal(saved.expenses.length, 0);
 });

@@ -33,7 +33,7 @@ function LoadingScreen() {
   return (
     <div className="star-loading">
       <div>
-        <PaintedCharacter reduced />
+        <PaintedCharacter reduced staticPreview />
       </div>
       <p>正在翻開你的故事…</p>
     </div>
@@ -55,7 +55,10 @@ function Onboarding() {
         <span className="star-eyebrow">WELCOME TO YOUR LITTLE ADVENTURE</span>
         <h2>帶著手帳，一起出發。</h2>
         <div style={{ height: 170, margin: "auto", width: 140 }}>
-          <PaintedCharacter look={state.profile.equipped.layered} />
+          <PaintedCharacter
+            look={state.profile.equipped.layered}
+            staticPreview
+          />
         </div>
         <label className="star-field">
           你的名字
